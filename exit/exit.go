@@ -29,12 +29,12 @@ const (
 	// ExitUnknownCommand indicates that the user attempted to call a subcommand that is not defined.
 	ExitUnknownCommand ExitCode = 2
 
-	// ExitGeneralArguments indiciates that the user attempted to pass invalid general arguments to the ggman command.
+	// ExitGeneralArguments indiciates that the user attempted to pass invalid general arguments to the program.
 	ExitGeneralArguments ExitCode = 3
-	// ExitCommandArguments indicates that the user attempted to pass invalid command-specific arguments to a ggman subcommand.
+	// ExitCommandArguments indicates that the user attempted to pass invalid command-specific arguments to a subcommand.
 	ExitCommandArguments ExitCode = 4
 
-	// ExitPanic indicates that the go code called panic() inside the executation of the ggman program.
+	// ExitPanic indicates that the go code called panic() inside the executation of the current program.
 	// This typically implies a bug inside a program.
 	ExitPanic ExitCode = 255
 )

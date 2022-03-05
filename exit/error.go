@@ -13,6 +13,11 @@ type Error struct {
 	Message string
 }
 
+// Error returns the error message belonging to this error.
+func (err Error) Error() string {
+	return err.Message
+}
+
 // AsError asserts that err is either nil or of type Error and returns it.
 // When err is nil, the zero value of type Error is returned.
 //
@@ -28,6 +33,7 @@ func AsError(err error) Error {
 }
 
 // WithMessage returns a copy of this error with the same Code but different Message.
+//
 // The new message is the message passed as an argument.
 func (err Error) WithMessage(message string) Error {
 	return Error{
@@ -40,12 +46,4 @@ func (err Error) WithMessage(message string) Error {
 // The new message is the current message, formatted using a call to SPrintf and the arguments.
 func (err Error) WithMessageF(args ...interface{}) Error {
 	return err.WithMessage(fmt.Sprintf(err.Message, args...))
-}
-
-func init() {
-	var _ error = (*Error)(nil)
-}
-
-func (err Error) Error() string {
-	return err.Message
 }
