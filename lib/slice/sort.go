@@ -12,7 +12,7 @@ type Ordered interface {
 		~string
 }
 
-// Sort sorts slice ascendingly according to the < operator.
+// Sort sorts slice ascendingly according to the < operator on T.
 func Sort[T Ordered](s []T) {
 	sort.Sort(slice[T](s))
 }

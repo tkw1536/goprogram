@@ -1,6 +1,7 @@
 package slice
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -149,7 +150,8 @@ func TestCopy(t *testing.T) {
 		args args
 		want []string
 	}{
-		{"empty slice", args{nil}, nil},
+		{"nil slice", args{nil}, nil},
+
 		{"non-empty slice", args{[]string{"a", "b", "c"}}, []string{"a", "b", "c"}},
 	}
 	for _, tt := range tests {
@@ -158,6 +160,103 @@ func TestCopy(t *testing.T) {
 				t.Errorf("Copy() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func ExampleCopy() {
+	// create an "old world" slice
+	old_world := []string{"hello", "old", "world"}
+
+	// make a copy and change old to new
+	new_world := Copy(old_world)
+	new_world[1] = "new"
+
+	// old world remains the same
+	fmt.Println(old_world)
+	fmt.Println(new_world)
+
+	// Output: [hello old world]
+	// [hello new world]
+}
+
+func TestFilterI(t *testing.T) {
+	type args struct {
+		slice []int
+		pred  func(int) bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want []int
+	}{
+		{
+			name: "nil list",
+			args: args{slice: nil, pred: func(i int) bool { panic("never reached") }},
+			want: nil,
+		},
+
+		{
+			name: "true filter",
+			args: args{slice: []int{0, 1, 2, 3}, pred: func(i int) bool { return true }},
+			want: []int{0, 1, 2, 3},
+		},
+		{
+			name: "false filter",
+			args: args{slice: []int{0, 1, 2, 3}, pred: func(i int) bool { return false }},
+			want: []int{},
+		},
+
+		{
+			name: "even filter",
+			args: args{slice: []int{0, 1, 2, 3}, pred: func(i int) bool { return i%2 == 0 }},
+			want: []int{0, 2},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FilterI(tt.args.slice, tt.args.pred); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("FilterI() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func ExampleFilterI() {
+
+	// create a slice and filter it in-place!
+	slice := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+	filtered := FilterI(slice, func(i int) bool { return i%2 == 0 })
+
+	// the filtered slice is as we would expect
+	fmt.Println(filtered)
+
+	// the original slice has been invalidated, elements not used have been zeroed out.
+	fmt.Println(slice)
+
+	// this has invalidated the outer slice
+
+	// because we filtered in place, slice[0:6] is the same as filtered[0:6]
+	// we show this by setting all of slice and printing it again
+	slice[0] = -1
+	slice[1] = -1
+	slice[2] = -1
+	slice[3] = -1
+	slice[4] = -1
+	slice[5] = -1
+	fmt.Println(filtered)
+
+	// Normally one would just
+	//  slice = FilterI(slice, ...)
+	// to prevent accidentally leaking memory.
+
+	// Output: [0 2 4 6 8]
+	// [0 2 4 6 8 0 0 0 0 0]
+	// [-1 -1 -1 -1 -1]
+}
+
+func BenchmarkFilterI(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		FilterI([]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, func(i int) bool { return i%2 == 0 })
 	}
 }
 

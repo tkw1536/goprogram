@@ -1,4 +1,4 @@
-// Package slice contains utility function for slices
+// Package slice implements slice utility functions.
 package slice
 
 // ContainsAny returns true iff at least one needle is contained in haystack.
@@ -13,7 +13,7 @@ func ContainsAny[T comparable](haystack []T, needles ...T) bool {
 	return false
 }
 
-// SliceContainsAny returns true iff at least one predicate matches any of haystack.
+// MatchesAny returns true iff at least one predicate matches any of haystack.
 func MatchesAny[T comparable](haystack []T, predicates ...func(T) bool) bool {
 	for _, hay := range haystack {
 		for _, predicate := range predicates {
@@ -41,7 +41,8 @@ func Equals[T comparable](first, second []T) bool {
 	return true
 }
 
-// Copy returns a copy of the provided slice.
+// Copy returns a new slice which contains the same elements as slice in the same order.
+// When len(slice) is 0, may return nil.
 func Copy[T any](slice []T) []T {
 	if len(slice) == 0 {
 		return nil
@@ -62,6 +63,16 @@ func Copy[T any](slice []T) []T {
 //
 //   s = FilterI(s, pred)
 func FilterI[T any](slice []T, pred func(T) bool) []T {
+	// check that we have a predicate!
+	if pred == nil {
+		panic("FilterI: pred is nil")
+	}
+
+	// when the slice is nil, we have nothing to filter
+	if slice == nil {
+		return nil
+	}
+
 	// create a new result slice
 	result := slice[:0]
 	for _, v := range slice {
@@ -71,11 +82,14 @@ func FilterI[T any](slice []T, pred func(T) bool) []T {
 		result = append(result, v)
 	}
 
-	// zero out all the now unused values of T
-	// this prevents memory leaks
-	var zeroT T
-	for i := len(result); i < len(slice); i++ {
-		slice[i] = zeroT
+	// if we still have some leftover elements we need to prevent memory leaks
+	// so zero out the rest of the slice.
+	if len(result) < len(slice) {
+		// outer if is an optimization to prevent allocation when not needed!
+		var zeroT T
+		for i := len(result); i < len(slice); i++ {
+			slice[i] = zeroT
+		}
 	}
 
 	// and return the result slice!
