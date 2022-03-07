@@ -1,6 +1,7 @@
 package slice
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -26,6 +27,13 @@ func TestSort(t *testing.T) {
 	}
 }
 
+func ExampleSort() {
+	fruits := []string{"strawberry", "coconut", "banana", "apple"}
+	Sort(fruits)
+	fmt.Println(fruits)
+	// Output: [apple banana coconut strawberry]
+}
+
 func TestSortFunc(t *testing.T) {
 	tests := []struct {
 		name  string
@@ -46,4 +54,14 @@ func TestSortFunc(t *testing.T) {
 			}
 		})
 	}
+}
+
+func ExampleSortFunc() {
+	fruits := []string{"strawberry", "coconut", "banana", "apple"}
+	SortFunc(fruits, func(f1, f2 string) bool {
+		// sort by the second letter of the fruit
+		return f1[1] < f2[1]
+	})
+	fmt.Println(fruits)
+	// Output: [banana coconut apple strawberry]
 }

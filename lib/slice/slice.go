@@ -1,4 +1,4 @@
-// Package slice implements slice utility functions.
+// Package slice provides generic slice utility functions
 package slice
 
 // ContainsAny returns true iff at least one needle is contained in haystack.

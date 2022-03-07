@@ -49,6 +49,19 @@ func TestContainsAny(t *testing.T) {
 		})
 	}
 }
+
+func ExampleContainsAny() {
+	fruits := []string{"apple", "banana", "coconut"}
+
+	fmt.Println(ContainsAny(fruits, "apple"))
+	fmt.Println(ContainsAny(fruits, "strawberry"))
+	fmt.Println(ContainsAny(fruits, "apple", "strawberry"))
+
+	// Output: true
+	// false
+	// true
+}
+
 func TestMatchesAny(t *testing.T) {
 
 	// p makes one predicate for each element in haystack
@@ -103,6 +116,18 @@ func TestMatchesAny(t *testing.T) {
 			}
 		})
 	}
+}
+
+func ExampleMatchesAny() {
+	fruits := []string{"apple", "banana", "coconut"}
+
+	fmt.Println(MatchesAny(fruits, func(s string) bool { return s[0] == 'a' }))
+	fmt.Println(MatchesAny(fruits, func(s string) bool { return s[0] == 's' }))
+	fmt.Println(MatchesAny(fruits, func(s string) bool { return s[0] == 'a' }, func(s string) bool { return s[0] == 's' }))
+
+	// Output: true
+	// false
+	// true
 }
 
 func TestEquals(t *testing.T) {
@@ -233,9 +258,7 @@ func ExampleFilterI() {
 	// the original slice has been invalidated, elements not used have been zeroed out.
 	fmt.Println(slice)
 
-	// this has invalidated the outer slice
-
-	// because we filtered in place, slice[0:6] is the same as filtered[0:6]
+	// because we filtered in place, slice[0:6] refers to the same underlying array as filtered[0:6]
 	// we show this by setting all of slice and printing it again
 	slice[0] = -1
 	slice[1] = -1
