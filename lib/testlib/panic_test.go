@@ -1,3 +1,4 @@
+// Package testlib contains functions useful for testing
 package testlib
 
 import (

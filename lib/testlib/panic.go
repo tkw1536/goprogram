@@ -1,3 +1,4 @@
+// Package testlib provides utilities for testing
 package testlib
 
 // DoesPanic runs f and checks if it panicked or not.
