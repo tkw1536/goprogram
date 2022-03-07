@@ -487,7 +487,7 @@ func TestProgram_Main(t *testing.T) {
 
 			// wrap if requested
 			if tt.wrapOut {
-				tt.wantStdout = wrap.WrapString(wrapLength, tt.wantStdout)
+				tt.wantStdout = wrap.String(wrapLength, tt.wantStdout)
 			}
 
 			if gotStdout != tt.wantStdout {
@@ -496,7 +496,7 @@ func TestProgram_Main(t *testing.T) {
 
 			// wrap if requested
 			if tt.wrapError {
-				tt.wantStderr = wrap.WrapString(wrapLength, tt.wantStderr)
+				tt.wantStderr = wrap.String(wrapLength, tt.wantStderr)
 			}
 
 			if gotStderr != tt.wantStderr {

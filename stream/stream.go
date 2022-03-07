@@ -73,7 +73,7 @@ var newLine = []byte("\n")
 //  io.Stdout.Write([]byte(s + "\n"))
 // but wrapped at a reasonable length
 func (io IOStream) StdoutWriteWrap(s string) (int, error) {
-	n, err := wrap.WriteString(io.Stdout, io.wrap, s)
+	n, err := wrap.Write(io.Stdout, io.wrap, s)
 	if err != nil {
 		return n, err
 	}
@@ -86,7 +86,7 @@ func (io IOStream) StdoutWriteWrap(s string) (int, error) {
 //  io.Stdout.Write([]byte(s + "\n"))
 // but wrapped at length Wrap.
 func (io IOStream) StderrWriteWrap(s string) (int, error) {
-	n, err := wrap.WriteString(io.Stderr, io.wrap, s)
+	n, err := wrap.Write(io.Stderr, io.wrap, s)
 	if err != nil {
 		return n, err
 	}
