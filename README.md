@@ -4,3 +4,9 @@
 
 A go 1.18 package to create programs, originally designed for [ggman](https://github.com/tkw1536/ggman).
 Documentation is a work in progress.
+
+## Changelog
+
+# 0.0.1 (Released [Mar 9 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.1))
+
+- initial release
