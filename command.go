@@ -85,9 +85,9 @@ type Requirement[F any] interface {
 // It calls the BeforeRegister method on c, and then register.
 //
 // It expects that the command does not have a name that is already taken.
-func (p *Program[R, P, Flags, Requirements]) Register(c Command[R, P, Flags, Requirements]) {
+func (p *Program[E, P, F, R]) Register(c Command[E, P, F, R]) {
 	if p.commands == nil {
-		p.commands = make(map[string]Command[R, P, Flags, Requirements])
+		p.commands = make(map[string]Command[E, P, F, R])
 	}
 
 	c.BeforeRegister(p)

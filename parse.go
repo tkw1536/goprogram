@@ -25,7 +25,7 @@ var errParseArgsUnknownError = exit.Error{
 // Any flags are just returned as unparsed positionals.
 //
 // When parsing fails, returns an error of type Error.
-func (args *Arguments[Flags]) parseP(argv []string) error {
+func (args *Arguments[F]) parseP(argv []string) error {
 	var err error
 
 	parser := flags.NewParser(args, flags.PassAfterNonOption|flags.PassDoubleDash)
