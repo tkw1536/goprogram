@@ -5,8 +5,8 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/tkw1536/goprogram/exit"
-	"github.com/tkw1536/goprogram/lib/slice"
 	"github.com/tkw1536/goprogram/meta"
+	"golang.org/x/exp/slices"
 )
 
 // Command represents a command associated with a program.
@@ -107,7 +107,7 @@ func (p Program[E, P, F, R]) Commands() []string {
 	for cmd := range p.commands {
 		commands = append(commands, cmd)
 	}
-	slice.Sort(commands)
+	slices.Sort(commands)
 	return commands
 }
 

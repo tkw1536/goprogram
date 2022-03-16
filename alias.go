@@ -1,8 +1,6 @@
 package goprogram
 
-import (
-	"github.com/tkw1536/goprogram/lib/slice"
-)
+import "golang.org/x/exp/slices"
 
 // Alias represents an alias for a command.
 //
@@ -65,6 +63,6 @@ func (p Program[E, P, F, R]) Aliases() []string {
 	for alias := range p.aliases {
 		aliases = append(aliases, alias)
 	}
-	slice.Sort(aliases)
+	slices.Sort(aliases)
 	return aliases
 }

@@ -1,13 +1,18 @@
 // Package slice provides generic slice utility functions
 package slice
 
+import (
+	"golang.org/x/exp/constraints"
+	"golang.org/x/exp/slices"
+)
+
 // ContainsAny returns true iff at least one needle is contained in haystack.
+//
+// When called with only one needle, use "golang.org/x/exp/slices".Contains instead.
 func ContainsAny[T comparable](haystack []T, needles ...T) bool {
-	for _, hay := range haystack {
-		for _, needle := range needles {
-			if hay == needle {
-				return true
-			}
+	for _, needle := range needles {
+		if slices.Contains(haystack, needle) {
+			return true
 		}
 	}
 	return false
@@ -23,22 +28,6 @@ func MatchesAny[T comparable](haystack []T, predicates ...func(T) bool) bool {
 		}
 	}
 	return false
-}
-
-// Equals checks if the first and second slice are equal.
-//
-// Two slices are considered equal when all elements are equal and occur in the same order.
-// Unlike reflect.DeepEqual, this considers any slices of zero length equal.
-func Equals[T comparable](first, second []T) bool {
-	if len(first) != len(second) {
-		return false
-	}
-	for idx, value := range first {
-		if value != second[idx] {
-			return false
-		}
-	}
-	return true
 }
 
 // Copy returns a new slice which contains the same elements as slice in the same order.
@@ -118,23 +107,7 @@ func RemoveZeros[T comparable](s []T) []T {
 //
 //  s = RemoveDuplicates(s)
 //
-func RemoveDuplicates[T Ordered](s []T) []T {
-	if len(s) == 0 {
-		return s
-	}
-
-	// adapted from https://github.com/golang/go/wiki/SliceTricks#in-place-deduplicate-comparable
-	Sort(s)
-
-	j := 0
-	for i := 1; i < len(s); i++ {
-		if s[j] == s[i] {
-			continue
-		}
-		j++
-
-		s[j] = s[i]
-	}
-
-	return s[:j+1]
+func RemoveDuplicates[T constraints.Ordered](s []T) []T {
+	slices.Sort(s)
+	return slices.Compact(s)
 }
