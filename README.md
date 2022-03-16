@@ -7,6 +7,11 @@ Documentation is a work in progress.
 
 ## Changelog
 
+# 0.0.2 (Released [Mar 16 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.2))
+
+- use `golang.org/x/exp/slices` package
+- name type parameters consistently
+
 # 0.0.1 (Released [Mar 9 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.1))
 
 - initial release
