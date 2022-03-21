@@ -6,7 +6,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/tkw1536/goprogram/exit"
-	"github.com/tkw1536/goprogram/lib/slice"
+	"golang.org/x/exp/slices"
 )
 
 var errParseArgsNeedOneArgument = exit.Error{
@@ -109,7 +109,7 @@ func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 
 	// specifically intercept the "--help" and "-h" arguments.
 	// this prevents any kind of side effect from occuring.
-	if slice.ContainsAny(context.Args.Pos, "--help", "-h") {
+	if slices.Contains(context.Args.Pos, "--help") || slices.Contains(context.Args.Pos, "-h") {
 		context.Args.Universals.Help = true
 		return nil
 	}

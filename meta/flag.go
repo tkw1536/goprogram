@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/tkw1536/goprogram/lib/slice"
 	"github.com/tkw1536/goprogram/lib/text"
+	"golang.org/x/exp/slices"
 )
 
 // Flag holds meta-information about a single flag of a command.
@@ -120,12 +120,12 @@ func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces boo
 	}
 
 	// collect long and short arguments and combine them
-	la := slice.Copy(opt.Long)
+	la := slices.Clone(opt.Long)
 	for k, v := range la {
 		la[k] = "--" + v
 	}
 
-	sa := slice.Copy(opt.Short)
+	sa := slices.Clone(opt.Short)
 	for k, v := range sa {
 		sa[k] = "-" + v
 	}
