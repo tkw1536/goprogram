@@ -68,6 +68,8 @@ type Description[F any, R Requirement[F]] struct {
 }
 
 // Requirement describes a requirement on a type of Flags F.
+//
+// A caller may use EmptyRequirement if no such abstraction is desired.
 type Requirement[F any] interface {
 	// AllowsFlag checks if the provided flag may be passed to fullfill this requirement
 	// By default it is used only for help page generation, and may be inaccurate.
@@ -77,9 +79,14 @@ type Requirement[F any] interface {
 	// It should return either nil, or an error of type exit.Error.
 	//
 	// Validate does not take into account AllowsOption, see ValidateAllowedOptions.
-	// TODO: Make this take context
 	Validate(arguments Arguments[F]) error
 }
+
+// EmptyRequirement represents a requirement that allows any flag and validates all arguments
+type EmptyRequirement[F any] struct{}
+
+func (EmptyRequirement[F]) AllowsFlag(meta.Flag) bool   { return true }
+func (EmptyRequirement[F]) Validate(Arguments[F]) error { return nil }
 
 // Register registers a command c with this program.
 // It calls the BeforeRegister method on c, and then register.
