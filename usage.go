@@ -29,7 +29,7 @@ func (p Program[E, P, F, R]) CommandUsage(context Context[E, P, F, R]) meta.Meta
 		Description: context.Description.Description,
 
 		Command:      context.Description.Command,
-		CommandFlags: meta.AllFlags(context.commandParser),
+		CommandFlags: context.parser.Flags(),
 
 		Positional: context.Description.Positional,
 	}

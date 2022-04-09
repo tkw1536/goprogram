@@ -262,7 +262,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:       "'fake' with unknown argument (not allowed)",
 			args:       []string{"fake", "--argument-not-declared"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1, IncludeUnknown: false}},
+			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: false}},
 			wantStdout: "",
 			wantStderr: "Error parsing flags: unknown flag `argument-not-declared'\n",
 			wantCode:   4,
@@ -271,7 +271,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:       "'fake' with unknown argument (allowed)",
 			args:       []string{"fake", "--argument-not-declared"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1, IncludeUnknown: true}},
+			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
 			wantStdout: "Got Flags: { }\nGot Pos: [--argument-not-declared]\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
@@ -320,7 +320,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:       "'fake' with non-global argument with identical name",
 			args:       []string{"--", "fake", "--global-one"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1, IncludeUnknown: true}},
+			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
 			wantStdout: "Got Flags: { }\nGot Pos: [--global-one]\nwrite to stdout\n",
 			wantStderr: "write to stderr\n", //
 			wantCode:   0,
@@ -329,7 +329,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:       "'fake' with parsed short argument",
 			args:       []string{"fake", "-o", "message"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1, IncludeUnknown: true}},
+			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
 			wantStdout: "Got Flags: { }\nGot Pos: []\nmessage\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
@@ -338,7 +338,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:       "'fake' with non-parsed short argument",
 			args:       []string{"fake", "--", "--s", "message"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1, IncludeUnknown: true}},
+			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
 			wantStdout: "Got Flags: { }\nGot Pos: [--s message]\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
@@ -347,7 +347,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:       "'fake' with parsed long argument",
 			args:       []string{"fake", "--stdout", "message"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1, IncludeUnknown: true}},
+			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
 			wantStdout: "Got Flags: { }\nGot Pos: []\nmessage\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
@@ -356,7 +356,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:       "'fake' with non-parsed long argument",
 			args:       []string{"fake", "--", "--stdout", "message"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1, IncludeUnknown: true}},
+			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
 			wantStdout: "Got Flags: { }\nGot Pos: [--stdout message]\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,

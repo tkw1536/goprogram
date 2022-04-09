@@ -1,7 +1,7 @@
 package goprogram
 
 import (
-	"github.com/jessevdk/go-flags"
+	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/stream"
 )
 
@@ -20,8 +20,9 @@ type Context[E any, P any, F any, R Requirement[F]] struct {
 	// Environment holds the environment for this command.
 	Environment E
 
-	// commandParser holds a parser that parsed argument passed to the command itself
-	commandParser *flags.Parser
+	// parser holds a parser for command-specific arguments
+	// this refers to the command itself
+	parser meta.Parser
 }
 
 // Arguments represent a set of command-independent arguments passed to a command.

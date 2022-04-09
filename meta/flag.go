@@ -67,28 +67,12 @@ func NewFlag(option *flags.Option) (flag Flag) {
 	return
 }
 
-// AllFlags returns all flags available to parser.
-//
-// This function is untested.
-func AllFlags(parser *flags.Parser) []Flag {
-	// if there are no flags to be passed, then return immediatly.
-	if parser == nil {
-		return nil
-	}
-
-	// collect all the options
-	var options []*flags.Option
-	groups := parser.Groups()
-	for _, g := range groups {
-		options = append(options, g.Options()...)
-	}
-
-	// turn them into proper flags
-	flags := make([]Flag, len(options))
-	for i, opt := range options {
-		flags[i] = NewFlag(opt)
-	}
-	return flags
+// AllFlags creates a new parser for type T
+// It then returns AllFlags(p)
+func AllFlags[T any]() []Flag {
+	return Parser{
+		parser: flags.NewParser(new(T), flags.None),
+	}.Flags()
 }
 
 // WriteSpecTo writes a short specification of f into w.

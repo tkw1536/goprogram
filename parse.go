@@ -1,11 +1,8 @@
 package goprogram
 
 import (
-	"reflect"
-	"strings"
-
-	"github.com/jessevdk/go-flags"
 	"github.com/tkw1536/goprogram/exit"
+	"github.com/tkw1536/goprogram/meta"
 	"golang.org/x/exp/slices"
 )
 
@@ -28,12 +25,12 @@ var errParseArgsUnknownError = exit.Error{
 func (args *Arguments[F]) parseP(argv []string) error {
 	var err error
 
-	parser := flags.NewParser(args, flags.PassAfterNonOption|flags.PassDoubleDash)
+	parser := meta.NewArgumentsParser(args)
 	args.Pos, err = parser.ParseArgs(argv)
 
 	// intercept unknonw flags
-	if e, ok := err.(*flags.Error); ok && e.Type == flags.ErrUnknownFlag {
-		err = errParseArgsUnknownError.WithMessageF(e.Message)
+	if meta.IsUnknownFlag(err) {
+		err = errParseArgsUnknownError.WithMessageF(err.Error())
 	}
 
 	// store the arguments we got and complain if there are none.
@@ -60,33 +57,6 @@ func (args *Arguments[F]) parseP(argv []string) error {
 	return err
 }
 
-var flagNameCutset = "/-"
-
-// parseFlagNames parses flag names between `' from a flags.Error
-func parseFlagNames(err *flags.Error) (names []string, ok bool) {
-
-	// find the `' delimiters
-	start := strings.IndexRune(err.Message, '`')
-	end := strings.IndexRune(err.Message, '\'')
-
-	// if they can't be found (or aren't in the right order)
-	if start == -1 || end == -1 || start >= end-1 {
-		return
-	}
-
-	// extract the description of the flags
-	description := err.Message[start+1 : end]
-	ok = true
-
-	// trim off the names
-	names = strings.Split(description, ", ")
-	for i, name := range names {
-		names[i] = strings.TrimLeft(name, flagNameCutset)
-	}
-
-	return
-}
-
 // use prepares this context for using the provided command.
 // It expects the context.Arguments object to exist, see the parseP method of Arguments.
 //
@@ -95,17 +65,7 @@ func parseFlagNames(err *flags.Error) (names []string, ok bool) {
 // When parsing fails, returns an error of type Error.
 func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 	context.Description = command.Description()
-
-	// when command is a pointer to a struct, we need to setup a parser for command specific arguments.
-	// this requires knowning about if unknown flags are treated as positional arguments or not.
-	if ptrval := reflect.TypeOf(command); command != nil && ptrval.Kind() == reflect.Ptr && ptrval.Elem().Kind() == reflect.Struct {
-		var options flags.Options = flags.PassDoubleDash | flags.HelpFlag
-		if context.Description.Positional.IncludeUnknown {
-			options |= flags.IgnoreUnknown
-		}
-
-		context.commandParser = flags.NewParser(command, options)
-	}
+	context.parser = context.Description.ParserConfig.NewCommandParser(command)
 
 	// specifically intercept the "--help" and "-h" arguments.
 	// this prevents any kind of side effect from occuring.
@@ -141,13 +101,10 @@ var errParseFlagSet = exit.Error{
 //
 // When an error occurs, returns an error of type Error.
 func (context *Context[E, P, F, R]) parseFlags() (err error) {
-	if context.commandParser == nil {
-		return
-	}
-	context.Args.Pos, err = context.commandParser.ParseArgs(context.Args.Pos)
+	context.Args.Pos, err = context.parser.ParseArgs(context.Args.Pos)
 
 	// catch the help error
-	if flagErr, ok := err.(*flags.Error); ok && flagErr.Type == flags.ErrHelp {
+	if meta.IsHelp(err) {
 		context.Args.Universals.Help = true
 		err = nil
 	}

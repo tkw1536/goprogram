@@ -3,7 +3,6 @@ package goprogram
 import (
 	"reflect"
 
-	"github.com/jessevdk/go-flags"
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/meta"
 	"golang.org/x/exp/slices"
@@ -60,8 +59,8 @@ type Description[F any, R Requirement[F]] struct {
 	Command     string
 	Description string
 
-	// Positional holds information about positional arguments for this command.
-	Positional meta.Positional
+	Positional   meta.Positional   // information about positional arguments
+	ParserConfig meta.ParserConfig // information about how to configure a parser for this command
 
 	// Requirements on the environment to be able to run the command
 	Requirements R
@@ -156,7 +155,7 @@ var errTakesNoArgument = exit.Error{
 func ValidateAllowedFlags[F any](r Requirement[F], args Arguments[F]) error {
 	fVal := reflect.ValueOf(args.Flags)
 
-	for _, flag := range globalFlags[F]() {
+	for _, flag := range meta.AllFlags[F]() {
 		if r.AllowsFlag(flag) {
 			continue
 		}
@@ -175,19 +174,19 @@ func ValidateAllowedFlags[F any](r Requirement[F], args Arguments[F]) error {
 
 }
 
-var universalOpts = meta.AllFlags(flags.NewParser(&Universals{}, flags.None))
+var universalOpts = meta.AllFlags[Universals]()
 
 // globalOptions returns a list of global options for a command with the provided flag type
 func globalOptions[F any]() (flags []meta.Flag) {
 	flags = append(flags, universalOpts...)
-	flags = append(flags, globalFlags[F]()...)
+	flags = append(flags, meta.AllFlags[F]()...)
 	return
 }
 
 // globalFlagsFor returns a list of global options for a command with the provided flag type
 func globalFlagsFor[F any](r Requirement[F]) (flags []meta.Flag) {
 	// filter options to be those that are allowed
-	gFlags := globalFlags[F]()
+	gFlags := meta.AllFlags[F]()
 	n := 0
 	for _, flag := range gFlags {
 		if !r.AllowsFlag(flag) {
@@ -202,9 +201,4 @@ func globalFlagsFor[F any](r Requirement[F]) (flags []meta.Flag) {
 	flags = append(flags, universalOpts...)
 	flags = append(flags, gFlags...)
 	return
-}
-
-// globalFlags returns a list of flags for the provided flag type.
-func globalFlags[F any]() []meta.Flag {
-	return meta.AllFlags(flags.NewParser(new(F), flags.None))
 }

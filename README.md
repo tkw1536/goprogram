@@ -7,6 +7,10 @@ Documentation is a work in progress.
 
 ## Changelog
 
+# 0.0.4 (Upcoming)
+
+- refactor argument parsing
+
 # 0.0.3 (Released [Mar 29 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.3))
 
 - add `EmptyRequirement` struct
