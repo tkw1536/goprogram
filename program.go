@@ -66,19 +66,19 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	context := Context[E, P, F, R]{
 		IOStream: stream,
 	}
-	if err := context.Args.parseP(argv); err != nil {
+	if err := context.Args.parseProgramFlags(argv); err != nil {
 		return err
 	}
 
 	// expand keywords
 	keyword, hasKeyword := p.keywords[context.Args.Command]
 	if hasKeyword {
-		if err := keyword(&context.Args); err != nil {
+		if err := keyword(&context.Args, &context.Args.pos); err != nil {
 			return err
 		}
 	}
 
-	// handle special global flags!
+	// handle universals
 	switch {
 	case context.Args.Universals.Help:
 		stream.StdoutWriteWrap(p.MainUsage().String())
@@ -91,7 +91,7 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	// expand the alias (if any)
 	alias, hasAlias := p.aliases[context.Args.Command]
 	if hasAlias {
-		context.Args.Command, context.Args.Pos = alias.Invoke(context.Args.Pos)
+		context.Args.Command, context.Args.pos = alias.Invoke(context.Args.pos)
 	}
 
 	// load the command if we have it
@@ -116,8 +116,10 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	}
 
 	// call the AfterParse hook
-	if err := command.AfterParse(); err != nil {
-		return err
+	if ap, isAP := command.(AfterParseCommand[E, P, F, R]); isAP {
+		if err := ap.AfterParse(); err != nil {
+			return err
+		}
 	}
 
 	// create the environment

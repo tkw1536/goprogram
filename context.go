@@ -1,7 +1,7 @@
 package goprogram
 
 import (
-	"github.com/tkw1536/goprogram/meta"
+	"github.com/tkw1536/goprogram/parser"
 	"github.com/tkw1536/goprogram/stream"
 )
 
@@ -16,13 +16,12 @@ type Context[E any, P any, F any, R Requirement[F]] struct {
 
 	// Description is the description of the command being invoked
 	Description Description[F, R]
-
 	// Environment holds the environment for this command.
 	Environment E
 
 	// parser holds a parser for command-specific arguments
 	// this refers to the command itself
-	parser meta.Parser
+	parser parser.Parser
 }
 
 // Arguments represent a set of command-independent arguments passed to a command.
@@ -34,7 +33,7 @@ type Arguments[F any] struct {
 	Flags      F          `group:"flags"`
 
 	Command string   // command to run
-	Pos     []string // positional arguments
+	pos     []string // positional arguments
 }
 
 // Universals holds flags added to every executable.

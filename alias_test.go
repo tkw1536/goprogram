@@ -28,7 +28,7 @@ func ExampleAlias() {
 func TestProgram_Alias(t *testing.T) {
 	var p iProgram
 
-	p.Register(tCommand{desc: iDescription{
+	p.Register(tCommand[struct{}]{MDesc: iDescription{
 		Command: "a",
 	}})
 	p.RegisterAlias(Alias{Name: "a", Command: "b", Args: []string{"c"}})

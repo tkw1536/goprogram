@@ -5,6 +5,7 @@ import (
 
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/meta"
+	"github.com/tkw1536/goprogram/parser"
 	"golang.org/x/exp/slices"
 )
 
@@ -44,6 +45,11 @@ type Command[E any, P any, F any, R Requirement[F]] interface {
 	// Description returns a description of this command.
 	// It may be called multiple times.
 	Description() Description[F, R]
+}
+
+// AfterParseCommand represents a command with an AfterParse function
+type AfterParseCommand[E any, P any, F any, R Requirement[F]] interface {
+	Command[E, P, F, R]
 
 	// AfterParse is called after arguments have been parsed, but before the command is being run.
 	// It may perform additional argument checking and should return an error if needed.
@@ -59,8 +65,7 @@ type Description[F any, R Requirement[F]] struct {
 	Command     string
 	Description string
 
-	Positional   meta.Positional   // information about positional arguments
-	ParserConfig meta.ParserConfig // information about how to configure a parser for this command
+	ParserConfig parser.Config // information about how to configure a parser for this command
 
 	// Requirements on the environment to be able to run the command
 	Requirements R
@@ -155,7 +160,7 @@ var errTakesNoArgument = exit.Error{
 func ValidateAllowedFlags[F any](r Requirement[F], args Arguments[F]) error {
 	fVal := reflect.ValueOf(args.Flags)
 
-	for _, flag := range meta.AllFlags[F]() {
+	for _, flag := range parser.AllFlags[F]() {
 		if r.AllowsFlag(flag) {
 			continue
 		}
@@ -174,19 +179,19 @@ func ValidateAllowedFlags[F any](r Requirement[F], args Arguments[F]) error {
 
 }
 
-var universalOpts = meta.AllFlags[Universals]()
+var universalOpts = parser.AllFlags[Universals]()
 
 // globalOptions returns a list of global options for a command with the provided flag type
 func globalOptions[F any]() (flags []meta.Flag) {
 	flags = append(flags, universalOpts...)
-	flags = append(flags, meta.AllFlags[F]()...)
+	flags = append(flags, parser.AllFlags[F]()...)
 	return
 }
 
 // globalFlagsFor returns a list of global options for a command with the provided flag type
 func globalFlagsFor[F any](r Requirement[F]) (flags []meta.Flag) {
 	// filter options to be those that are allowed
-	gFlags := meta.AllFlags[F]()
+	gFlags := parser.AllFlags[F]()
 	n := 0
 	for _, flag := range gFlags {
 		if !r.AllowsFlag(flag) {

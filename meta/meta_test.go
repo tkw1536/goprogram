@@ -88,11 +88,13 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 						Default: "true",
 					},
 				},
-				Positional: Positional{
-					Value:       "op",
-					Description: "Operations to make",
-					Min:         1,
-					Max:         -1,
+				Positionals: []Positional{
+					{
+						Value: "op",
+						Usage: "Operations to make",
+						Min:   1,
+						Max:   -1,
+					},
 				},
 			},
 			"Usage: cmd --global|-g name [--quiet|-q] [--] sub --dud|-d dud [--silent|-s] [--] op [op ...]\n\nDo something local\n\nGlobal Arguments:\n\n   -g, --global name\n      A global argument\n\n   -q, --quiet\n      Be quiet (default false)\n\nCommand Arguments:\n\n   -d, --dud dud\n      A local argument\n\n   -s, --silent\n      Be silent (default true)\n\n   op [op ...]\n      Operations to make",

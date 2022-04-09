@@ -10,13 +10,19 @@ import (
 // Positional holds meta-information about a positional argument.
 type Positional struct {
 	// Name and Description of the positional in help texts
-	Value       string // defaults to "ARGUMENT"
-	Description string
+	Value string // defaults to "ARGUMENT"
+	Usage string
 
 	// Min and Max indicate how many positional arguments are expected for this command.
 	// Min must be >= 0. Max must be either Min, or -1.
 	// Max == -1 inidicates an unlimited number of repeats.
 	Min, Max int
+}
+
+// ValidRange checks if posititional has valid min and max values.
+func (pos Positional) ValidRange() bool {
+	extra := pos.Max - pos.Min
+	return pos.Min >= 0 && (pos.Max <= 0 || extra >= 0)
 }
 
 // defaultPositionalValue is the default name used for a positional argument.
@@ -27,8 +33,8 @@ const defaultPositionalValue = "ARGUMENT"
 func (pos Positional) WriteSpecTo(w io.Writer) {
 	extra := pos.Max - pos.Min
 
-	if pos.Min < 0 || (pos.Max > 0 && extra < 0) { // invalid arguments
-		panic("Positional: negative min or out of range max")
+	if !pos.ValidRange() {
+		panic("Positional: invalid range")
 	}
 
 	if pos.Value == "" {

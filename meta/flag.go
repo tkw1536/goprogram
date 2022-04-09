@@ -2,19 +2,14 @@ package meta
 
 import (
 	"io"
-	"strings"
 
-	"github.com/jessevdk/go-flags"
 	"github.com/tkw1536/goprogram/lib/text"
 	"golang.org/x/exp/slices"
 )
 
 // Flag holds meta-information about a single flag of a command.
-// It is similar to "github.com/jessevdk/go-flags".Flag.
 //
-// Unlike the actual flag, it holds no reflect references, and does not contain an actual value.
-//
-// See also NewFlag.
+// To create a new flag, see parser.NewFlag.
 type Flag struct {
 
 	// For the purposes of documentation we use the following argument as an example.
@@ -37,42 +32,6 @@ type Flag struct {
 
 	// Default value of the flag (as a string)
 	Default string // "42"
-}
-
-// NewFlag creates a new flag based on an option from the flags package.
-func NewFlag(option *flags.Option) (flag Flag) {
-	flag.Required = option.Required
-
-	short := option.ShortName
-	if short != rune(0) {
-		flag.Short = []string{string(short)}
-	}
-
-	long := option.LongName
-	if long != "" {
-		flag.Long = []string{long}
-	}
-
-	flag.FieldName = option.Field().Name
-
-	flag.Value = option.ValueName
-
-	flag.Usage = option.Description
-
-	dflt := option.Default
-	if len(dflt) != 0 {
-		flag.Default = strings.Join(dflt, ", ")
-	}
-
-	return
-}
-
-// AllFlags creates a new parser for type T
-// It then returns AllFlags(p)
-func AllFlags[T any]() []Flag {
-	return Parser{
-		parser: flags.NewParser(new(T), flags.None),
-	}.Flags()
 }
 
 // WriteSpecTo writes a short specification of f into w.

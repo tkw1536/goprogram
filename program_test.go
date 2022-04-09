@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"testing"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/tkw1536/goprogram/lib/testlib"
 	"github.com/tkw1536/goprogram/lib/wrap"
 	"github.com/tkw1536/goprogram/meta"
+	"github.com/tkw1536/goprogram/parser"
 	"github.com/tkw1536/goprogram/stream"
 )
 
@@ -26,22 +28,24 @@ type tEnvironment string
 type tParameters string
 
 func makeEchoCommand(name string) iCommand {
-	return tCommand{
-		desc: iDescription{
-			Command: name,
-			Positional: meta.Positional{
-				Max: -1,
-			},
+	cmd := &tCommand[struct {
+		Arguments []string `description:"Arguments"`
+	}]{
+		MDesc: iDescription{
+			Command:      name,
 			Requirements: func(flag meta.Flag) bool { return true },
 		},
 
-		beforeRegister: func() error { return nil },
-		afterParse:     func() error { return nil },
-		run: func(context iContext) error {
-			context.Printf("%v\n", context.Args.Pos)
-			return nil
-		},
+		MBeforeRegister: func() error { return nil },
+		MafterParse:     func() error { return nil },
 	}
+	cmd.MRun = func(context iContext) error {
+		defer func() { cmd.Positionals.Arguments = nil }() // for the next time
+
+		context.Printf("%v\n", cmd.Positionals.Arguments)
+		return nil
+	}
+	return cmd
 }
 
 // makeProgram creates a new program and registers an echo command with it.
@@ -80,39 +84,51 @@ type iDescription = Description[tFlags, tRequirements]
 
 // tCommand represents a sample test suite command.
 // It runs the associated private functions, or prints an info message to stdout.
-type tCommand struct {
+type tCommand[Pos any] struct {
 	StdoutMsg string `short:"o" long:"stdout" value-name:"message" default:"write to stdout"`
 	StderrMsg string `short:"e" long:"stderr" value-name:"message" default:"write to stderr"`
 
-	beforeRegister func() error
-	desc           iDescription
-	afterParse     func() error
-	run            func(context iContext) error
+	Positionals Pos `positional-args:"true"`
+
+	MDesc iDescription
+
+	MBeforeRegister func() error
+	MafterParse     func() error
+	MRun            func(context iContext) error
 }
 
-func (t tCommand) BeforeRegister(program *iProgram) {
-	if t.beforeRegister == nil {
+func (t tCommand[Pos]) BeforeRegister(program *iProgram) {
+	if t.MBeforeRegister == nil {
 		fmt.Println("BeforeRegister()")
 		return
 	}
-	t.beforeRegister()
+	t.MBeforeRegister()
 }
-func (t tCommand) Description() iDescription {
-	return t.desc
+func (t tCommand[Pos]) Description() iDescription {
+	return t.MDesc
 }
-func (t tCommand) AfterParse() error {
-	if t.afterParse == nil {
+
+func (t tCommand[Pos]) AfterParse() error {
+	if t.MafterParse == nil {
 		fmt.Println("AfterParse()")
 		return nil
 	}
-	return t.afterParse()
+	return t.MafterParse()
 }
-func (t tCommand) Run(ctx iContext) error {
-	if t.run == nil {
+func (t tCommand[Pos]) Run(ctx iContext) error {
+	if t.MRun == nil {
 		fmt.Println("Run()")
 		return nil
 	}
-	return t.run(ctx)
+	return t.MRun(ctx)
+}
+
+// makeTPM_Positionals makes a new command with the provided positional arguments
+func makeTPM_Positionals[Pos any]() iCommand {
+	return &tCommand[Pos]{
+		MBeforeRegister: func() error { return nil },
+		MafterParse:     func() error { return nil },
+	}
 }
 
 func TestProgram_Main(t *testing.T) {
@@ -137,8 +153,13 @@ func TestProgram_Main(t *testing.T) {
 	reqAny := tRequirements(func(flag meta.Flag) bool { return true })
 
 	tests := []struct {
-		name       string
-		args       []string
+		name string
+		args []string
+
+		// should use makeTPM_Positionals[/* positionals type */]()
+		// for failure detection, set Args inside the positionals type
+		positionals iCommand
+
 		desc       iDescription
 		parameters tParameters
 
@@ -155,53 +176,67 @@ func TestProgram_Main(t *testing.T) {
 	}{
 
 		{
-			name:       "no arguments",
-			args:       []string{},
+			name:        "no arguments",
+			args:        []string{},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStderr: "Unable to parse arguments: Need at least one argument.\n",
 			wantCode:   3,
 		},
 
 		{
-			name:       "unknown general args",
-			args:       []string{"--this-flag-doesnt-exist", "--", "fake"},
+			name:        "unknown general args",
+			args:        []string{"--this-flag-doesnt-exist", "--", "fake"},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStderr: "Unable to parse arguments: unknown flag `this-flag-doesnt-exist'\n",
 			wantCode:   3,
 		},
 
 		{
-			name:       "display help",
-			args:       []string{"--help"},
+			name:        "display help",
+			args:        []string{"--help"},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nCOMMAND [ARGS...]\n\nsomething something dark side\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "display help, don't run command",
-			args:       []string{"--help", "fake", "whatever"},
+			name:        "display help, don't run command",
+			args:        []string{"--help", "fake", "whatever"},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nCOMMAND [ARGS...]\n\nsomething something dark side\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "display version",
-			args:       []string{"--version"},
+			name:        "display version",
+			args:        []string{"--version"},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStdout: "exe version 42.0.0, built 1970-01-01 00:00:00 +0000 UTC, using " + runtime.Version() + "\n",
 			wrapOut:    true,
 			wantCode:   0,
 		},
 
 		{
-			name:       "command help (1)",
-			args:       []string{"fake", "--help"},
-			desc:       iDescription{Requirements: reqAny},
+			name:        "command help (1)",
+			args:        []string{"fake", "--help"},
+			desc:        iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nfake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "command help (2)",
-			args:       []string{"--", "fake", "--help"},
-			desc:       iDescription{Requirements: reqAny},
+			name:        "command help (2)",
+			args:        []string{"--", "fake", "--help"},
+			desc:        iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nfake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
 			wantCode:   0,
 		},
@@ -214,8 +249,9 @@ func TestProgram_Main(t *testing.T) {
 				Command: "fake",
 			},
 
-			args: []string{"alias", "--help"},
-			desc: iDescription{Requirements: reqAny},
+			args:        []string{"alias", "--help"},
+			desc:        iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct{}](),
 
 			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nAlias for `exe fake`. See `exe fake --help` for detailed help page about fake.\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake`.\n",
 			wantCode:   0,
@@ -229,8 +265,10 @@ func TestProgram_Main(t *testing.T) {
 				Command: "fake",
 			},
 
-			args:       []string{"--", "alias", "--help"},
-			desc:       iDescription{Requirements: reqAny},
+			args:        []string{"--", "alias", "--help"},
+			desc:        iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nAlias for `exe fake`. See `exe fake --help` for detailed help page about fake.\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake`.\n",
 			wantCode:   0,
 		},
@@ -245,135 +283,185 @@ func TestProgram_Main(t *testing.T) {
 				Description: "Some useful alias",
 			},
 
-			args:       []string{"alias", "--help"},
-			desc:       iDescription{Requirements: reqAny},
+			args:        []string{"alias", "--help"},
+			desc:        iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nSome useful alias\n\nAlias for `exe fake something else`. See `exe fake --help` for detailed help\npage about fake.\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake something else`.\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "not enough arguments for fake",
-			args:       []string{"fake"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 1, Max: 2}},
-			wantStderr: "Wrong number of positional arguments for fake: Between 1 and 2 argument(s)\nrequired\n",
+			name: "not enough arguments for fake",
+			args: []string{"fake"},
+			desc: iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct {
+				Args []string `required:"1-2"`
+			}](),
+
+			wantStderr: "Wrong arguments for fake: the required argument `Args (at least 1 argument)`\nwas not provided\n",
 			wantCode:   4,
 		},
 
 		{
-			name:       "'fake' with unknown argument (not allowed)",
-			args:       []string{"fake", "--argument-not-declared"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: false}},
+			name: "'fake' with unknown argument (not allowed)",
+			args: []string{"fake", "--argument-not-declared"},
+			desc: iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: false}},
+			positionals: makeTPM_Positionals[struct {
+				Args []string
+			}](),
+
 			wantStdout: "",
-			wantStderr: "Error parsing flags: unknown flag `argument-not-declared'\n",
+			wantStderr: "Wrong arguments for fake: unknown flag `argument-not-declared'\n",
 			wantCode:   4,
 		},
 
 		{
-			name:       "'fake' with unknown argument (allowed)",
-			args:       []string{"fake", "--argument-not-declared"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
-			wantStdout: "Got Flags: { }\nGot Pos: [--argument-not-declared]\nwrite to stdout\n",
+			name: "'fake' with unknown argument (allowed)",
+			args: []string{"fake", "--argument-not-declared"},
+			desc: iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			positionals: makeTPM_Positionals[struct {
+				Args []string
+			}](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[--argument-not-declared]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "'fake' without global",
-			args:       []string{"fake", "hello", "world"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 1, Max: 2}},
-			wantStdout: "Got Flags: { }\nGot Pos: [hello world]\nwrite to stdout\n",
+			name: "'fake' without global",
+			args: []string{"fake", "hello", "world"},
+			desc: iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct {
+				Args []string `required:"1-2"`
+			}](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[hello world]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
 		{
-			name:       "'fake' with global (1)",
-			args:       []string{"-a", "real", "fake", "hello", "world"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 1, Max: 2}},
-			wantStdout: "Got Flags: {real }\nGot Pos: [hello world]\nwrite to stdout\n",
+			name: "'fake' with global (1)",
+			args: []string{"-a", "real", "fake", "hello", "world"},
+			desc: iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct {
+				Args []string `required:"1-2"`
+			}](),
+
+			wantStdout: "Got Flags: {real }\nGot Pos: {[hello world]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
 		{
-			name:       "'fake' with global (2)",
-			args:       []string{"--global-two", "real", "fake", "hello", "world"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 1, Max: 2}},
-			wantStdout: "Got Flags: { real}\nGot Pos: [hello world]\nwrite to stdout\n",
+			name: "'fake' with global (2)",
+			args: []string{"--global-two", "real", "fake", "hello", "world"},
+			desc: iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct {
+				Args []string `required:"1-2"`
+			}](),
+
+			wantStdout: "Got Flags: { real}\nGot Pos: {[hello world]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
 		{
-			name:       "'fake' with disallowed global",
-			args:       []string{"--global-one", "notallowed", "fake", "hello", "world"},
-			desc:       iDescription{Requirements: reqOne, Positional: meta.Positional{Min: 1, Max: 2}},
+			name: "'fake' with disallowed global",
+			args: []string{"--global-one", "notallowed", "fake", "hello", "world"},
+			desc: iDescription{Requirements: reqOne},
+			positionals: makeTPM_Positionals[struct {
+				Args []string `required:"1-2"`
+			}](),
+
 			wantStderr: "Wrong number of arguments: 'fake' takes no '--global-one' argument.\n",
 			wantCode:   4,
 		},
 
 		{
-			name:       "'fake' with allowed and disallowed global",
-			args:       []string{"--global-one", "one", "--global-two", "two", "fake", "hello", "world"},
-			desc:       iDescription{Requirements: reqOne, Positional: meta.Positional{Min: 1, Max: 2}},
+			name: "'fake' with allowed and disallowed global",
+			args: []string{"--global-one", "one", "--global-two", "two", "fake", "hello", "world"},
+			desc: iDescription{Requirements: reqOne},
+			positionals: makeTPM_Positionals[struct {
+				Args []string `required:"1-2"`
+			}](),
+
 			wantStderr: "Wrong number of arguments: 'fake' takes no '--global-one' argument.\n",
 			wantCode:   4,
 		},
 
 		{
-			name:       "'fake' with non-global argument with identical name",
-			args:       []string{"--", "fake", "--global-one"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
-			wantStdout: "Got Flags: { }\nGot Pos: [--global-one]\nwrite to stdout\n",
+			name:        "'fake' with non-global argument with identical name",
+			args:        []string{"--", "fake", "--global-one"},
+			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			positionals: makeTPM_Positionals[struct{ Args []string }](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[--global-one]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n", //
 			wantCode:   0,
 		},
 
 		{
-			name:       "'fake' with parsed short argument",
-			args:       []string{"fake", "-o", "message"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
-			wantStdout: "Got Flags: { }\nGot Pos: []\nmessage\n",
+			name:        "'fake' with parsed short argument",
+			args:        []string{"fake", "-o", "message"},
+			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			positionals: makeTPM_Positionals[struct{ Args []string }](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[]}\nmessage\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "'fake' with non-parsed short argument",
-			args:       []string{"fake", "--", "--s", "message"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
-			wantStdout: "Got Flags: { }\nGot Pos: [--s message]\nwrite to stdout\n",
+			name:        "'fake' with non-parsed short argument",
+			args:        []string{"fake", "--", "--s", "message"},
+			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			positionals: makeTPM_Positionals[struct{ Args []string }](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[--s message]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "'fake' with parsed long argument",
-			args:       []string{"fake", "--stdout", "message"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
-			wantStdout: "Got Flags: { }\nGot Pos: []\nmessage\n",
+			name:        "'fake' with parsed long argument",
+			args:        []string{"fake", "--stdout", "message"},
+			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			positionals: makeTPM_Positionals[struct{ Args []string }](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[]}\nmessage\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "'fake' with non-parsed long argument",
-			args:       []string{"fake", "--", "--stdout", "message"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}, ParserConfig: meta.ParserConfig{IncludeUnknown: true}},
-			wantStdout: "Got Flags: { }\nGot Pos: [--stdout message]\nwrite to stdout\n",
+			name:        "'fake' with non-parsed long argument",
+			args:        []string{"fake", "--", "--stdout", "message"},
+			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			positionals: makeTPM_Positionals[struct{ Args []string }](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[--stdout message]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
 
 		{
-			name:       "'fake' with failure ",
-			args:       []string{"fake", "fail"},
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 1, Max: 2}},
-			wantStdout: "Got Flags: { }\nGot Pos: [fail]\nwrite to stdout\n",
+			name: "'fake' with failure ",
+			args: []string{"fake", "fail"},
+			desc: iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct {
+				Args []string `required:"1-2"`
+			}](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[fail]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\nTest Failure\n",
 			wantCode:   1,
 		},
 
 		{
-			name:       "'notexistent' command",
-			args:       []string{"notexistent"},
+			name:        "'notexistent' command",
+			args:        []string{"notexistent"},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStderr: "Unknown command. Must be one of \"fake\".\n",
 			wantCode:   2,
 		},
@@ -386,7 +474,9 @@ func TestProgram_Main(t *testing.T) {
 				Command: "fake",
 			},
 
-			args:       []string{"notexistent"},
+			args:        []string{"notexistent"},
+			positionals: makeTPM_Positionals[struct{}](),
+
 			wantStderr: "Unknown command. Must be one of \"fake\".\n",
 			wantCode:   2,
 		},
@@ -400,10 +490,11 @@ func TestProgram_Main(t *testing.T) {
 				Command: "fake",
 			},
 
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}},
-			wantStdout: "Got Flags: { }\nGot Pos: [hello world]\nwrite to stdout\n",
-			wantStderr: "write to stderr\n",
-			wantCode:   0,
+			desc:        iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct{ Args []string }](),
+			wantStdout:  "Got Flags: { }\nGot Pos: {[hello world]}\nwrite to stdout\n",
+			wantStderr:  "write to stderr\n",
+			wantCode:    0,
 		},
 
 		{
@@ -416,8 +507,10 @@ func TestProgram_Main(t *testing.T) {
 				Args:    []string{"hello"},
 			},
 
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}},
-			wantStdout: "Got Flags: { }\nGot Pos: [hello world]\nwrite to stdout\n",
+			desc:        iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct{ Args []string }](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[hello world]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
@@ -432,8 +525,10 @@ func TestProgram_Main(t *testing.T) {
 				Args:    []string{"hello"},
 			},
 
-			desc:       iDescription{Requirements: reqAny, Positional: meta.Positional{Min: 0, Max: -1}},
-			wantStdout: "Got Flags: { }\nGot Pos: [hello world]\nwrite to stdout\n",
+			desc:        iDescription{Requirements: reqAny},
+			positionals: makeTPM_Positionals[struct{ Args []string }](),
+
+			wantStdout: "Got Flags: { }\nGot Pos: {[hello world]}\nwrite to stdout\n",
 			wantStderr: "write to stderr\n",
 			wantCode:   0,
 		},
@@ -444,30 +539,40 @@ func TestProgram_Main(t *testing.T) {
 			stdoutBuffer.Reset()
 			stderrBuffer.Reset()
 
-			program := makeProgram()
+			// var fakeCommand *tCommand[T]
+			fakeCommand := reflect.ValueOf(tt.positionals).Elem()
 
-			tt.desc.Command = "fake"
-			fake := &tCommand{
-				desc:           tt.desc,
-				beforeRegister: func() error { return nil },
-				afterParse:     func() error { return nil },
-			}
+			// tt.MDesc = ...
+			fakeCommand.FieldByName("MDesc").Set(reflect.ValueOf(tt.desc))
 
-			fake.run = func(context iContext) error {
+			// tt.MDesc.Command = ...
+			fakeCommand.FieldByName("MDesc").FieldByName("Command").Set(reflect.ValueOf("fake"))
+
+			// tt.MRun = ...
+			fakeCommand.FieldByName("MRun").Set(reflect.ValueOf(func(context iContext) error {
+				pos := fakeCommand.FieldByName("Positionals")
+
 				context.Printf("Got Flags: %s\n", context.Args.Flags)
-				context.Printf("Got Pos: %v\n", context.Args.Pos)
+				context.Printf("Got Pos: %v\n", pos.Interface())
 
-				context.Println(fake.StdoutMsg)
-				context.EPrintln(fake.StderrMsg)
+				context.Println(fakeCommand.FieldByName("StdoutMsg").Interface())
+				context.EPrintln(fakeCommand.FieldByName("StderrMsg").Interface())
 
-				// fail when requested
-				if len(context.Args.Pos) > 0 && context.Args.Pos[0] == "fail" {
-					return exit.Error{ExitCode: exit.ExitGeneric, Message: "Test Failure"}
+				fakeCommand.FieldByName("Positionals").FieldByName("Args")
+
+				// fail when requested to fail
+				if argField := pos.FieldByName("Args"); argField.IsValid() {
+					pos, ok := argField.Interface().([]string)
+					if ok && len(pos) > 0 && pos[0] == "fail" {
+						return exit.Error{ExitCode: exit.ExitGeneric, Message: "Test Failure"}
+					}
 				}
 
 				return nil
-			}
-			program.Register(fake)
+			}))
+
+			program := makeProgram()
+			program.Register(tt.positionals)
 
 			if tt.alias.Name != "" {
 				program.RegisterAlias(tt.alias)

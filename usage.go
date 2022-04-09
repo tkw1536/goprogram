@@ -31,7 +31,7 @@ func (p Program[E, P, F, R]) CommandUsage(context Context[E, P, F, R]) meta.Meta
 		Command:      context.Description.Command,
 		CommandFlags: context.parser.Flags(),
 
-		Positional: context.Description.Positional,
+		Positionals: context.parser.Positionals(),
 	}
 }
 
@@ -56,11 +56,13 @@ func (p Program[E, P, F, R]) AliasUsage(context Context[E, P, F, R], alias Alias
 		Command:      alias.Name,
 		CommandFlags: nil,
 
-		Positional: meta.Positional{
-			Value:       "ARG",
-			Description: fmt.Sprintf("Arguments to pass after %s.", exCmd),
-			Min:         0,
-			Max:         -1,
+		Positionals: []meta.Positional{
+			{
+				Value: "ARG",
+				Usage: fmt.Sprintf("Arguments to pass after %s.", exCmd),
+				Min:   0,
+				Max:   -1,
+			},
 		},
 	}
 }

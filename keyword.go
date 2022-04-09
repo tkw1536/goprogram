@@ -1,9 +1,9 @@
 package goprogram
 
-// Keywords are special "commands" that manipulate arguments before execution.
+// Keywords are special "commands" that manipulate arguments and positionals before execution.
 //
 // Keywords can not be stopped by calls to universal flags; they are expanded once before aliases and command expansion takes place.
-type Keyword[F any] func(args *Arguments[F]) error
+type Keyword[F any] func(args *Arguments[F], pos *[]string) error
 
 // RegisterKeyword registers a new keyword.
 // See also Keyword.

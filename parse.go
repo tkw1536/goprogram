@@ -2,7 +2,7 @@ package goprogram
 
 import (
 	"github.com/tkw1536/goprogram/exit"
-	"github.com/tkw1536/goprogram/meta"
+	"github.com/tkw1536/goprogram/parser"
 	"golang.org/x/exp/slices"
 )
 
@@ -16,26 +16,26 @@ var errParseArgsUnknownError = exit.Error{
 	Message:  "Unable to parse arguments: %s",
 }
 
-// parseP parses program-wide arguments.
+// parseProgramFlags parses program-wide arguments.
 //
 // In particular, it *does not* parse command specific arguments.
 // Any flags are just returned as unparsed positionals.
 //
 // When parsing fails, returns an error of type Error.
-func (args *Arguments[F]) parseP(argv []string) error {
+func (args *Arguments[F]) parseProgramFlags(argv []string) error {
 	var err error
 
-	parser := meta.NewArgumentsParser(args)
-	args.Pos, err = parser.ParseArgs(argv)
+	argsParser := parser.NewArgumentsParser(args)
+	args.pos, err = argsParser.ParseArgs(argv)
 
-	// intercept unknonw flags
-	if meta.IsUnknownFlag(err) {
+	// intercept unknown flags
+	if parser.IsUnknownFlag(err) {
 		err = errParseArgsUnknownError.WithMessageF(err.Error())
 	}
 
 	// store the arguments we got and complain if there are none.
 	// If we had a 'for' argument though, we should raise an error.
-	if len(args.Pos) == 0 {
+	if len(args.pos) == 0 {
 		switch {
 		case args.Universals.Help || args.Universals.Version:
 			return nil
@@ -51,8 +51,8 @@ func (args *Arguments[F]) parseP(argv []string) error {
 	}
 
 	// setup command and arguments
-	args.Command = args.Pos[0]
-	args.Pos = args.Pos[1:]
+	args.Command = args.pos[0]
+	args.pos = args.pos[1:]
 
 	return err
 }
@@ -65,71 +65,60 @@ func (args *Arguments[F]) parseP(argv []string) error {
 // When parsing fails, returns an error of type Error.
 func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 	context.Description = command.Description()
+	// TODO: Lift the command arguments here!
 	context.parser = context.Description.ParserConfig.NewCommandParser(command)
 
 	// specifically intercept the "--help" and "-h" arguments.
 	// this prevents any kind of side effect from occuring.
-	if slices.Contains(context.Args.Pos, "--help") || slices.Contains(context.Args.Pos, "-h") {
+	if slices.Contains(context.Args.pos, "--help") || slices.Contains(context.Args.pos, "-h") {
 		context.Args.Universals.Help = true
 		return nil
 	}
 
-	// check that the requirements for the command have been fullfilled
-	if err := context.checkRequirements(); err != nil {
+	// check that the requirements for the command are fullfilled
+	if err := context.Description.Requirements.Validate(context.Args); err != nil {
 		return err
 	}
 
-	// do the actual parsing of the flags and validate that the right number of arguments has been given.
-	if err := context.parseFlags(); err != nil {
+	// parse the command flags
+	if err := context.parseCommandFlags(); err != nil {
 		return err
 	}
 
-	if err := context.checkPositionalCount(); err != nil {
-		return err
+	// check that no positional arguments are left over
+	if len(context.Args.pos) > 0 {
+		return errParseArgCount.WithMessageF(context.Args.Command, len(context.Args.pos))
 	}
 
 	return nil
 }
 
-var errParseFlagSet = exit.Error{
+var errWrongArguments = exit.Error{
 	ExitCode: exit.ExitCommandArguments,
-	Message:  "Error parsing flags: %s",
+	Message:  "Wrong arguments for %s: %s",
 }
 
-// parseFlagset calls Parse() on the flagset.
-// If the flagset has no defined flags (or is nil), immediatly returns nil
+// parseCommandFlags uses the parser to parse flags passed directly to the command.
 //
 // When an error occurs, returns an error of type Error.
-func (context *Context[E, P, F, R]) parseFlags() (err error) {
-	context.Args.Pos, err = context.parser.ParseArgs(context.Args.Pos)
+func (context *Context[E, P, F, R]) parseCommandFlags() (err error) {
+	context.Args.pos, err = context.parser.ParseArgs(context.Args.pos)
 
 	// catch the help error
-	if meta.IsHelp(err) {
+	if parser.IsHelp(err) {
 		context.Args.Universals.Help = true
 		err = nil
 	}
 
 	// if an error occured, return it!
 	if err != nil {
-		err = errParseFlagSet.WithMessageF(err.Error())
+		err = errWrongArguments.WithMessageF(context.Args.Command, err.Error())
 	}
 
 	return err
 }
 
-func (context Context[E, P, F, R]) checkRequirements() error {
-	return context.Description.Requirements.Validate(context.Args)
-}
-
 var errParseArgCount = exit.Error{
 	ExitCode: exit.ExitCommandArguments,
-	Message:  "Wrong number of positional arguments for %s: %s",
-}
-
-func (context Context[E, P, F, R]) checkPositionalCount() error {
-	err := context.Description.Positional.Validate(len(context.Args.Pos))
-	if err != nil {
-		return errParseArgCount.WithMessageF(context.Args.Command, err)
-	}
-	return nil
+	Message:  "Wrong number of positional arguments for %s: %d additional arguments were provided",
 }

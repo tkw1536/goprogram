@@ -19,7 +19,7 @@ type Meta struct {
 	// Applicable Global, Command and Positional Flags.
 	GlobalFlags  []Flag
 	CommandFlags []Flag
-	Positional   Positional
+	Positionals  []Positional
 
 	// List of available sub-commands, only set when Command == "".
 	Commands []string
@@ -130,9 +130,13 @@ func (page Meta) writeCommandMessageTo(w io.Writer) {
 		arg.WriteSpecTo(w)
 	}
 
-	if page.Positional.Max != 0 {
-		io.WriteString(w, " [--] ")
-		page.Positional.WriteSpecTo(w)
+	if len(page.Positionals) != 0 {
+		io.WriteString(w, " [--]")
+
+		for _, p := range page.Positionals {
+			io.WriteString(w, " ")
+			p.WriteSpecTo(w)
+		}
 	}
 
 	// description (if any)
@@ -151,7 +155,7 @@ func (page Meta) writeCommandMessageTo(w io.Writer) {
 	}
 
 	// no command arguments provided!
-	if len(page.CommandFlags) == 0 && page.Positional.Max == 0 {
+	if len(page.CommandFlags) == 0 && len(page.Positionals) == 0 {
 		return
 	}
 
@@ -161,12 +165,11 @@ func (page Meta) writeCommandMessageTo(w io.Writer) {
 		opt.WriteMessageTo(w)
 	}
 
-	// write the usage message of the argument (if any)
-	if page.Positional.Description != "" {
+	for _, p := range page.Positionals {
 		io.WriteString(w, usageMsg1)
-		page.Positional.WriteSpecTo(w)
+		p.WriteSpecTo(w)
 		io.WriteString(w, usageMsg2)
-		io.WriteString(w, page.Positional.Description)
+		io.WriteString(w, p.Usage)
 		io.WriteString(w, usageMsg3)
 	}
 }
