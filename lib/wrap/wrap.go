@@ -36,7 +36,7 @@ var wrapperPool = &sync.Pool{
 
 // Write is a convenience method that creates a new wrapper and calls the write method on it.
 func Write(writer io.Writer, length int, s string) (int, error) {
-	// This method is untested because Wrapper.Write is tested.
+	// NOTE(twiesing): This method is untested because Wrapper.Write is tested
 
 	wrapper := wrapperPool.Get().(*Wrapper)
 	wrapper.Writer = writer
