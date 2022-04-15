@@ -7,7 +7,9 @@ Documentation is a work in progress.
 
 ## Changelog
 
-# 0.0.4 (Upcoming)
+# 0.0.5 (Upcoming)
+
+# 0.0.4 (Released [Apr 15 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.4))
 
 - refactor argument parsing
 
