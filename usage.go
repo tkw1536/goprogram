@@ -45,7 +45,7 @@ func (p Program[E, P, F, R]) AliasUsage(context Context[E, P, F, R], alias Alias
 	if alias.Description != "" {
 		description = alias.Description + "\n\n"
 	}
-	description += fmt.Sprintf("alias for %s. See %s for detailed help page about %s", exCmd, helpCmd, name)
+	description += fmt.Sprintf("alias for %s. see %s for detailed help page about %s", exCmd, helpCmd, name)
 
 	return meta.Meta{
 		Executable:  p.Info.Executable,

@@ -3,7 +3,7 @@ package exit
 import (
 	"fmt"
 
-	"github.com/tkw1536/goprogram/lib/doccheck"
+	"github.com/tkw1536/goprogram/lib/docfmt"
 )
 
 // Error represents any error state by a program.
@@ -19,7 +19,7 @@ type Error struct {
 
 // Error returns the error message belonging to this error.
 func (err Error) Error() string {
-	doccheck.Check(err.Message)
+	docfmt.Check(err.Message)
 	return err.Message
 }
 
@@ -41,7 +41,7 @@ func AsError(err error) Error {
 //
 // The new message is the message passed as an argument.
 func (err Error) WithMessage(message string) Error {
-	doccheck.Check(err.Message)
+	docfmt.Check(err.Message)
 	return Error{
 		ExitCode: err.ExitCode,
 		Message:  message,
@@ -51,6 +51,6 @@ func (err Error) WithMessage(message string) Error {
 // WithMessageF returns a copy of this error with the same Code but different Message.
 // The new message is the current message, formatted using a call to SPrintf and the arguments.
 func (err Error) WithMessageF(args ...interface{}) Error {
-	doccheck.Check(err.Message)
+	docfmt.Check(err.Message)
 	return err.WithMessage(fmt.Sprintf(err.Message, args...))
 }

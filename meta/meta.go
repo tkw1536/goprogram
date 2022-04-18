@@ -4,7 +4,7 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/tkw1536/goprogram/lib/doccheck"
+	"github.com/tkw1536/goprogram/lib/docfmt"
 )
 
 // Meta holds meta-information about an entire program or a subcommand.
@@ -67,7 +67,7 @@ func (meta Meta) writeProgramMessageTo(w io.Writer) {
 	// description (if any)
 	if meta.Description != "" {
 		io.WriteString(w, "\n\n")
-		doccheck.Check(meta.Description)
+		docfmt.Check(meta.Description)
 		io.WriteString(w, meta.Description)
 	}
 
@@ -145,7 +145,7 @@ func (page Meta) writeCommandMessageTo(w io.Writer) {
 	// description (if any)
 	if page.Description != "" {
 		io.WriteString(w, "\n\n")
-		doccheck.Check(page.Description)
+		docfmt.Check(page.Description)
 		io.WriteString(w, page.Description)
 	}
 
@@ -174,7 +174,7 @@ func (page Meta) writeCommandMessageTo(w io.Writer) {
 		p.WriteSpecTo(w)
 		io.WriteString(w, usageMsg2)
 		io.WriteString(w, p.Usage)
-		doccheck.Check(p.Usage)
+		docfmt.Check(p.Usage)
 		io.WriteString(w, usageMsg3)
 	}
 }

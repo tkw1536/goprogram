@@ -1,5 +1,5 @@
 //go:build !doccheck
 
-package doccheck
+package docfmt
 
 const enabled = false

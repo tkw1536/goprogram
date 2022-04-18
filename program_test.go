@@ -253,7 +253,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nalias for `exe fake`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nalias for `exe fake`. see `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake`\n",
 			wantCode:   0,
 		},
 
@@ -269,7 +269,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nalias for `exe fake`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nalias for `exe fake`. see `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake`\n",
 			wantCode:   0,
 		},
 
@@ -287,7 +287,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nsome useful alias\n\nalias for `exe fake something else`. See `exe fake --help` for detailed help\npage about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake something else`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nsome useful alias\n\nalias for `exe fake something else`. see `exe fake --help` for detailed help\npage about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake something else`\n",
 			wantCode:   0,
 		},
 
@@ -373,7 +373,7 @@ func TestProgram_Main(t *testing.T) {
 				Args []string `required:"1-2"`
 			}](),
 
-			wantStderr: "wrong number of arguments: 'fake' takes no '--global-one' argument\n",
+			wantStderr: "wrong number of arguments: \"fake\" takes no \"--global-one\" argument\n",
 			wantCode:   4,
 		},
 
@@ -385,7 +385,7 @@ func TestProgram_Main(t *testing.T) {
 				Args []string `required:"1-2"`
 			}](),
 
-			wantStderr: "wrong number of arguments: 'fake' takes no '--global-one' argument\n",
+			wantStderr: "wrong number of arguments: \"fake\" takes no \"--global-one\" argument\n",
 			wantCode:   4,
 		},
 

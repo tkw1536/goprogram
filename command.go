@@ -157,7 +157,7 @@ func CloneCommand[E any, P any, F any, R Requirement[F]](command Command[E, P, F
 
 var errTakesNoArgument = exit.Error{
 	ExitCode: exit.ExitCommandArguments,
-	Message:  "wrong number of arguments: '%s' takes no '%s' argument",
+	Message:  "wrong number of arguments: %q takes no %q argument",
 }
 
 // Validate validates that every flag f in args.flags either passes the AllowsOption method of the given requirement, or has the zero value.
