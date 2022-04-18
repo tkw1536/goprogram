@@ -9,6 +9,8 @@ Documentation is a work in progress.
 
 # 0.0.6 (Upcoming)
 
+- add more doccheck tests
+
 # 0.0.5 (Released [Apr 18 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.5))
 
 - add doccheck package

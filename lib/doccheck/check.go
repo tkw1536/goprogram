@@ -9,18 +9,16 @@ import (
 	"unicode"
 )
 
-// Check checks the message for proper formatting and returns it unchanged.
+// Check checks the message for proper formatting.
 //
 // When checking is disabled, no checking is performed.
-// When checking is enabled and a message fails to pass validation, raises a panic().
-func Check(message string) string {
-	// NOTE(twiesing): This function is untested because tags make it non-feasible.
-	if Enabled() {
+// When checking is enabled and a message fails to pass validation, calls panic()
+func Check(message string) {
+	if enabled {
 		if err := Validate(message); err != nil {
 			panic(err)
 		}
 	}
-	return message
 }
 
 // CheckError is returned when a message fails validation.
@@ -38,14 +36,14 @@ type CheckError struct {
 }
 
 func (ce CheckError) Error() string {
+	// NOTE(twiesing): This function is untested because it is used only for developing
 	return fmt.Sprintf("message %q failed validation: part %q: %s", ce.Message, ce.Part, ce.Failure)
 }
 
-// Validate validates that the message is formatted correctly.
+// Validate validates that message is formatted correctly.
 // When the message passes validation returns nil, otherwise a *CheckError.
 //
-// To perform validation, the message is first split into parts
-// delimited by ':'s.
+// To perform validation, the message is first split into parts delimited by ':'s.
 //
 // Then the following tests are performed for each part:
 //   - a part must be non-empty
