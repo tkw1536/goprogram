@@ -15,7 +15,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 			"main executable page",
 			Meta{
 				Executable:  "cmd",
-				Description: "Do something interesting",
+				Description: "do something interesting",
 
 				GlobalFlags: []Flag{
 					{
@@ -25,7 +25,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 						Long:  []string{"global"},
 
 						Value:   "name",
-						Usage:   "A global argument",
+						Usage:   "a global argument",
 						Default: "",
 					},
 					{
@@ -33,20 +33,20 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 
 						Short:   []string{"q"},
 						Long:    []string{"quiet"},
-						Usage:   "Be quiet",
+						Usage:   "be quiet",
 						Default: "false",
 					},
 				},
 				Commands: []string{"a", "b", "c"},
 			},
-			"Usage: cmd --global|-g name [--quiet|-q] [--] COMMAND [ARGS...]\n\nDo something interesting\n\n   -g, --global name\n      A global argument\n\n   -q, --quiet\n      Be quiet (default false)\n\n   COMMAND [ARGS...]\n      Command to call. One of \"a\", \"b\", \"c\". See individual commands for more help.",
+			"Usage: cmd --global|-g name [--quiet|-q] [--] COMMAND [ARGS...]\n\ndo something interesting\n\n   -g, --global name\n      a global argument\n\n   -q, --quiet\n      be quiet (default false)\n\n   COMMAND [ARGS...]\n      Command to call. One of \"a\", \"b\", \"c\". See individual commands for more help.",
 		},
 		{
 			"sub executable page",
 			Meta{
 				Executable:  "cmd",
 				Command:     "sub",
-				Description: "Do something local",
+				Description: "do something local",
 
 				GlobalFlags: []Flag{
 					{
@@ -56,7 +56,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 						Long:  []string{"global"},
 
 						Value:   "name",
-						Usage:   "A global argument",
+						Usage:   "a global argument",
 						Default: "",
 					},
 					{
@@ -64,7 +64,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 
 						Short:   []string{"q"},
 						Long:    []string{"quiet"},
-						Usage:   "Be quiet",
+						Usage:   "be quiet",
 						Default: "false",
 					},
 				},
@@ -76,7 +76,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 						Long:  []string{"dud"},
 
 						Value:   "dud",
-						Usage:   "A local argument",
+						Usage:   "a local argument",
 						Default: "",
 					},
 					{
@@ -84,20 +84,20 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 
 						Short:   []string{"s"},
 						Long:    []string{"silent"},
-						Usage:   "Be silent",
+						Usage:   "be silent",
 						Default: "true",
 					},
 				},
 				Positionals: []Positional{
 					{
 						Value: "op",
-						Usage: "Operations to make",
+						Usage: "operations to make",
 						Min:   1,
 						Max:   -1,
 					},
 				},
 			},
-			"Usage: cmd --global|-g name [--quiet|-q] [--] sub --dud|-d dud [--silent|-s] [--] op [op ...]\n\nDo something local\n\nGlobal Arguments:\n\n   -g, --global name\n      A global argument\n\n   -q, --quiet\n      Be quiet (default false)\n\nCommand Arguments:\n\n   -d, --dud dud\n      A local argument\n\n   -s, --silent\n      Be silent (default true)\n\n   op [op ...]\n      Operations to make",
+			"Usage: cmd --global|-g name [--quiet|-q] [--] sub --dud|-d dud [--silent|-s] [--] op [op ...]\n\ndo something local\n\nGlobal Arguments:\n\n   -g, --global name\n      a global argument\n\n   -q, --quiet\n      be quiet (default false)\n\nCommand Arguments:\n\n   -d, --dud dud\n      a local argument\n\n   -s, --silent\n      be silent (default true)\n\n   op [op ...]\n      operations to make",
 		},
 	}
 	for _, tt := range tests {

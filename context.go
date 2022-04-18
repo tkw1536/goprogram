@@ -40,6 +40,6 @@ type Arguments[F any] struct {
 //
 // Command line arguments are annotated using syntax provided by "github.com/jessevdk/go-flags".
 type Universals struct {
-	Help    bool `short:"h" long:"help" description:"Print a help message and exit"`
-	Version bool `short:"v" long:"version" description:"Print a version message and exit"`
+	Help    bool `short:"h" long:"help" description:"print a help message and exit"`
+	Version bool `short:"v" long:"version" description:"print a version message and exit"`
 }

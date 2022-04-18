@@ -3,6 +3,7 @@ package meta
 import (
 	"io"
 
+	"github.com/tkw1536/goprogram/lib/doccheck"
 	"github.com/tkw1536/goprogram/lib/text"
 	"golang.org/x/exp/slices"
 )
@@ -113,6 +114,7 @@ func (opt Flag) WriteMessageTo(w io.Writer) {
 	opt.WriteLongSpecTo(w)
 	io.WriteString(w, usageMsg2)
 
+	doccheck.Check(opt.Usage)
 	io.WriteString(w, opt.Usage)
 	if dflt := opt.Default; dflt != "" {
 		io.WriteString(w, " (default ")

@@ -45,7 +45,7 @@ func (p Program[E, P, F, R]) AliasUsage(context Context[E, P, F, R], alias Alias
 	if alias.Description != "" {
 		description = alias.Description + "\n\n"
 	}
-	description += fmt.Sprintf("Alias for %s. See %s for detailed help page about %s. ", exCmd, helpCmd, name)
+	description += fmt.Sprintf("alias for %s. See %s for detailed help page about %s", exCmd, helpCmd, name)
 
 	return meta.Meta{
 		Executable:  p.Info.Executable,
@@ -59,7 +59,7 @@ func (p Program[E, P, F, R]) AliasUsage(context Context[E, P, F, R], alias Alias
 		Positionals: []meta.Positional{
 			{
 				Value: "ARG",
-				Usage: fmt.Sprintf("Arguments to pass after %s.", exCmd),
+				Usage: fmt.Sprintf("arguments to pass after %s", exCmd),
 				Min:   0,
 				Max:   -1,
 			},

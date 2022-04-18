@@ -95,7 +95,7 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	}
 
 	// load the command if we have it
-	command, hasCommand := p.commands[context.Args.Command]
+	command, hasCommand := p.Command(context.Args.Command)
 	if !hasCommand {
 		return errProgramUnknownCommand.WithMessageF(p.FmtCommands())
 	}
@@ -143,5 +143,5 @@ func (p Program[E, P, F, R]) makeEnvironment(params P, context Context[E, P, F, 
 
 var errProgramUnknownCommand = exit.Error{
 	ExitCode: exit.ExitUnknownCommand,
-	Message:  "Unknown command. Must be one of %s. ",
+	Message:  "unknown command: must be one of %s",
 }

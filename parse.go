@@ -8,12 +8,12 @@ import (
 
 var errParseArgsNeedOneArgument = exit.Error{
 	ExitCode: exit.ExitGeneralArguments,
-	Message:  "Unable to parse arguments: Need at least one argument. ",
+	Message:  "unable to parse arguments: need at least one argument",
 }
 
 var errParseArgsUnknownError = exit.Error{
 	ExitCode: exit.ExitGeneralArguments,
-	Message:  "Unable to parse arguments: %s",
+	Message:  "unable to parse arguments: %s",
 }
 
 // parseProgramFlags parses program-wide arguments.
@@ -95,7 +95,7 @@ func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 
 var errWrongArguments = exit.Error{
 	ExitCode: exit.ExitCommandArguments,
-	Message:  "Wrong arguments for %s: %s",
+	Message:  "wrong arguments for %s: %s",
 }
 
 // parseCommandFlags uses the parser to parse flags passed directly to the command.

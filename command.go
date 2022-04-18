@@ -122,6 +122,13 @@ func (p Program[E, P, F, R]) Commands() []string {
 	return commands
 }
 
+// Command returns the command with the provided name and if it exists
+func (p Program[E, P, F, R]) Command(name string) (Command[E, P, F, R], bool) {
+	// NOTE(twiesing): This function is not tested because it is so trivial
+	cmd, ok := p.commands[name]
+	return cmd, ok
+}
+
 // FmtCommands returns a human readable string describing the commands.
 // See also Commands.
 func (p Program[E, P, F, R]) FmtCommands() string {
@@ -150,7 +157,7 @@ func CloneCommand[E any, P any, F any, R Requirement[F]](command Command[E, P, F
 
 var errTakesNoArgument = exit.Error{
 	ExitCode: exit.ExitCommandArguments,
-	Message:  "Wrong number of arguments: '%s' takes no '%s' argument. ",
+	Message:  "wrong number of arguments: '%s' takes no '%s' argument",
 }
 
 // Validate validates that every flag f in args.flags either passes the AllowsOption method of the given requirement, or has the zero value.

@@ -6,6 +6,7 @@ import (
 	"io"
 
 	"github.com/tkw1536/goprogram/exit"
+	"github.com/tkw1536/goprogram/lib/doccheck"
 	"github.com/tkw1536/goprogram/lib/wrap"
 )
 
@@ -119,6 +120,7 @@ func (io IOStream) Die(err error) error {
 
 	// print the error message to standard error in a wrapped way
 	if message := e.Error(); message != "" {
+		doccheck.Check(message)
 		io.StderrWriteWrap(message)
 	}
 

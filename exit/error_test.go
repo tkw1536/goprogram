@@ -51,17 +51,17 @@ func TestError_WithMessage(t *testing.T) {
 		args   args
 		want   Error
 	}{
-		{"replaces empty message", fields{}, args{message: "Hello world"}, Error{Message: "Hello world"}},
-		{"replaces non-empty message", fields{Message: "not empty"}, args{message: "Hello world"}, Error{Message: "Hello world"}},
+		{"replaces empty message", fields{}, args{message: "hello world"}, Error{Message: "hello world"}},
+		{"replaces non-empty message", fields{Message: "not empty"}, args{message: "hello world"}, Error{Message: "hello world"}},
 
-		{"keeps exit code 1", fields{ExitCode: 1}, args{message: "Hello world"}, Error{ExitCode: 1, Message: "Hello world"}},
-		{"keeps exit code 2", fields{ExitCode: 2}, args{message: "Hello world"}, Error{ExitCode: 2, Message: "Hello world"}},
-		{"keeps exit code 3", fields{ExitCode: 3}, args{message: "Hello world"}, Error{ExitCode: 3, Message: "Hello world"}},
-		{"keeps exit code 4", fields{ExitCode: 4}, args{message: "Hello world"}, Error{ExitCode: 4, Message: "Hello world"}},
-		{"keeps exit code 5", fields{ExitCode: 5}, args{message: "Hello world"}, Error{ExitCode: 5, Message: "Hello world"}},
+		{"keeps exit code 1", fields{ExitCode: 1}, args{message: "hello world"}, Error{ExitCode: 1, Message: "hello world"}},
+		{"keeps exit code 2", fields{ExitCode: 2}, args{message: "hello world"}, Error{ExitCode: 2, Message: "hello world"}},
+		{"keeps exit code 3", fields{ExitCode: 3}, args{message: "hello world"}, Error{ExitCode: 3, Message: "hello world"}},
+		{"keeps exit code 4", fields{ExitCode: 4}, args{message: "hello world"}, Error{ExitCode: 4, Message: "hello world"}},
+		{"keeps exit code 5", fields{ExitCode: 5}, args{message: "hello world"}, Error{ExitCode: 5, Message: "hello world"}},
 
-		{"does not substitute strings in old message", fields{Message: "old %s"}, args{message: "Hello world"}, Error{Message: "Hello world"}},
-		{"does not substitute strings in new message", fields{Message: "old message"}, args{message: "Hello world %s"}, Error{Message: "Hello world %s"}},
+		{"does not substitute strings in old message", fields{Message: "old %s"}, args{message: "hello world"}, Error{Message: "hello world"}},
+		{"does not substitute strings in new message", fields{Message: "old message"}, args{message: "hello world %s"}, Error{Message: "hello world %s"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -90,14 +90,14 @@ func TestError_WithMessageF(t *testing.T) {
 		args   args
 		want   Error
 	}{
-		{"keeps message without format", fields{Message: "Hello world"}, args{}, Error{Message: "Hello world"}},
-		{"replaces message", fields{Message: "Hello %s"}, args{[]interface{}{"world"}}, Error{Message: "Hello world"}},
+		{"keeps message without format", fields{Message: "hello world"}, args{}, Error{Message: "hello world"}},
+		{"replaces message", fields{Message: "hello %s"}, args{[]interface{}{"world"}}, Error{Message: "hello world"}},
 
-		{"keeps exit code 1", fields{ExitCode: 1, Message: "%s"}, args{[]interface{}{"Hello world"}}, Error{ExitCode: 1, Message: "Hello world"}},
-		{"keeps exit code 2", fields{ExitCode: 2, Message: "%s"}, args{[]interface{}{"Hello world"}}, Error{ExitCode: 2, Message: "Hello world"}},
-		{"keeps exit code 3", fields{ExitCode: 3, Message: "%s"}, args{[]interface{}{"Hello world"}}, Error{ExitCode: 3, Message: "Hello world"}},
-		{"keeps exit code 4", fields{ExitCode: 4, Message: "%s"}, args{[]interface{}{"Hello world"}}, Error{ExitCode: 4, Message: "Hello world"}},
-		{"keeps exit code 5", fields{ExitCode: 5, Message: "%s"}, args{[]interface{}{"Hello world"}}, Error{ExitCode: 5, Message: "Hello world"}},
+		{"keeps exit code 1", fields{ExitCode: 1, Message: "%s"}, args{[]interface{}{"hello world"}}, Error{ExitCode: 1, Message: "hello world"}},
+		{"keeps exit code 2", fields{ExitCode: 2, Message: "%s"}, args{[]interface{}{"hello world"}}, Error{ExitCode: 2, Message: "hello world"}},
+		{"keeps exit code 3", fields{ExitCode: 3, Message: "%s"}, args{[]interface{}{"hello world"}}, Error{ExitCode: 3, Message: "hello world"}},
+		{"keeps exit code 4", fields{ExitCode: 4, Message: "%s"}, args{[]interface{}{"hello world"}}, Error{ExitCode: 4, Message: "hello world"}},
+		{"keeps exit code 5", fields{ExitCode: 5, Message: "%s"}, args{[]interface{}{"hello world"}}, Error{ExitCode: 5, Message: "hello world"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
