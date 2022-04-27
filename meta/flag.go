@@ -114,8 +114,7 @@ func (opt Flag) WriteMessageTo(w io.Writer) {
 	opt.WriteLongSpecTo(w)
 	io.WriteString(w, usageMsg2)
 
-	docfmt.Check(opt.Usage)
-	io.WriteString(w, opt.Usage)
+	io.WriteString(w, docfmt.Format(opt.Usage))
 	if dflt := opt.Default; dflt != "" {
 		io.WriteString(w, " (default ")
 		io.WriteString(w, dflt)

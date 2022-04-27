@@ -120,8 +120,7 @@ func (io IOStream) Die(err error) error {
 
 	// print the error message to standard error in a wrapped way
 	if message := e.Error(); message != "" {
-		docfmt.Check(message)
-		io.StderrWriteWrap(message)
+		io.StderrWriteWrap(docfmt.Format(message))
 	}
 
 	return e

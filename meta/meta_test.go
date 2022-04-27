@@ -39,7 +39,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 				},
 				Commands: []string{"a", "b", "c"},
 			},
-			"Usage: cmd --global|-g name [--quiet|-q] [--] COMMAND [ARGS...]\n\ndo something interesting\n\n   -g, --global name\n      a global argument\n\n   -q, --quiet\n      be quiet (default false)\n\n   COMMAND [ARGS...]\n      Command to call. One of \"a\", \"b\", \"c\". See individual commands for more help.",
+			"Usage: cmd --global|-g name [--quiet|-q] [--] COMMAND [ARGS...]\n\nDo something interesting\n\n   -g, --global name\n      A global argument\n\n   -q, --quiet\n      Be quiet (default false)\n\n   COMMAND [ARGS...]\n      Command to call. One of \"a\", \"b\", \"c\". See individual commands for more help.",
 		},
 		{
 			"sub executable page",
@@ -97,7 +97,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 					},
 				},
 			},
-			"Usage: cmd --global|-g name [--quiet|-q] [--] sub --dud|-d dud [--silent|-s] [--] op [op ...]\n\ndo something local\n\nGlobal Arguments:\n\n   -g, --global name\n      a global argument\n\n   -q, --quiet\n      be quiet (default false)\n\nCommand Arguments:\n\n   -d, --dud dud\n      a local argument\n\n   -s, --silent\n      be silent (default true)\n\n   op [op ...]\n      operations to make",
+			"Usage: cmd --global|-g name [--quiet|-q] [--] sub --dud|-d dud [--silent|-s] [--] op [op ...]\n\nDo something local\n\nGlobal Arguments:\n\n   -g, --global name\n      A global argument\n\n   -q, --quiet\n      Be quiet (default false)\n\nCommand Arguments:\n\n   -d, --dud dud\n      A local argument\n\n   -s, --silent\n      Be silent (default true)\n\n   op [op ...]\n      Operations to make",
 		},
 	}
 	for _, tt := range tests {

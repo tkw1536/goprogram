@@ -67,8 +67,7 @@ func (meta Meta) writeProgramMessageTo(w io.Writer) {
 	// description (if any)
 	if meta.Description != "" {
 		io.WriteString(w, "\n\n")
-		docfmt.Check(meta.Description)
-		io.WriteString(w, meta.Description)
+		io.WriteString(w, docfmt.Format(meta.Description))
 	}
 
 	//
@@ -145,8 +144,7 @@ func (page Meta) writeCommandMessageTo(w io.Writer) {
 	// description (if any)
 	if page.Description != "" {
 		io.WriteString(w, "\n\n")
-		docfmt.Check(page.Description)
-		io.WriteString(w, page.Description)
+		io.WriteString(w, docfmt.Format(page.Description))
 	}
 
 	//
@@ -173,8 +171,7 @@ func (page Meta) writeCommandMessageTo(w io.Writer) {
 		io.WriteString(w, usageMsg1)
 		p.WriteSpecTo(w)
 		io.WriteString(w, usageMsg2)
-		io.WriteString(w, p.Usage)
-		docfmt.Check(p.Usage)
+		io.WriteString(w, docfmt.Format(p.Usage))
 		io.WriteString(w, usageMsg3)
 	}
 }

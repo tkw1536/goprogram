@@ -14,12 +14,13 @@ type Error struct {
 	// Exit code of the program (if applicable)
 	ExitCode
 	// Message for this error
+	// Messages should pass docfmt.Validate
 	Message string
 }
 
 // Error returns the error message belonging to this error.
 func (err Error) Error() string {
-	docfmt.Check(err.Message)
+	docfmt.AssertValid(err.Message)
 	return err.Message
 }
 
@@ -41,7 +42,7 @@ func AsError(err error) Error {
 //
 // The new message is the message passed as an argument.
 func (err Error) WithMessage(message string) Error {
-	docfmt.Check(err.Message)
+	docfmt.AssertValid(err.Message)
 	return Error{
 		ExitCode: err.ExitCode,
 		Message:  message,
@@ -51,6 +52,6 @@ func (err Error) WithMessage(message string) Error {
 // WithMessageF returns a copy of this error with the same Code but different Message.
 // The new message is the current message, formatted using a call to SPrintf and the arguments.
 func (err Error) WithMessageF(args ...interface{}) Error {
-	docfmt.Check(err.Message)
+	docfmt.AssertValid(err.Message)
 	return err.WithMessage(fmt.Sprintf(err.Message, args...))
 }

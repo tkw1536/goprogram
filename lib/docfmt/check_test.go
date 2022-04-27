@@ -7,7 +7,7 @@ import (
 	"github.com/tkw1536/goprogram/lib/testlib"
 )
 
-func TestCheck(t *testing.T) {
+func TestAssertValid(t *testing.T) {
 	for _, tt := range partTests {
 		t.Run(tt.name, func(t *testing.T) {
 			var wantPanic bool
@@ -16,7 +16,7 @@ func TestCheck(t *testing.T) {
 			if enabled {
 				wantPanic = tt.wantError != nil
 				if wantPanic {
-					wantError = &CheckError{
+					wantError = &ValidationError{
 						Message: tt.input,
 						Results: tt.wantError,
 					}
@@ -24,15 +24,15 @@ func TestCheck(t *testing.T) {
 			}
 
 			gotPanic, gotError := testlib.DoesPanic(func() {
-				Check(tt.input)
+				AssertValid(tt.input)
 			})
 
 			if gotPanic != wantPanic {
-				t.Errorf("Check() got panic = %v, want = %v", gotPanic, wantPanic)
+				t.Errorf("AssertValid() got panic = %v, want = %v", gotPanic, wantPanic)
 			}
 
 			if !reflect.DeepEqual(gotError, wantError) {
-				t.Errorf("Check() got error = %v, want = %v", gotError, wantError)
+				t.Errorf("AssertValid() got error = %v, want = %v", gotError, wantError)
 			}
 		})
 	}

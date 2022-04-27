@@ -58,7 +58,6 @@ const (
 //     - a word that starts with '%' is always valid, because it might be a format string
 //     - each word (except for the last word) must end with a space character, that is either " " or "\n" (InvalidEndSpace)
 func Validate(message string) (errors []ValidationResult) {
-	// TODO: Test me!
 	parts := SplitParts(message)
 partloop:
 	for pI, part := range parts {

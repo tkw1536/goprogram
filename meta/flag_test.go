@@ -96,22 +96,22 @@ func TestFlag_WriteMessageTo(t *testing.T) {
 		{
 			"long only option",
 			Flag{Usage: "a long option", Long: []string{"long"}},
-			"\n\n   --long\n      a long option",
+			"\n\n   --long\n      A long option",
 		},
 		{
 			"short and long option",
 			Flag{Usage: "a long or short option", Short: []string{"s"}, Long: []string{"long"}},
-			"\n\n   -s, --long\n      a long or short option",
+			"\n\n   -s, --long\n      A long or short option",
 		},
 		{
 			"short and long named option",
 			Flag{Usage: "this one is named", Value: "name", Short: []string{"s"}, Long: []string{"long"}},
-			"\n\n   -s, --long name\n      this one is named",
+			"\n\n   -s, --long name\n      This one is named",
 		},
 		{
 			"short and long named option with default",
 			Flag{Usage: "this one is named", Value: "name", Short: []string{"s"}, Long: []string{"long"}, Default: "default"},
-			"\n\n   -s, --long name\n      this one is named (default default)",
+			"\n\n   -s, --long name\n      This one is named (default default)",
 		},
 	}
 	for _, tt := range tests {
