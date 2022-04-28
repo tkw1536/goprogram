@@ -7,9 +7,11 @@ Documentation is a work in progress.
 
 ## Changelog
 
-# 0.0.6 (Upcoming)
+# 0.0.7 (Upcoming)
 
-- add more doccheck tests
+# 0.0.6 (Released [Apr 28 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.6))
+
+- extend doccheck package into docfmt package
 
 # 0.0.5 (Released [Apr 18 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.5))
 
