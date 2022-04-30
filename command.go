@@ -18,18 +18,12 @@ import (
 // Eventually the Run method of this command is invoked, using an appropriate new Context.
 // See Context for details on the latter.
 //
-// A command must be implemented as a struct or pointer to a struct.
-// Flag parsing is implemented using the "github.com/jessevdk/go-flags" package.
-// A Command implementation that is not a pointer to a struct is assumed to be flagless.
-//
+// A command should be implemented as a struct or pointer to a struct.
 // Typically command contains state that represents the parsed options.
-// This would prevent a single value of type command to run multiple times.
-// To work around this, the CloneCommand method exists.
+// Flag parsing is implemented using the "github.com/jessevdk/go-flags" package.
 //
-// In order for the CloneCommand method to work correctly, a Command must fullfill the following:
-// If it is not implemented as a pointer receiver, the zero value is expected to be ready to use.
-// Otherwise the zero value of the element struct is expected to be ready to use.
-// See also CloneCommand.
+// To ensure consistency between runs, a command is copied before being executed.
+// When command is a pointer, the underlying data (not the pointer to it) will be copied.
 type Command[E any, P any, F any, R Requirement[F]] interface {
 	// Run runs this command in the given context.
 	//
@@ -133,26 +127,6 @@ func (p Program[E, P, F, R]) Command(name string) (Command[E, P, F, R], bool) {
 // See also Commands.
 func (p Program[E, P, F, R]) FmtCommands() string {
 	return meta.JoinCommands(p.Commands())
-}
-
-// CloneCommand returns a new Command that behaves exactly like Command.
-//
-// This function is mostly intended to be used when a command should be called multiple times for testing.
-// during a single run of ggman.
-func CloneCommand[E any, P any, F any, R Requirement[F]](command Command[E, P, F, R]) (cmd Command[E, P, F, R]) {
-	cmdStruct := reflect.ValueOf(command) // cmd.CommandStruct
-
-	// clone := cmd.CommandStruct{...zero...}
-	var clone reflect.Value
-	if cmdStruct.Type().Kind() == reflect.Ptr {
-		clone = reflect.New(cmdStruct.Type().Elem())
-	} else {
-		clone = reflect.Zero(cmdStruct.Type())
-	}
-
-	// command = clone
-	reflect.ValueOf(&cmd).Elem().Set(clone)
-	return cmd
 }
 
 var errTakesNoArgument = exit.Error{

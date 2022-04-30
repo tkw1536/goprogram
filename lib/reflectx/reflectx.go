@@ -14,6 +14,60 @@ func TypeOf[T any]() reflect.Type {
 	return reflect.TypeOf((*T)(nil)).Elem()
 }
 
+// MakePointerCopy returns a new copy of value of interface type I that is backed by a pointer (if possible).
+// ptr holds the new copy, ok indiciates if the value is indeed a pointer.
+func MakePointerCopy[I any](value I) (ptr I, ok bool) {
+	iType := TypeOf[I]()
+	if iType.Kind() != reflect.Interface {
+		panic("MakePointer: I must be an interface type")
+	}
+
+	// get concrete type and value
+	rValue := reflect.ValueOf(value)
+	rTyp := rValue.Type()
+
+	// check that the target type implements type
+	tTyp := reflect.PointerTo(rTyp)
+	if !tTyp.Implements(iType) {
+		return Copy(value, true), rTyp.Kind() == reflect.Pointer
+	}
+
+	// easy case: we can address the value
+	if rValue.CanAddr() {
+		return rValue.Addr().Interface().(I), true // ok because of implements test above!
+	}
+
+	// create a new copy of value
+	copy := reflect.New(rTyp)
+	copy.Elem().Set(rValue)
+
+	// safe because above
+	return copy.Interface().(I), true
+}
+
+// Copy returns a copy of value.
+// When copyElem is true, and value is of kind pointer, returns a pointer to a copy of the pointed to value.
+func Copy[T any](value T, copyElem bool) T {
+	rValue := reflect.ValueOf(value)
+	rTyp := rValue.Type()
+
+	// copy the underlying element if requested
+	if copyElem && rTyp.Kind() == reflect.Pointer {
+		eValue := rValue.Elem()
+		eTyp := eValue.Type()
+
+		copy := reflect.New(eTyp)
+		copy.Elem().Set(eValue)
+
+		return copy.Interface().(T)
+	}
+
+	// make a copy
+	copy := reflect.New(rTyp)
+	copy.Elem().Set(rValue)
+	return copy.Elem().Interface().(T)
+}
+
 // IterateFields iterates over the struct fields of T and calls f for each field.
 // Fields are iterated in the order they are returned by reflect.Field().
 //

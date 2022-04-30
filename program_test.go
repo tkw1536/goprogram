@@ -27,10 +27,12 @@ import (
 type tEnvironment string
 type tParameters string
 
+type echoStruct = struct {
+	Arguments []string `description:"Arguments"`
+}
+
 func makeEchoCommand(name string) iCommand {
-	cmd := &tCommand[struct {
-		Arguments []string `description:"Arguments"`
-	}]{
+	cmd := &tCommand[echoStruct]{
 		MDesc: iDescription{
 			Command:      name,
 			Requirements: func(flag meta.Flag) bool { return true },
@@ -39,10 +41,10 @@ func makeEchoCommand(name string) iCommand {
 		MBeforeRegister: func() error { return nil },
 		MafterParse:     func() error { return nil },
 	}
-	cmd.MRun = func(context iContext) error {
-		defer func() { cmd.Positionals.Arguments = nil }() // for the next time
+	cmd.MRun = func(command tCommand[echoStruct], context iContext) error {
+		defer func() { command.Positionals.Arguments = nil }() // for the next time
 
-		context.Printf("%v\n", cmd.Positionals.Arguments)
+		context.Printf("%v\n", command.Positionals.Arguments)
 		return nil
 	}
 	return cmd
@@ -94,7 +96,7 @@ type tCommand[Pos any] struct {
 
 	MBeforeRegister func() error
 	MafterParse     func() error
-	MRun            func(context iContext) error
+	MRun            func(command tCommand[Pos], context iContext) error
 }
 
 func (t tCommand[Pos]) BeforeRegister(program *iProgram) {
@@ -120,7 +122,7 @@ func (t tCommand[Pos]) Run(ctx iContext) error {
 		fmt.Println("Run()")
 		return nil
 	}
-	return t.MRun(ctx)
+	return t.MRun(t, ctx)
 }
 
 // makeTPM_Positionals makes a new command with the provided positional arguments
@@ -549,26 +551,36 @@ func TestProgram_Main(t *testing.T) {
 			fakeCommand.FieldByName("MDesc").FieldByName("Command").Set(reflect.ValueOf("fake"))
 
 			// tt.MRun = ...
-			fakeCommand.FieldByName("MRun").Set(reflect.ValueOf(func(context iContext) error {
-				pos := fakeCommand.FieldByName("Positionals")
+			MRun := fakeCommand.FieldByName("MRun")
+			MRun.Set(reflect.MakeFunc(MRun.Type(), func(args []reflect.Value) (results []reflect.Value) {
+				err := (func(command reflect.Value, context iContext) error {
+					pos := command.FieldByName("Positionals")
 
-				context.Printf("Got Flags: %s\n", context.Args.Flags)
-				context.Printf("Got Pos: %v\n", pos.Interface())
+					context.Printf("Got Flags: %s\n", context.Args.Flags)
+					context.Printf("Got Pos: %v\n", pos.Interface())
 
-				context.Println(fakeCommand.FieldByName("StdoutMsg").Interface())
-				context.EPrintln(fakeCommand.FieldByName("StderrMsg").Interface())
+					context.Println(command.FieldByName("StdoutMsg").Interface())
+					context.EPrintln(command.FieldByName("StderrMsg").Interface())
 
-				fakeCommand.FieldByName("Positionals").FieldByName("Args")
+					command.FieldByName("Positionals").FieldByName("Args")
 
-				// fail when requested to fail
-				if argField := pos.FieldByName("Args"); argField.IsValid() {
-					pos, ok := argField.Interface().([]string)
-					if ok && len(pos) > 0 && pos[0] == "fail" {
-						return exit.Error{ExitCode: exit.ExitGeneric, Message: "test failure"}
+					// fail when requested to fail
+					if argField := pos.FieldByName("Args"); argField.IsValid() {
+						pos, ok := argField.Interface().([]string)
+						if ok && len(pos) > 0 && pos[0] == "fail" {
+							return exit.Error{ExitCode: exit.ExitGeneric, Message: "test failure"}
+						}
 					}
+
+					return nil
+				})(args[0], args[1].Interface().(iContext))
+
+				var rErr = reflect.Zero(reflect.TypeOf((*error)(nil)).Elem())
+				if err != nil {
+					rErr = reflect.ValueOf(err)
 				}
 
-				return nil
+				return []reflect.Value{rErr}
 			}))
 
 			program := makeProgram()

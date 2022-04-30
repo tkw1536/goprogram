@@ -16,7 +16,6 @@ type Config struct {
 // NewCommandParser checks if command represents a valid command and, when this is the case, creates a new parser for it
 // with the config provided in ParserConfig.
 func (cfg Config) NewCommandParser(command any) (p Parser) {
-	// TODO: Should consider automatically "lifting" to pointers in the caller
 
 	// the command must be backed by a pointed-to struct
 	// when this is not the case, we don't need to create a parser

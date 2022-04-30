@@ -153,3 +153,99 @@ func ExampleIterateAllFields_cancel() {
 	// encounted field EmbeddedField with index [2 0]
 	// returned: true
 }
+
+// counter is used for testing
+type counter struct {
+	Value int
+}
+
+func (c *counter) Inc() {
+	c.Value++
+}
+
+func (c counter) AsInt() int {
+	return c.Value
+}
+
+func ExampleMakePointerCopy_pointer() {
+	// Inc is an interface that incremenets
+	type Inc interface {
+		Inc()
+	}
+
+	// make a pointer to a counter
+	original := Inc(&counter{Value: 0})
+
+	// make a copy and increment the copy
+	copy, _ := MakePointerCopy(original)
+	copy.Inc()
+
+	// print the value of the original counter and the copy
+	// the copy is also a pointer
+	fmt.Println("original counter", original)
+	fmt.Println("copy of counter", copy)
+
+	// Output: original counter &{0}
+	// copy of counter &{1}
+}
+
+func ExampleMakePointerCopy_lift() {
+
+	// AsInt is an interface that returns an integer value
+	type AsInt interface {
+		AsInt() int
+	}
+
+	// make a *non-pointer* counter
+	original := AsInt(counter{Value: 0})
+
+	// make a copy and increment the copy
+	copy, _ := MakePointerCopy(original)
+	copy.(interface{ Inc() }).Inc()
+
+	// print the original value and the new value
+	// the original is a plain value, the copy is a pointer!
+	fmt.Println("original counter", original)
+	fmt.Println("copy of counter", copy)
+
+	// Output: original counter {0}
+	// copy of counter &{1}
+}
+
+func ExampleCopy() {
+	// counter is a struct holding a single number
+
+	// copying a data structure directly
+	func() {
+		original := counter{Value: 0}
+		copy := Copy(original, false)
+		copy.Value++
+		fmt.Println("original data", original)
+		fmt.Println("copy of data", copy)
+	}()
+
+	// copy a pointed value, which copies only the pointer
+	func() {
+		original := &counter{Value: 0}
+		copy := Copy(original, false)
+		copy.Value++
+		fmt.Println("original pointer", original)
+		fmt.Println("copy of pointer", copy)
+	}()
+
+	// copy a pointed value with element which copies the data
+	func() {
+		original := &counter{Value: 0}
+		copy := Copy(original, true)
+		copy.Value++
+		fmt.Println("original pointer", original)
+		fmt.Println("copied data", copy)
+	}()
+
+	// Output: original data {0}
+	// copy of data {1}
+	// original pointer &{1}
+	// copy of pointer &{1}
+	// original pointer &{0}
+	// copied data &{1}
+}

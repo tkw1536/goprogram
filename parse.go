@@ -65,7 +65,7 @@ func (args *Arguments[F]) parseProgramFlags(argv []string) error {
 // When parsing fails, returns an error of type Error.
 func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 	context.Description = command.Description()
-	// TODO: Lift the command arguments here!
+
 	context.parser = context.Description.ParserConfig.NewCommandParser(command)
 
 	// specifically intercept the "--help" and "-h" arguments.
