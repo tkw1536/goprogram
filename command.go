@@ -4,6 +4,7 @@ import (
 	"reflect"
 
 	"github.com/tkw1536/goprogram/exit"
+	"github.com/tkw1536/goprogram/lib/reflectx"
 	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/parser"
 	"golang.org/x/exp/slices"
@@ -111,6 +112,9 @@ func (p Program[E, P, F, R]) Commands() []string {
 func (p Program[E, P, F, R]) Command(name string) (Command[E, P, F, R], bool) {
 	// NOTE(twiesing): This function is not tested because it is so trivial
 	cmd, ok := p.commands[name]
+	if ok {
+		cmd, _ = reflectx.MakePointerCopy(cmd)
+	}
 	return cmd, ok
 }
 

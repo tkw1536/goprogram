@@ -3,7 +3,6 @@ package goprogram
 
 import (
 	"github.com/tkw1536/goprogram/exit"
-	"github.com/tkw1536/goprogram/lib/reflectx"
 	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/stream"
 )
@@ -101,9 +100,6 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	if !hasCommand {
 		return errProgramUnknownCommand.WithMessageF(p.FmtCommands())
 	}
-
-	// make a fresh copy of command
-	command, _ = reflectx.MakePointerCopy(command)
 
 	// make the context use the given command
 	if err := context.use(command); err != nil {
