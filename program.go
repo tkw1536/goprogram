@@ -66,6 +66,7 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	// create a new context
 	context := Context[E, P, F, R]{
 		IOStream: stream,
+		Program:  p,
 	}
 	if err := context.Args.parseProgramFlags(argv); err != nil {
 		return err

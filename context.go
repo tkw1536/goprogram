@@ -19,6 +19,9 @@ type Context[E any, P any, F any, R Requirement[F]] struct {
 	// Environment holds the environment for this command.
 	Environment E
 
+	// Program is the current program this command is executing under
+	Program Program[E, P, F, R]
+
 	// parser holds a parser for command-specific arguments
 	// this refers to the command itself
 	parser parser.Parser

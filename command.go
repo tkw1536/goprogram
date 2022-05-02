@@ -30,12 +30,6 @@ type Command[E any, P any, F any, R Requirement[F]] interface {
 	// It is called only once and must return either nil or an error of type Error.
 	Run(context Context[E, P, F, R]) error
 
-	// BeforeRegister is called right before this command is registered with a program.
-	// In particular it is called before any other function on this command is called.
-	//
-	// It is never called more than once for a single instance of a command.
-	BeforeRegister(program *Program[E, P, F, R])
-
 	// Description returns a description of this command.
 	// It may be called multiple times.
 	Description() Description[F, R]
@@ -87,15 +81,12 @@ func (EmptyRequirement[F]) AllowsFlag(meta.Flag) bool   { return true }
 func (EmptyRequirement[F]) Validate(Arguments[F]) error { return nil }
 
 // Register registers a command c with this program.
-// It calls the BeforeRegister method on c, and then register.
 //
 // It expects that the command does not have a name that is already taken.
 func (p *Program[E, P, F, R]) Register(c Command[E, P, F, R]) {
 	if p.commands == nil {
 		p.commands = make(map[string]Command[E, P, F, R])
 	}
-
-	c.BeforeRegister(p)
 
 	Name := c.Description().Command
 

@@ -38,8 +38,7 @@ func makeEchoCommand(name string) iCommand {
 			Requirements: func(flag meta.Flag) bool { return true },
 		},
 
-		MBeforeRegister: func() error { return nil },
-		MafterParse:     func() error { return nil },
+		MafterParse: func() error { return nil },
 	}
 	cmd.MRun = func(command tCommand[echoStruct], context iContext) error {
 		defer func() { command.Positionals.Arguments = nil }() // for the next time
@@ -94,18 +93,10 @@ type tCommand[Pos any] struct {
 
 	MDesc iDescription
 
-	MBeforeRegister func() error
-	MafterParse     func() error
-	MRun            func(command tCommand[Pos], context iContext) error
+	MafterParse func() error
+	MRun        func(command tCommand[Pos], context iContext) error
 }
 
-func (t tCommand[Pos]) BeforeRegister(program *iProgram) {
-	if t.MBeforeRegister == nil {
-		fmt.Println("BeforeRegister()")
-		return
-	}
-	t.MBeforeRegister()
-}
 func (t tCommand[Pos]) Description() iDescription {
 	return t.MDesc
 }
@@ -128,8 +119,7 @@ func (t tCommand[Pos]) Run(ctx iContext) error {
 // makeTPM_Positionals makes a new command with the provided positional arguments
 func makeTPM_Positionals[Pos any]() iCommand {
 	return &tCommand[Pos]{
-		MBeforeRegister: func() error { return nil },
-		MafterParse:     func() error { return nil },
+		MafterParse: func() error { return nil },
 	}
 }
 

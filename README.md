@@ -9,6 +9,7 @@ Documentation is a work in progress.
 
 # 0.0.7 (Upcoming)
 
+- remove `BeforeRegister` method and pass program in context
 - copy commands before executing and make sure they become pointers
 
 # 0.0.6 (Released [Apr 28 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.6))
