@@ -7,6 +7,7 @@ import (
 	"github.com/tkw1536/goprogram/lib/reflectx"
 	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/parser"
+	"golang.org/x/exp/maps"
 	"golang.org/x/exp/slices"
 )
 
@@ -100,10 +101,7 @@ func (p *Program[E, P, F, R]) Register(c Command[E, P, F, R]) {
 
 // Commands returns a list of known commands
 func (p Program[E, P, F, R]) Commands() []string {
-	commands := make([]string, 0, len(p.commands))
-	for cmd := range p.commands {
-		commands = append(commands, cmd)
-	}
+	commands := maps.Keys(p.commands)
 	slices.Sort(commands)
 	return commands
 }

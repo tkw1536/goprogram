@@ -23,9 +23,39 @@ var errParseArgsUnknownError = exit.Error{
 //
 // When parsing fails, returns an error of type Error.
 func (args *Arguments[F]) parseProgramFlags(argv []string) error {
-	var err error
+	parser := parser.NewArgumentsParser(args)
+	return args.parseProgramFlagsActual(argv, parser)
+}
 
-	argsParser := parser.NewArgumentsParser(args)
+// completeProgramFlags parsers a (possibly partial) set of arguments in argv and attempts completion on them
+//
+// ok indicates if there were any completions to be returned
+// completions and err hold these completions when that's the case
+func (args *Arguments[F]) completeProgramFlags(argv []string) (ok bool, completions []parser.Completion, err error) {
+	// TESTME
+
+	// create a parser and do completion!
+	// NOTE: This has to happen BEFORE parsing, because that might mutate the state!
+	parser := parser.NewArgumentsParser(args)
+	completions, completeErr := parser.CompleteArgs(argv)
+
+	// parse the flags, but ignore a missing command!
+	err = args.parseProgramFlagsActual(argv, parser)
+	if err == errParseArgsNeedOneArgument {
+		err = nil
+		args.Command = ""
+	}
+
+	// if we had completions, return them!
+	if len(completions) != 0 || completeErr != nil {
+		return true, completions, completeErr
+	}
+
+	return false, nil, nil
+}
+
+// parseProgramFlagsActual implements the tail of parseProgramFlags and completeProgramFlags
+func (args *Arguments[F]) parseProgramFlagsActual(argv []string, argsParser parser.Parser) (err error) {
 	args.pos, err = argsParser.ParseArgs(argv)
 
 	// intercept unknown flags
@@ -54,7 +84,7 @@ func (args *Arguments[F]) parseProgramFlags(argv []string) error {
 	args.Command = args.pos[0]
 	args.pos = args.pos[1:]
 
-	return err
+	return
 }
 
 // use prepares this context for using the provided command.
@@ -91,6 +121,11 @@ func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 	}
 
 	return nil
+}
+
+func (context *Context[E, P, F, R]) complete(command Command[E, P, F, R]) ([]parser.Completion, error) {
+	parser := context.Description.ParserConfig.NewCommandParser(command)
+	return parser.CompleteArgs(context.Args.pos)
 }
 
 var errWrongArguments = exit.Error{

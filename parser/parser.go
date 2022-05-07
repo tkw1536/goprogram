@@ -3,6 +3,7 @@ package parser
 
 import (
 	"errors"
+	"os"
 	"reflect"
 
 	"github.com/jessevdk/go-flags"
@@ -20,6 +21,8 @@ type Parser struct {
 	tp     reflect.Type
 }
 
+const goFlagsCompletion = "GO_FLAGS_COMPLETION"
+
 // ParseArgs parses arguments for this parser.
 //
 // The returned error may be nil, a help error, an unknown flag error or otherwise.
@@ -30,9 +33,56 @@ func (p Parser) ParseArgs(args []string) ([]string, error) {
 		return args, nil
 	}
 
+	// make sure that completion is *not* triggered
+	if c := os.Getenv(goFlagsCompletion); c != "" {
+		os.Setenv(goFlagsCompletion, "")
+		defer os.Setenv(goFlagsCompletion, c)
+	}
+
 	// NOTE(twiesing): In a future version we probably want to wrap the error here
 	// For now, the error is returned as-is with IsHelp() and IsUnknownFlag methods.
 	return p.parser.ParseArgs(args)
+}
+
+var errNotCalled = errors.New("CompleteArgs: CompletionHandler not called")
+
+type Completion = flags.Completion
+
+// CompleteArgs is a work in progress
+func (p Parser) CompleteArgs(args []string) (items []Completion, err error) {
+	// TESTME
+
+	// if we don't have a parser, there is nothing to complete
+	if p.parser == nil {
+		return nil, nil
+	}
+
+	// store the completion handler
+	handler := p.parser.CompletionHandler
+	defer func() { p.parser.CompletionHandler = handler }()
+
+	// store the completion env
+	c := os.Getenv(goFlagsCompletion)
+	defer os.Setenv(goFlagsCompletion, c)
+
+	// setup a completion handler
+	var ok bool
+	p.parser.CompletionHandler = func(i []flags.Completion) {
+		ok = true
+		items = i
+	}
+
+	// do the completion!
+	os.Setenv(goFlagsCompletion, "1")
+	p.parser.ParseArgs(args)
+
+	// check that we were actually called
+	if !ok {
+		return nil, errNotCalled
+	}
+
+	// and return them!
+	return items, nil
 }
 
 // IsHelp checks if err represents the help flag being passed

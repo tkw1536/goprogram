@@ -1,9 +1,21 @@
 package goprogram
 
+import (
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
+)
+
 // Keywords are special "commands" that manipulate arguments and positionals before execution.
 //
 // Keywords can not be stopped by calls to universal flags; they are expanded once before aliases and command expansion takes place.
 type Keyword[F any] func(args *Arguments[F], pos *[]string) error
+
+// Keywords returns a list of known keywords
+func (p Program[E, P, F, R]) Keywords() []string {
+	keywords := maps.Keys(p.keywords)
+	slices.Sort(keywords)
+	return keywords
+}
 
 // RegisterKeyword registers a new keyword.
 // See also Keyword.
