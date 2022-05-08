@@ -67,16 +67,13 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 		IOStream: stream,
 		Program:  p,
 	}
-	if err := context.Args.parseProgramFlags(argv); err != nil {
+	if err := context.Args.parse(argv); err != nil {
 		return err
 	}
 
 	// expand keywords
-	keyword, hasKeyword := p.keywords[context.Args.Command]
-	if hasKeyword {
-		if err := keyword(&context.Args, &context.Args.pos); err != nil {
-			return err
-		}
+	if _, err := context.expandKeywords(); err != nil {
+		return err
 	}
 
 	// handle universals
@@ -89,11 +86,8 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 		return nil
 	}
 
-	// expand the alias (if any)
-	alias, hasAlias := p.aliases[context.Args.Command]
-	if hasAlias {
-		context.Args.Command, context.Args.pos = alias.Invoke(context.Args.pos)
-	}
+	// expand the aliases!
+	alias, hasAlias := context.expandAliases()
 
 	// load the command if we have it
 	command, hasCommand := p.Command(context.Args.Command)

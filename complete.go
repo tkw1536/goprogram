@@ -6,56 +6,44 @@ import (
 	"github.com/tkw1536/goprogram/parser"
 )
 
-// Complete provides tab completion for this program
-func (p Program[E, P, F, R]) Complete(params P, argv []string) (completions []parser.Completion, err error) {
+// Complete attempts to parse argv into a set of arguments to parse a specific command, and provide completion on the last argument in argv.
+//
+// Arg
+func (p Program[E, P, F, R]) Complete(argv []string) (pfCompletions []parser.Completion, err error) {
 	// TESTME
 
 	context := Context[E, P, F, R]{
 		Program: p,
 	}
 
-	// perform completion on the first set of arguments!
-	ok, completions, err := context.Args.completeProgramFlags(argv)
+	// perform completion on program flags
+	hasPf, pfCompletions, pfErr := context.Args.complete(argv)
 
-	// perform completion on the arguments
-	// TODO: Share this code with Main()
-	keyword, hasKeyword := p.keywords[context.Args.Command]
-	if hasKeyword {
-		if err := keyword(&context.Args, &context.Args.pos); err != nil {
-			// FIXME(twiesing): Do we want to attempt completion anyways?
-			return nil, nil
-		}
-	}
-
-	// expand alias (if any)
-	alias, hasAlias := p.aliases[context.Args.Command]
-	if hasAlias {
-		context.Args.Command, context.Args.pos = alias.Invoke(context.Args.pos)
-	}
-
-	// check to load the command
+	// expand keywords and arguments
+	// then attempt to load the final command
+	hasKeyword, _ := context.expandKeywords()
+	_, hasAlias := context.expandAliases()
 	command, hasCommand := p.Command(context.Args.Command)
-	if !hasCommand {
-		if ok {
-			return completions, err
-		}
 
-		// user tried to invoke an unknown command
-		// so we can't do any completion!
-		if len(context.Args.pos) > 0 {
-			return nil, nil
-		}
-
-		// else complete the list of commands
-		// complete the list of commands!
-		return p.completeCommandLike(context.Args.Command, !hasKeyword, !hasAlias), nil
+	switch {
+	case !hasCommand && hasPf:
+		// we don't have a real command, but we did get completions from the before the command
+		// so we should attempt to complete those!
+		return pfCompletions, pfErr
+	case !hasCommand:
+		// we did not get a command, and did not have completions for them
+		// so we should attempt to complete the command-like argument itself!
+		return p.cCommandName(context.Args.Command, !hasKeyword, !hasAlias), nil
+	default:
+		// we got an actual command, so we should complete the actual content
+		return context.complete(command)
 	}
-
-	// do the completion on the command!
-	return context.complete(command)
 }
 
-func (p Program[E, P, F, R]) completeCommandLike(query string, includeKeywords bool, includeAlias bool) (completions []parser.Completion) {
+// cCommandName provides completions for a command-like name
+//
+// A command-like query is a command, keyword or alias.
+func (p Program[E, P, F, R]) cCommandName(query string, includeKeywords bool, includeAlias bool) (completions []parser.Completion) {
 	for _, cmd := range p.Commands() {
 		if strings.HasPrefix(cmd, query) {
 			c, _ := p.Command(cmd)

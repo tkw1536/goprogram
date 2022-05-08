@@ -27,6 +27,25 @@ type Context[E any, P any, F any, R Requirement[F]] struct {
 	parser parser.Parser
 }
 
+// expandKeywords expands any keywords in the context (if any)
+func (context *Context[E, P, F, R]) expandKeywords() (hasKeyword bool, err error) {
+	var keyword Keyword[F]
+	keyword, hasKeyword = context.Program.keywords[context.Args.Command]
+	if hasKeyword {
+		err = keyword(&context.Args, &context.Args.pos)
+	}
+	return
+}
+
+// expandAliases expands any alias in the context (if any)
+func (context *Context[E, P, F, R]) expandAliases() (alias Alias, hasAlias bool) {
+	alias, hasAlias = context.Program.aliases[context.Args.Command]
+	if hasAlias {
+		context.Args.Command, context.Args.pos = alias.Invoke(context.Args.pos)
+	}
+	return
+}
+
 // Arguments represent a set of command-independent arguments passed to a command.
 // These should be further parsed into CommandArguments using the appropriate Parse() method.
 //

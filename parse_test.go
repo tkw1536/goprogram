@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestArguments_parseProgramFlags(t *testing.T) {
+func TestArguments_parse(t *testing.T) {
 	type args struct {
 		argv []string
 	}
@@ -54,7 +54,7 @@ func TestArguments_parseProgramFlags(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var args iArguments
-			err := args.parseProgramFlags(tt.args.argv)
+			err := args.parse(tt.args.argv)
 
 			// turn wantErr into a string
 			var wantErr string
@@ -70,7 +70,7 @@ func TestArguments_parseProgramFlags(t *testing.T) {
 
 			// compare error messages
 			if wantErr != gotErr {
-				t.Errorf("Arguments.parseP() error = %#v, wantErr %#v", err, tt.wantErr)
+				t.Errorf("Arguments.parse() error = %#v, wantErr %#v", err, tt.wantErr)
 			}
 
 			if tt.wantErr != nil { // ignore checks when an error is returned; we don't care
@@ -78,7 +78,7 @@ func TestArguments_parseProgramFlags(t *testing.T) {
 			}
 
 			if !reflect.DeepEqual(args, tt.wantParsed) {
-				t.Errorf("Arguments.parseProgramFlags() args = %#v, wantArgs %#v", args, &tt.wantParsed)
+				t.Errorf("Arguments.parse() args = %#v, wantArgs %#v", args, &tt.wantParsed)
 			}
 		})
 	}

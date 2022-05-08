@@ -23,33 +23,36 @@ type Parser struct {
 
 const goFlagsCompletion = "GO_FLAGS_COMPLETION"
 
-// ParseArgs parses arguments for this parser.
+// Parse parses arguments for this parser.
+// It guarantees that the completion handler is not called.
 //
 // The returned error may be nil, a help error, an unknown flag error or otherwise.
 // See also IsHelp, IsUnknownFlag.
-func (p Parser) ParseArgs(args []string) ([]string, error) {
+func (p Parser) Parse(args []string) ([]string, error) {
+	// TESTME
+
 	// if we don't have a parser, parsing is a no-op!
 	if p.parser == nil {
 		return args, nil
 	}
 
-	// make sure that completion is *not* triggered
-	if c := os.Getenv(goFlagsCompletion); c != "" {
-		os.Setenv(goFlagsCompletion, "")
-		defer os.Setenv(goFlagsCompletion, c)
-	}
+	// store the completion variable
+	defer os.Setenv(goFlagsCompletion, os.Getenv(goFlagsCompletion))
 
 	// NOTE(twiesing): In a future version we probably want to wrap the error here
 	// For now, the error is returned as-is with IsHelp() and IsUnknownFlag methods.
+	os.Setenv(goFlagsCompletion, "")
 	return p.parser.ParseArgs(args)
 }
 
-var errNotCalled = errors.New("CompleteArgs: CompletionHandler not called")
-
+// Completion represents the completion of a single flag of the parser.
 type Completion = flags.Completion
 
-// CompleteArgs is a work in progress
-func (p Parser) CompleteArgs(args []string) (items []Completion, err error) {
+// Complete completes a set of partial arguments provided to this parser.
+// It guarantees that argument parsing does not take place, and no state is modified.
+//
+// The returned error may be nil
+func (p Parser) Complete(args []string) (items []Completion, err error) {
 	// TESTME
 
 	// if we don't have a parser, there is nothing to complete
@@ -57,13 +60,15 @@ func (p Parser) CompleteArgs(args []string) (items []Completion, err error) {
 		return nil, nil
 	}
 
-	// store the completion handler
-	handler := p.parser.CompletionHandler
-	defer func() { p.parser.CompletionHandler = handler }()
+	// store the old completion handler
+	defer func(handler func(items []flags.Completion)) {
+		p.parser.CompletionHandler = handler
+	}(
+		p.parser.CompletionHandler,
+	)
 
 	// store the completion env
-	c := os.Getenv(goFlagsCompletion)
-	defer os.Setenv(goFlagsCompletion, c)
+	defer os.Setenv(goFlagsCompletion, os.Getenv(goFlagsCompletion))
 
 	// setup a completion handler
 	var ok bool
@@ -76,9 +81,10 @@ func (p Parser) CompleteArgs(args []string) (items []Completion, err error) {
 	os.Setenv(goFlagsCompletion, "1")
 	p.parser.ParseArgs(args)
 
-	// check that we were actually called
+	// if no one called the completion handler, then "go-flags" changed it's implementation
+	// and we shouldn't assume anything anymore!
 	if !ok {
-		return nil, errNotCalled
+		panic("Parser.Complete(): CompletionHandler was not called")
 	}
 
 	// and return them!
@@ -97,8 +103,25 @@ func IsUnknownFlag(err error) bool {
 	return errors.As(err, &flagError) && flagError.Type == flags.ErrUnknownFlag
 }
 
-// options collects all options contained in p or inside a group of p
-func (p Parser) args() (options []*flags.Arg) {
+// Positionals returns information about all the positionals found in this parser
+func (p Parser) Positionals() []meta.Positional {
+	// collect the args
+	args := p.args()
+	types := p.argTypes()
+	if len(args) != len(types) {
+		panic("Parser.Positionals(): len(args) != len(types)")
+	}
+
+	// turn them into proper positionals
+	poss := make([]meta.Positional, len(args))
+	for i, arg := range args {
+		poss[i] = NewPositional(arg, types[i])
+	}
+	return poss
+}
+
+// args collects all the arguments found in this parser
+func (p Parser) args() (args []*flags.Arg) {
 	if p.parser == nil {
 		return nil
 	}
@@ -106,6 +129,7 @@ func (p Parser) args() (options []*flags.Arg) {
 	return p.parser.Args()
 }
 
+// argTypes collects the struct fields corresponding to the arguments in this parser
 func (p Parser) argTypes() (types []reflect.StructField) {
 	if p.parser == nil {
 		return nil
@@ -129,20 +153,17 @@ func (p Parser) argTypes() (types []reflect.StructField) {
 	return
 }
 
-func (p Parser) Positionals() []meta.Positional {
-	// collect the args
-	args := p.args()
-	types := p.argTypes()
-	if len(args) != len(types) {
-		panic("Parser.Positionals(): len(args) != len(types)")
-	}
+// Flags returns information about the flags belonging to this parser
+func (p Parser) Flags() []meta.Flag {
+	// collect the options
+	options := p.options()
 
-	// turn them into proper positionals
-	poss := make([]meta.Positional, len(args))
-	for i, arg := range args {
-		poss[i] = NewPositional(arg, types[i])
+	// turn them into proper flags
+	flags := make([]meta.Flag, len(options))
+	for i, opt := range options {
+		flags[i] = NewFlag(opt)
 	}
-	return poss
+	return flags
 }
 
 // options collects all options contained in p or inside a group of p
@@ -157,17 +178,4 @@ func (p Parser) options() (options []*flags.Option) {
 	}
 
 	return
-}
-
-// Flags returns information about the flags belonging to this parser
-func (p Parser) Flags() []meta.Flag {
-	// collect the options
-	options := p.options()
-
-	// turn them into proper flags
-	flags := make([]meta.Flag, len(options))
-	for i, opt := range options {
-		flags[i] = NewFlag(opt)
-	}
-	return flags
 }

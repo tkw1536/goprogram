@@ -16,31 +16,31 @@ var errParseArgsUnknownError = exit.Error{
 	Message:  "unable to parse arguments: %s",
 }
 
-// parseProgramFlags parses program-wide arguments.
+// parse parses program-wide arguments.
 //
 // In particular, it *does not* parse command specific arguments.
 // Any flags are just returned as unparsed positionals.
 //
 // When parsing fails, returns an error of type Error.
-func (args *Arguments[F]) parseProgramFlags(argv []string) error {
+func (args *Arguments[F]) parse(argv []string) error {
 	parser := parser.NewArgumentsParser(args)
-	return args.parseProgramFlagsActual(argv, parser)
+	return args.parseActual(argv, parser)
 }
 
-// completeProgramFlags parsers a (possibly partial) set of arguments in argv and attempts completion on them
+// complete parsers a (possibly partial) set of arguments in argv and attempts completion on them
 //
 // ok indicates if there were any completions to be returned
 // completions and err hold these completions when that's the case
-func (args *Arguments[F]) completeProgramFlags(argv []string) (ok bool, completions []parser.Completion, err error) {
+func (args *Arguments[F]) complete(argv []string) (ok bool, completions []parser.Completion, err error) {
 	// TESTME
 
 	// create a parser and do completion!
 	// NOTE: This has to happen BEFORE parsing, because that might mutate the state!
 	parser := parser.NewArgumentsParser(args)
-	completions, completeErr := parser.CompleteArgs(argv)
+	completions, completeErr := parser.Complete(argv)
 
 	// parse the flags, but ignore a missing command!
-	err = args.parseProgramFlagsActual(argv, parser)
+	err = args.parseActual(argv, parser)
 	if err == errParseArgsNeedOneArgument {
 		err = nil
 		args.Command = ""
@@ -54,9 +54,10 @@ func (args *Arguments[F]) completeProgramFlags(argv []string) (ok bool, completi
 	return false, nil, nil
 }
 
-// parseProgramFlagsActual implements the tail of parseProgramFlags and completeProgramFlags
-func (args *Arguments[F]) parseProgramFlagsActual(argv []string, argsParser parser.Parser) (err error) {
-	args.pos, err = argsParser.ParseArgs(argv)
+// parseActual implements the tail of parse and complete.
+// This function MUST NOT be called outside of this file.
+func (args *Arguments[F]) parseActual(argv []string, argsParser parser.Parser) (err error) {
+	args.pos, err = argsParser.Parse(argv)
 
 	// intercept unknown flags
 	if parser.IsUnknownFlag(err) {
@@ -125,7 +126,7 @@ func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 
 func (context *Context[E, P, F, R]) complete(command Command[E, P, F, R]) ([]parser.Completion, error) {
 	parser := context.Description.ParserConfig.NewCommandParser(command)
-	return parser.CompleteArgs(context.Args.pos)
+	return parser.Complete(context.Args.pos)
 }
 
 var errWrongArguments = exit.Error{
@@ -137,7 +138,7 @@ var errWrongArguments = exit.Error{
 //
 // When an error occurs, returns an error of type Error.
 func (context *Context[E, P, F, R]) parseCommandFlags() (err error) {
-	context.Args.pos, err = context.parser.ParseArgs(context.Args.pos)
+	context.Args.pos, err = context.parser.Parse(context.Args.pos)
 
 	// catch the help error
 	if parser.IsHelp(err) {

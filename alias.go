@@ -1,6 +1,9 @@
 package goprogram
 
-import "golang.org/x/exp/slices"
+import (
+	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
+)
 
 // Alias represents an alias for a command.
 //
@@ -59,10 +62,7 @@ func (p *Program[E, P, F, R]) RegisterAlias(alias Alias) {
 // Aliases returns the names of all registered aliases.
 // Aliases are returned in sorted order.
 func (p Program[E, P, F, R]) Aliases() []string {
-	aliases := make([]string, 0, len(p.aliases))
-	for alias := range p.aliases {
-		aliases = append(aliases, alias)
-	}
+	aliases := maps.Keys(p.aliases)
 	slices.Sort(aliases)
 	return aliases
 }
