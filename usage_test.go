@@ -24,7 +24,7 @@ func TestProgram_MainUsage(t *testing.T) {
 
 // makeTPM_Positionals makes a new parser with the provided positional arguments
 func makeTPCU_Positionals[Pos any]() parser.Parser {
-	return parser.Config{}.NewCommandParser(&struct {
+	return parser.Config{}.NewParser(&struct {
 		Boolean     bool `short:"b" value-name:"random" long:"bool" description:"a random boolean argument with short"`
 		Int         int  `long:"int" value-name:"dummy" description:"a dummy integer flag" default:"12"`
 		Positionals Pos  `positional-args:"true"`

@@ -96,7 +96,7 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	}
 
 	// make the context use the given command
-	if err := context.use(command); err != nil {
+	if err := context.prepareMain(command); err != nil {
 		return err
 	}
 

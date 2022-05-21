@@ -13,13 +13,16 @@ type Config struct {
 	IncludeUnknown bool
 }
 
-// NewCommandParser checks if command represents a valid command and, when this is the case, creates a new parser for it
+// NewParser checks if command represents a valid command and, when this is the case, creates a new parser for it
 // with the config provided in ParserConfig.
-func (cfg Config) NewCommandParser(command any) (p Parser) {
+func (cfg Config) NewParser(command any) (p Parser) {
+	// TESTME
 
 	// the command must be backed by a pointed-to struct
 	// when this is not the case, we don't need to create a parser
 	if ptrval := reflect.TypeOf(command); command == nil || ptrval.Kind() != reflect.Ptr || ptrval.Elem().Kind() != reflect.Struct {
+		// TODO: Do we want to raise a panic here?
+		// There should never be a command that is not backed by a struct or lifted
 		return
 	}
 

@@ -8,7 +8,10 @@ import (
 
 // Complete attempts to parse argv into a set of arguments to parse a specific command, and provide completion on the last argument in argv.
 //
-// Arg
+// Whenever possible, complete attempts to return a completion.
+// This means that any parsing errors might be silenced.
+//
+// Furthermore, exact results should not be relied upon, and might be incorrect.
 func (p Program[E, P, F, R]) Complete(argv []string) (pfCompletions []parser.Completion, err error) {
 	// TESTME
 

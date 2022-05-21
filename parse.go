@@ -88,16 +88,17 @@ func (args *Arguments[F]) parseActual(argv []string, argsParser parser.Parser) (
 	return
 }
 
-// use prepares this context for using the provided command.
+// prepareMain prepares the context for using this command.
 // It expects the context.Arguments object to exist, see the parseP method of Arguments.
 //
 // It expects that neither the Help nor Version flag of Arguments are true.
 //
 // When parsing fails, returns an error of type Error.
-func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
-	context.Description = command.Description()
+func (context *Context[E, P, F, R]) prepareMain(command Command[E, P, F, R]) error {
+	// TESTME
 
-	context.parser = context.Description.ParserConfig.NewCommandParser(command)
+	context.Description = command.Description()
+	context.parser = context.Description.ParserConfig.NewParser(command)
 
 	// specifically intercept the "--help" and "-h" arguments.
 	// this prevents any kind of side effect from occuring.
@@ -125,7 +126,8 @@ func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 }
 
 func (context *Context[E, P, F, R]) complete(command Command[E, P, F, R]) ([]parser.Completion, error) {
-	parser := context.Description.ParserConfig.NewCommandParser(command)
+	// TESTME
+	parser := context.Description.ParserConfig.NewParser(command)
 	return parser.Complete(context.Args.pos)
 }
 
