@@ -3,8 +3,9 @@ name: CI
 on: [push, pull_request]
 
 env:
-  GO_VERSION: '^1.18'
+  GO_VERSION: '^1.19'
   GO_STABLE: 'true'
+  GOEXPERIMENT: 'unified'
 
 jobs:
   test:
