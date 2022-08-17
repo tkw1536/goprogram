@@ -42,21 +42,21 @@ const (
 //
 // Each message is first split into parts, see SplitParts.
 // Then each part is validated as follows:
-//     - a part (with the exception of the last part) may not be empty (PartIsEmpty)
+//   - a part (with the exception of the last part) may not be empty (PartIsEmpty)
 //
 // Furthermore each part is split into words, see SplitWords.
 // Then each word is validated as follows:
-//     - no word may be empty (WordIsEmpty)
-//     - a word may only contain lower case letter (ForbiddenCharacter)
-//     - a word starting with ` and ending with ' is always valid, because it is a quoted word
-//     - a word starting with ` and not ending with ' must be a word quoted in go syntax, and may not have any extra content (WordIncorrectQuote)
-//     - a word may have a leading '(' or a trailing ')', then the other runes apply accordingly
-//     - a word may contain a trailing comma
-//     - a word may only contain capital letters when all runes in it are capital letters, or if the last letter is an s and the rest are capital.
-//     - a word may consist of only digits when all runes in it are digits
-//     - a word may contain '-'s, but only non-sequential occurences (WordNoSequentialDashes) that are not the first or last letter (WordNoOutsideDashes)
-//     - a word that starts with '%' is always valid, because it might be a format string
-//     - each word (except for the last word) must end with a space character, that is either " " or "\n" (InvalidEndSpace)
+//   - no word may be empty (WordIsEmpty)
+//   - a word may only contain lower case letter (ForbiddenCharacter)
+//   - a word starting with ` and ending with ' is always valid, because it is a quoted word
+//   - a word starting with ` and not ending with ' must be a word quoted in go syntax, and may not have any extra content (WordIncorrectQuote)
+//   - a word may have a leading '(' or a trailing ')', then the other runes apply accordingly
+//   - a word may contain a trailing comma
+//   - a word may only contain capital letters when all runes in it are capital letters, or if the last letter is an s and the rest are capital.
+//   - a word may consist of only digits when all runes in it are digits
+//   - a word may contain '-'s, but only non-sequential occurences (WordNoSequentialDashes) that are not the first or last letter (WordNoOutsideDashes)
+//   - a word that starts with '%' is always valid, because it might be a format string
+//   - each word (except for the last word) must end with a space character, that is either " " or "\n" (InvalidEndSpace)
 func Validate(message string) (errors []ValidationResult) {
 	parts := SplitParts(message)
 partloop:

@@ -17,7 +17,7 @@ import (
 //
 // Any message fullfills the invariant:
 //
-//   message == strings.Join(SplitParts(message), "")
+//	message == strings.Join(SplitParts(message), "")
 func SplitParts(message string) (parts []string) {
 	return splitString([]rune(message), isPartSeperator, false)
 }
@@ -39,8 +39,8 @@ func isPartSeperator(r rune) bool {
 //
 // Any part fullfills the invariant:
 //
-//    words, sep := SplitWords(part)
-//    part == strings.Join(SplitParts(words), "") + sep
+//	words, sep := SplitWords(part)
+//	part == strings.Join(SplitParts(words), "") + sep
 func SplitWords(part string) (words []string, sep string) {
 	if part == "" {
 		return

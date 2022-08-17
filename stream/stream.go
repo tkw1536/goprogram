@@ -71,7 +71,9 @@ func NewIOStream(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
 var newLine = []byte("\n")
 
 // StdoutWriteWrap is like
-//  io.Stdout.Write([]byte(s + "\n"))
+//
+//	io.Stdout.Write([]byte(s + "\n"))
+//
 // but wrapped at a reasonable length
 func (io IOStream) StdoutWriteWrap(s string) (int, error) {
 	n, err := wrap.Write(io.Stdout, io.wrap, s)
@@ -84,7 +86,9 @@ func (io IOStream) StdoutWriteWrap(s string) (int, error) {
 }
 
 // StderrWriteWrap is like
-//  io.Stdout.Write([]byte(s + "\n"))
+//
+//	io.Stdout.Write([]byte(s + "\n"))
+//
 // but wrapped at length Wrap.
 func (io IOStream) StderrWriteWrap(s string) (int, error) {
 	n, err := wrap.Write(io.Stderr, io.wrap, s)

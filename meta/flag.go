@@ -37,7 +37,9 @@ type Flag struct {
 
 // WriteSpecTo writes a short specification of f into w.
 // It is of the form
-//    --flag|-f value
+//
+//	--flag|-f value
+//
 // WriteSpecTo adds braces around the argument if it is optional.
 func (f Flag) WriteSpecTo(w io.Writer) {
 	f.spec(w, "|", true, true)
@@ -45,7 +47,9 @@ func (f Flag) WriteSpecTo(w io.Writer) {
 
 // WriteLongSpecTo writes a long specification of f into w.
 // It is of the form
-//  -f, --flag value
+//
+//	-f, --flag value
+//
 // WriteLongSpecTo does not add any brackets around the argument.
 func (opt Flag) WriteLongSpecTo(w io.Writer) {
 	opt.spec(w, ", ", false, false)
@@ -93,7 +97,7 @@ func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces boo
 // usageMsgTpl is the template for long usage messages
 // it is split into three parts, that are joined by the arguments.
 //
-//  const usageMsgTpl = usageMsg1 + "%s" + usageMsg2 + "%s" + usageMsg3
+//	const usageMsgTpl = usageMsg1 + "%s" + usageMsg2 + "%s" + usageMsg3
 const (
 	usageMsg1 = "\n\n   "
 	usageMsg2 = "\n      "
@@ -102,9 +106,13 @@ const (
 
 // WriteMessageTo writes a long message of f to w.
 // It is of the form
-//    -f, --flag ARG
+//
+//	-f, --flag ARG
+//
 // and
-//    DESCRIPTION (default DEFAULT)
+//
+//	DESCRIPTION (default DEFAULT)
+//
 // .
 //
 // This function is implicity tested via other tests.

@@ -10,6 +10,7 @@ Documentation is a work in progress.
 # 0.0.8 (Upcoming)
 
 - add `ReadLine`, `ReadPassword` and `ReadPasswordStrict` methods
+- minor `go1.19` formatting
 
 # 0.0.7 (Released [May 2 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.7))
 
