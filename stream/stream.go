@@ -8,6 +8,7 @@ import (
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/lib/docfmt"
 	"github.com/tkw1536/goprogram/lib/wrap"
+	"golang.org/x/term"
 )
 
 // IOStream represents a set of input and output streams commonly associated to a process.
@@ -17,6 +18,12 @@ type IOStream struct {
 
 	// Number of columns to wrap input and output in
 	wrap int
+}
+
+// StdinIsATerminal checks if standard input is a terminal
+func (io IOStream) StdinIsATerminal() bool {
+	file, ok := io.Stdin.(interface{ Fd() uintptr })
+	return ok && term.IsTerminal(int(file.Fd()))
 }
 
 // Printf is like "fmt.Printf" but prints to io.Stdout.
