@@ -9,6 +9,7 @@ Documentation is a work in progress.
 
 # 0.0.9 (Upcoming)
 
+- add `BeforeKeyword`, `BeforeAlias`, `BeforeCommand` hooks
 - add a method `StdinIsATerminal` to check if stdin is a terminal
 
 # 0.0.8 (Released [Aug 17 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.8))

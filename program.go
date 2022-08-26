@@ -35,6 +35,15 @@ type Program[E any, P any, F any, R Requirement[F]] struct {
 	// the zero value of type E.
 	NewEnvironment func(params P, context Context[E, P, F, R]) (E, error)
 
+	// BeforeKeyword, BeforeAlias and BeforeCommand (if non-nil) are invoked right before their respective datum is executed.
+	// They are intended to act as a guard before executing a particular datum.
+	//
+	// The returned error must be nil or of type exit.Error.
+	// When non-nil, the error is returned to the caller of Main().
+	BeforeKeyword func(context Context[E, P, F, R], keyword Keyword[F]) error
+	BeforeAlias   func(context Context[E, P, F, R], alias Alias) error
+	BeforeCommand func(context Context[E, P, F, R], command Command[E, P, F, R]) error
+
 	// Commands, Keywords, and Aliases associated with this program.
 	// They are expanded in order; see Main for details.
 	keywords map[string]Keyword[F]
@@ -74,6 +83,13 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	// expand keywords
 	keyword, hasKeyword := p.keywords[context.Args.Command]
 	if hasKeyword {
+		// invoke BeforeKeyword (if any)
+		if p.BeforeKeyword != nil {
+			err := p.BeforeKeyword(context, keyword)
+			if err != nil {
+				return err
+			}
+		}
 		if err := keyword(&context.Args, &context.Args.pos); err != nil {
 			return err
 		}
@@ -92,6 +108,13 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	// expand the alias (if any)
 	alias, hasAlias := p.aliases[context.Args.Command]
 	if hasAlias {
+		// invoke BeforeAlias (if any)
+		if p.BeforeAlias != nil {
+			err := p.BeforeAlias(context, alias)
+			if err != nil {
+				return err
+			}
+		}
 		context.Args.Command, context.Args.pos = alias.Invoke(context.Args.pos)
 	}
 
@@ -126,6 +149,14 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	// create the environment
 	if context.Environment, err = p.makeEnvironment(params, context); err != nil {
 		return err
+	}
+
+	// invoke BeforeCommand (if any)
+	if p.BeforeCommand != nil {
+		err := p.BeforeCommand(context, command)
+		if err != nil {
+			return err
+		}
 	}
 
 	// do the command!
