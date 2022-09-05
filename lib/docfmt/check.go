@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// AssertValid asserts that message is propertly format and calling Validate on it returns no results.
+// AssertValid asserts that message is properly formatted and calling Validate on it returns no results.
 //
 // When checking is disabled, no runtime checking is performed.
 // When checking is enabled and a message fails to pass validation, calls panic()
