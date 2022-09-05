@@ -7,7 +7,9 @@ Documentation is a work in progress.
 
 ## Changelog
 
-# 0.0.10 (Upcoming)
+# 0.0.11 (Upcoming)
+
+# 0.0.10 (Released [Aug 26 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.10))
 
 - add error wrapping
 
