@@ -16,6 +16,14 @@ type Error struct {
 	// Message for this error
 	// Messages should pass docfmt.Validate
 	Message string
+
+	// underlying wrapped error, if any
+	err error
+}
+
+// Unwrap unwraps this error, if any
+func (err Error) Unwrap() error {
+	return err.err
 }
 
 // Error returns the error message belonging to this error.
@@ -53,5 +61,15 @@ func (err Error) WithMessage(message string) Error {
 // The new message is the current message, formatted using a call to SPrintf and the arguments.
 func (err Error) WithMessageF(args ...interface{}) Error {
 	docfmt.AssertValid(err.Message)
+	// TODO: Runtime check if there is a single error argument
+	// and recommend using err.Wrap() instead
 	return err.WithMessage(fmt.Sprintf(err.Message, args...))
+}
+
+// Wrap creates a new error with same exit code, wrapping the inner error.
+// The message of the new error will contain the Error() result of the inner error.
+func (err Error) Wrap(inner error) Error {
+	err.Message = fmt.Sprintf("%s: %s", err.Message, inner)
+	err.err = inner
+	return err
 }

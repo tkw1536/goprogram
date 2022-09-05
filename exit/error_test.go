@@ -111,3 +111,35 @@ func TestError_WithMessageF(t *testing.T) {
 		})
 	}
 }
+
+func TestError_Wrap(t *testing.T) {
+	var inner = errors.New("inner error")
+	type fields struct {
+		ExitCode ExitCode
+		Message  string
+		err      error
+	}
+	type args struct {
+		inner error
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   Error
+	}{
+		{"wraps an inner error", fields{ExitCode: 1, Message: "Something went wrong"}, args{inner}, Error{ExitCode: 1, Message: "Something went wrong: inner error", err: inner}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := Error{
+				ExitCode: tt.fields.ExitCode,
+				Message:  tt.fields.Message,
+				err:      tt.fields.err,
+			}
+			if got := err.Wrap(tt.args.inner); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Error.Wrap() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

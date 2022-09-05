@@ -9,6 +9,8 @@ Documentation is a work in progress.
 
 # 0.0.10 (Upcoming)
 
+- add error wrapping
+
 # 0.0.9 (Released [Aug 26 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.9))
 
 - add `BeforeKeyword`, `BeforeAlias`, `BeforeCommand` hooks
