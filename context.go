@@ -27,6 +27,11 @@ type Context[E any, P any, F any, R Requirement[F]] struct {
 	parser parser.Parser
 }
 
+// Exec is like context.Program.Exec.
+func (context Context[E, P, F, R]) Exec(command string, args ...string) error {
+	return context.Program.Exec(context, command, args...)
+}
+
 // Arguments represent a set of command-independent arguments passed to a command.
 // These should be further parsed into CommandArguments using the appropriate Parse() method.
 //

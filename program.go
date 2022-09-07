@@ -76,10 +76,48 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 		IOStream: stream,
 		Program:  p,
 	}
+
+	// parse flags!
 	if err := context.Args.parseProgramFlags(argv); err != nil {
 		return err
 	}
 
+	// and run!
+	return p.run(context, func(context Context[E, P, F, R]) (E, error) {
+		e, err := p.makeEnvironment(params, context)
+		return e, err
+	})
+}
+
+// Exec executes this program from within a given context.
+//
+// It does not create a new environment.
+// It does not re-parse arguments preceeding the keyword, alias or command.
+//
+// This function is intended to safely run a command from within another command.
+func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, pos ...string) error {
+	// NOTE(twiesing): This function is untested, because it is nearly identical to Main
+
+	// create a new context
+	econtext := Context[E, P, F, R]{
+		IOStream: context.IOStream,
+		Program:  p,
+
+		Args: Arguments[F]{
+			Universals: context.Args.Universals,
+			Flags:      context.Args.Flags,
+
+			Command: command,
+			pos:     pos,
+		},
+	}
+
+	// reset the arguments to the context
+	return p.run(econtext, func(Context[E, P, F, R]) (E, error) { return context.Environment, nil })
+}
+
+// run implements Main and Exec
+func (p Program[E, P, F, R]) run(context Context[E, P, F, R], makeEnv func(context Context[E, P, F, R]) (E, error)) (err error) {
 	// expand keywords
 	keyword, hasKeyword := p.keywords[context.Args.Command]
 	if hasKeyword {
@@ -98,10 +136,10 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	// handle universals
 	switch {
 	case context.Args.Universals.Help:
-		stream.StdoutWriteWrap(p.MainUsage().String())
+		context.StdoutWriteWrap(p.MainUsage().String())
 		return nil
 	case context.Args.Universals.Version:
-		stream.StdoutWriteWrap(p.Info.FmtVersion())
+		context.StdoutWriteWrap(p.Info.FmtVersion())
 		return nil
 	}
 
@@ -132,10 +170,10 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	// write out help information (if given)
 	if context.Args.Universals.Help {
 		if hasAlias {
-			stream.StdoutWriteWrap(p.AliasUsage(context, alias).String())
+			context.StdoutWriteWrap(p.AliasUsage(context, alias).String())
 			return nil
 		}
-		stream.StdoutWriteWrap(p.CommandUsage(context).String())
+		context.StdoutWriteWrap(p.CommandUsage(context).String())
 		return nil
 	}
 
@@ -147,7 +185,7 @@ func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []strin
 	}
 
 	// create the environment
-	if context.Environment, err = p.makeEnvironment(params, context); err != nil {
+	if context.Environment, err = makeEnv(context); err != nil {
 		return err
 	}
 
