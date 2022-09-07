@@ -110,6 +110,8 @@ func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, p
 			Command: command,
 			pos:     pos,
 		},
+
+		inExec: true,
 	}
 
 	// reset the arguments to the context

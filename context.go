@@ -25,6 +25,14 @@ type Context[E any, P any, F any, R Requirement[F]] struct {
 	// parser holds a parser for command-specific arguments
 	// this refers to the command itself
 	parser parser.Parser
+
+	// inExec indicates if the current command is being called from within a program.Exec call.
+	inExec bool
+}
+
+// InExec returns true if this execution environment was started from within a program.Exec command.
+func (context Context[E, P, F, R]) InExec() bool {
+	return context.inExec
 }
 
 // Exec is like context.Program.Exec.
