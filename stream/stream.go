@@ -75,6 +75,29 @@ func NewIOStream(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
 	}
 }
 
+// Streams creates a new IOStream with the provided streams and wrap.
+// If any parameter is the zero value, copies the values from io.
+func (io IOStream) Streams(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
+	if Stdout == nil {
+		Stdout = io.Stdout
+	}
+	if Stderr == nil {
+		Stderr = io.Stderr
+	}
+	if Stdin == nil {
+		Stdin = io.Stdin
+	}
+	if wrap == 0 {
+		wrap = io.wrap
+	}
+	return NewIOStream(Stdout, Stderr, Stdin, wrap)
+}
+
+// NonInteractive creates a new IOStream with [Null] as standard input.
+func (io IOStream) NonInteractive() IOStream {
+	return io.Streams(nil, nil, Null, 0)
+}
+
 var newLine = []byte("\n")
 
 // StdoutWriteWrap is like

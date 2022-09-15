@@ -9,6 +9,8 @@ Documentation is a work in progress.
 
 # 0.0.12 (Upcoming)
 
+- add `Streams` and `NonInteractive` utility methods to `stream`
+
 # 0.0.11 (Released [Sep 7 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.11))
 
 - add `program.Exec` method to execute a command from within a command
