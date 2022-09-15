@@ -7,7 +7,9 @@ Documentation is a work in progress.
 
 ## Changelog
 
-# 0.0.12 (Upcoming)
+# 0.0.13 (Upcoming)
+
+# 0.0.12 (Released [Sep 15 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.12))
 
 - add `Streams` and `NonInteractive` utility methods to `stream`
 
