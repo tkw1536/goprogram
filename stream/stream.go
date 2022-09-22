@@ -142,7 +142,7 @@ func (io IOStream) StderrWriteWrap(s string) (int, error) {
 
 var errDieUnknown = exit.Error{
 	ExitCode: exit.ExitGeneric,
-	Message:  "Unknown Error: %s",
+	Message:  "Unknown Error",
 }
 
 // Die prints a non-nil err to io.Stderr and returns an error of type Error or nil.
@@ -159,7 +159,7 @@ func (io IOStream) Die(err error) error {
 	case exit.Error:
 		e = ee
 	default:
-		e = errDieUnknown.WithMessageF(ee)
+		e = errDieUnknown.Wrap(ee)
 	}
 
 	// print the error message to standard error in a wrapped way
