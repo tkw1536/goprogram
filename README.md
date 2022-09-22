@@ -9,6 +9,7 @@ Documentation is a work in progress.
 
 # 0.0.13 (Upcoming)
 
+- add `Print` and `EPrint` methods to `stream`
 - add `FromDebug` method to stream
 
 # 0.0.12 (Released [Sep 15 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.12))

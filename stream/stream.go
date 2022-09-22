@@ -26,22 +26,32 @@ func (io IOStream) StdinIsATerminal() bool {
 	return ok && term.IsTerminal(int(file.Fd()))
 }
 
-// Printf is like "fmt.Printf" but prints to io.Stdout.
+// Printf is like [fmt.Printf] but prints to io.Stdout.
 func (io IOStream) Printf(format string, args ...interface{}) (n int, err error) {
 	return fmt.Fprintf(io.Stdout, format, args...)
 }
 
-// EPrintf is like "fmt.EPrintf" but prints to io.Stderr.
+// EPrintf is like [fmt.Printf] but prints to io.Stderr.
 func (io IOStream) EPrintf(format string, args ...interface{}) (n int, err error) {
 	return fmt.Fprintf(io.Stderr, format, args...)
 }
 
-// Println is like "fmt.Println" but prints to io.Stdout.
+// Print is like [fmt.Print] but prints to io.Stdout.
+func (io IOStream) Print(args ...interface{}) (n int, err error) {
+	return fmt.Fprint(io.Stdout, args...)
+}
+
+// EPrint is like [fmt.Print] but prints to io.Stderr.
+func (io IOStream) EPrint(args ...interface{}) (n int, err error) {
+	return fmt.Fprint(io.Stderr, args...)
+}
+
+// Println is like [fmt.Println] but prints to io.Stdout.
 func (io IOStream) Println(args ...interface{}) (n int, err error) {
 	return fmt.Fprintln(io.Stdout, args...)
 }
 
-// EPrintln is like "fmt.Println" but prints to io.Stderr.
+// EPrintln is like [fmt.Println] but prints to io.Stderr.
 func (io IOStream) EPrintln(args ...interface{}) (n int, err error) {
 	return fmt.Fprintln(io.Stderr, args...)
 }
