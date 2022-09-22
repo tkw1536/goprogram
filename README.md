@@ -7,7 +7,9 @@ Documentation is a work in progress.
 
 ## Changelog
 
-# 0.0.14 (Upcoming)
+# 0.0.15 (Upcoming)
+
+# 0.0.14 (Released [Sep 22 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.14))
 
 - add `status` package
 
