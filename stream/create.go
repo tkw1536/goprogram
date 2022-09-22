@@ -18,3 +18,12 @@ func FromEnv() IOStream {
 		wrap:   ioDefaultWrap,
 	}
 }
+
+// FromDebug returns a stream that behaves like [FromNil] when debugging is disabled.
+// When debugging is enabled (by building with the "debug" tag), behaves like [FromEnv] instead.
+func FromDebug() IOStream {
+	if debugEnabled {
+		return FromEnv()
+	}
+	return FromNil()
+}
