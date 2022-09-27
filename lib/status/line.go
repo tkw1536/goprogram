@@ -1,83 +1,92 @@
 package status
 
 import (
-	"strings"
+	"bytes"
+	"io"
 	"sync"
 )
 
-// LineBuffer is an [io.Writer] that calls Line for every newline-delimited line written to it.
+// LineBuffer is an [io.Writer] that calls a function Line for every newline-delimited line written to it.
 // Do not copy a non-zero LineBuffer.
 type LineBuffer struct {
-	l       sync.Mutex // l protects builder
-	builder strings.Builder
+	m      sync.Mutex
+	buffer bytes.Buffer
 
 	// Line is called once a complete newline-terminated line has been written to this LineBuffer.
 	// It is called for each line, in the correct order.
+	// The parameter has a trailing '\r\n' or '\n' trimmed.
 	//
-	// The parameter will be the line written, with terminating '\r\n' or '\n' stripped.
+	// Write methods block until the Line function has returned.
+	// Therefor Line must not trigger another Write into the LineBuffer.
 	Line func(line string)
 }
 
 // Write writes b into the internal buffer.
 // When this completes one or more lines, calls Line appropriatly.
 func (lb *LineBuffer) Write(b []byte) (int, error) {
-	lb.l.Lock()
-	defer lb.l.Unlock()
+	lb.m.Lock()
+	defer lb.m.Unlock()
 
-	defer lb.flush() // flush when done!
-
-	return lb.builder.Write(b)
+	defer lb.flush()
+	return lb.buffer.Write(b)
 }
 
 // WriteByte is like [Write], but takes a single byte.
 func (lb *LineBuffer) WriteByte(b byte) error {
-	lb.l.Lock()
-	defer lb.l.Unlock()
+	lb.m.Lock()
+	defer lb.m.Unlock()
 
 	defer lb.flush()
-
-	return lb.builder.WriteByte(b)
+	return lb.buffer.WriteByte(b)
 }
 
 // WriteRune is like [Write], but takes a single rune
 func (lb *LineBuffer) WriteRune(r rune) (int, error) {
-	lb.l.Lock()
-	defer lb.l.Unlock()
+	lb.m.Lock()
+	defer lb.m.Unlock()
 
 	defer lb.flush()
-
-	return lb.builder.WriteRune(r)
+	return lb.buffer.WriteRune(r)
 }
 
 // WriteString is like [Write], but takes a string
 func (lb *LineBuffer) WriteString(s string) (int, error) {
-	lb.l.Lock()
-	defer lb.l.Unlock()
+	lb.m.Lock()
+	defer lb.m.Unlock()
 
 	defer lb.flush()
-
-	return lb.builder.WriteString(s)
+	return lb.buffer.WriteString(s)
 }
 
-// flush takes any completed lines in the internal buffer and flushes them by calling [Line].
-// Returns the number of calls to line performed.
-func (lb *LineBuffer) flush() (count int) {
-	// grab the text from the buffer, and while there are newlines in it
-	// trim off the first line.
-	text := lb.builder.String()
-	var line string
-	for strings.ContainsRune(text, '\n') {
-		line, text, _ = strings.Cut(text, "\n")
-		lb.Line(strings.TrimSuffix(line, "\r"))
-		count++
-	}
+func (lb *LineBuffer) ReadFrom(r io.Reader) (n int64, err error) {
+	lb.m.Lock()
+	defer lb.m.Unlock()
 
-	// reset the builder to contain only the remaining text.
-	// except if there wasn't any change to the text.
-	if count != 0 {
-		lb.builder.Reset()
-		lb.builder.WriteString(text)
-	}
+	defer lb.flush()
+	return lb.buffer.ReadFrom(r)
 
-	return
+}
+
+// runeR and runeN represent the bytes corresponding to '\r' and '\n' respecitively.
+const runeR byte = '\r'
+const runeN byte = '\n'
+
+// flush takes any completed lines in the internal buffer and calls the Line function
+func (lb *LineBuffer) flush() {
+	for {
+		// find the index of any '\n'
+		index := bytes.IndexByte(lb.buffer.Bytes(), runeN)
+		if index == -1 {
+			return
+		}
+
+		// take the line, and trim any trailing '\r'
+		line := lb.buffer.Next(index + 1)[:index]
+		if index > 0 && line[index-1] == runeR {
+			line = line[:index-1]
+		}
+
+		// call the line function!
+		lb.Line(string(line))
+	}
 }

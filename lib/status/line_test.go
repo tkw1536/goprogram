@@ -1,6 +1,9 @@
 package status
 
-import "fmt"
+import (
+	"fmt"
+	"testing"
+)
 
 func ExampleLineBuffer() {
 	// create a new line buffer
@@ -17,4 +20,19 @@ func ExampleLineBuffer() {
 	// Output: Line("line 1")
 	// Line("partial line 2")
 	// Line("")
+}
+
+func BenchmarkLineBuffer(b *testing.B) {
+
+	buffer := LineBuffer{
+		Line: func(line string) {
+			/* do nothing */
+		},
+	}
+
+	data := []byte("world\nhello")
+
+	for i := 0; i < b.N; i++ {
+		buffer.Write(data)
+	}
 }
