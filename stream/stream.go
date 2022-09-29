@@ -22,7 +22,20 @@ type IOStream struct {
 
 // StdinIsATerminal checks if standard input is a terminal
 func (io IOStream) StdinIsATerminal() bool {
-	file, ok := io.Stdin.(interface{ Fd() uintptr })
+	return streamIsTerminal(io.Stdin)
+}
+
+func (io IOStream) StdoutIsATerminal() bool {
+	return streamIsTerminal(io.Stdout)
+}
+
+func (io IOStream) StderrIsATerminal() bool {
+	return streamIsTerminal(io.Stderr)
+}
+
+// streamIsTerminal checks if stream is a terminal
+func streamIsTerminal(stream any) bool {
+	file, ok := stream.(interface{ Fd() uintptr })
 	return ok && term.IsTerminal(int(file.Fd()))
 }
 
