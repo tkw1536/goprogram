@@ -2,6 +2,7 @@ package status
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"sync"
 )
@@ -11,6 +12,7 @@ import (
 type LineBuffer struct {
 	m      sync.Mutex
 	buffer bytes.Buffer
+	closed bool
 
 	// Line is called once a complete newline-terminated line has been written to this LineBuffer.
 	// It is called for each line, in the correct order.
@@ -19,6 +21,10 @@ type LineBuffer struct {
 	// Write methods block until the Line function has returned.
 	// Therefor Line must not trigger another Write into the LineBuffer.
 	Line func(line string)
+
+	// CloseLine is called when the Close function of this LineBuffer is called for the first time.
+	// CloseLine may be nil
+	CloseLine func()
 }
 
 // Write writes b into the internal buffer.
@@ -26,6 +32,10 @@ type LineBuffer struct {
 func (lb *LineBuffer) Write(b []byte) (int, error) {
 	lb.m.Lock()
 	defer lb.m.Unlock()
+
+	if lb.closed {
+		return 0, errLineBufferClosed
+	}
 
 	defer lb.flush()
 	return lb.buffer.Write(b)
@@ -36,6 +46,10 @@ func (lb *LineBuffer) WriteByte(b byte) error {
 	lb.m.Lock()
 	defer lb.m.Unlock()
 
+	if lb.closed {
+		return errLineBufferClosed
+	}
+
 	defer lb.flush()
 	return lb.buffer.WriteByte(b)
 }
@@ -44,6 +58,10 @@ func (lb *LineBuffer) WriteByte(b byte) error {
 func (lb *LineBuffer) WriteRune(r rune) (int, error) {
 	lb.m.Lock()
 	defer lb.m.Unlock()
+
+	if lb.closed {
+		return 0, errLineBufferClosed
+	}
 
 	defer lb.flush()
 	return lb.buffer.WriteRune(r)
@@ -54,6 +72,10 @@ func (lb *LineBuffer) WriteString(s string) (int, error) {
 	lb.m.Lock()
 	defer lb.m.Unlock()
 
+	if lb.closed {
+		return 0, errLineBufferClosed
+	}
+
 	defer lb.flush()
 	return lb.buffer.WriteString(s)
 }
@@ -62,9 +84,12 @@ func (lb *LineBuffer) ReadFrom(r io.Reader) (n int64, err error) {
 	lb.m.Lock()
 	defer lb.m.Unlock()
 
+	if lb.closed {
+		return 0, errLineBufferClosed
+	}
+
 	defer lb.flush()
 	return lb.buffer.ReadFrom(r)
-
 }
 
 // runeR and runeN represent the bytes corresponding to '\r' and '\n' respecitively.
@@ -73,6 +98,11 @@ const runeN byte = '\n'
 
 // flush takes any completed lines in the internal buffer and calls the Line function
 func (lb *LineBuffer) flush() {
+	// if we're closed, just delete all the lines!
+	if lb.closed {
+		lb.buffer.Reset()
+		return
+	}
 	for {
 		// find the index of any '\n'
 		index := bytes.IndexByte(lb.buffer.Bytes(), runeN)
@@ -89,4 +119,29 @@ func (lb *LineBuffer) flush() {
 		// call the line function!
 		lb.Line(string(line))
 	}
+}
+
+var errLineBufferClosed = errors.New("LineBuffer: Close() was called")
+
+// Close closes this LineBuffer, ensuring any future calls to [Write] or [Close] and friends return an error.
+// Close may block and wait for any concurrent calls to [Write] and friends active at the time of the Close call to finish.
+//
+// Writing to this LineBuffer after Close has returned a nil error no longer call the [Line] function.
+// Calling Close multiple times returns nil error, and performs no further actions.
+func (lb *LineBuffer) Close() error {
+	lb.m.Lock()
+	defer lb.m.Unlock()
+
+	// we already closed, so we shouldn't close again.
+	if lb.closed {
+		return nil
+	}
+
+	lb.closed = true
+
+	// call the CloseLine function (if any)
+	if lb.CloseLine != nil {
+		lb.CloseLine()
+	}
+	return nil
 }

@@ -9,6 +9,8 @@ Documentation is a work in progress.
 
 # 0.0.15 (Upcoming)
 
+- update and document `status` package
+
 # 0.0.14 (Released [Sep 22 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.14))
 
 - add `status` package

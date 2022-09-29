@@ -17,6 +17,7 @@ type Group[Item any] struct {
 
 	// When PrefixAlign is set, automatically ensure that all prefixes are of the same length,
 	// by adding appropriate spaces.
+	// This only works within a single [Use] or [Run] invocation.
 	PrefixAlign bool
 
 	// ErrString is called to generate a message for when the given item has finished processing.
@@ -29,22 +30,19 @@ type Group[Item any] struct {
 	Handler func(item Item, index int, writer io.Writer) error
 }
 
-// Run calls Handler for all passed Items concurrently, each passing output to a dedicated line of a new [Status].
+// Use calls Handler for all passed Items concurrently, each passing output to a dedicated line of status.
+// When completed all output lines are marked as Done on the status.
 //
 // It returns the first non-nil error returned from the Handler invocations.
-// Run always waits for all handlers to return, regardless which one returns an error.
-func (group Group[Item]) Run(items []Item) error {
-	// setup the status!
-	status := New(group.Writer, len(items))
-	status.Start()
-	defer status.Stop()
+// Use always waits for all handlers to return, regardless which one returns an error.
+func (group Group[Item]) Use(status *Status, items []Item) error {
 
-	// create a waitgroup
-	var wg sync.WaitGroup
-	wg.Add(len(items))
+	prefixes := make([]string, len(items))        // prefixes per-line
+	writers := make([]io.WriteCloser, len(items)) // writers per-line
+	errors := make([]error, len(items))           // results per item
 
 	// generate all the prefixes and compute the maximum prefix length
-	prefixes := make([]string, len(items))
+
 	var maxPrefixLength int
 	if group.PrefixString != nil {
 		for index, item := range items {
@@ -64,25 +62,30 @@ func (group Group[Item]) Run(items []Item) error {
 	}
 
 	// generate an errors array
-	errors := make([]error, len(items))
+
+	var wg sync.WaitGroup
+	wg.Add(len(items))
 	for index, item := range items {
+		// add a new line to the writer
+		writers[index] = status.AddLine(prefixes[index])
+
 		// and call the handler functions
-		go func(index int, item Item, prefix string) {
+		go func(index int, item Item) {
 			defer wg.Done()
 
-			// and a writer
-			writer := status.Line(prefix, index)
-
 			// write into the error array
-			errors[index] = group.Handler(item, index, writer)
+			errors[index] = group.Handler(item, index, writers[index])
 
 			// and write out the result
-			io.WriteString(writer, "\n"+group.ErrString(item, index, errors[index])+"\n")
-		}(index, item, prefixes[index])
+			io.WriteString(writers[index], "\n"+group.ErrString(item, index, errors[index])+"\n")
+		}(index, item)
 	}
-
-	// wait for everything to finish
 	wg.Wait()
+
+	// close all the writers (in order)
+	for _, w := range writers {
+		w.Close()
+	}
 
 	// return the first non-nil error
 	for _, err := range errors {
@@ -91,4 +94,18 @@ func (group Group[Item]) Run(items []Item) error {
 		}
 	}
 	return nil
+}
+
+// Run calls Handler for all passed Items concurrently, each passing output to a dedicated line of a new [Status].
+//
+// It returns the first non-nil error returned from the Handler invocations.
+// Run always waits for all handlers to return, regardless which one returns an error.
+func (group Group[Item]) Run(items []Item) error {
+	// setup the status!
+	status := New(group.Writer, 0)
+	status.Start()
+	defer status.Stop()
+
+	// and use it!
+	return group.Use(status, items)
 }
