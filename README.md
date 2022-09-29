@@ -7,7 +7,9 @@ Documentation is a work in progress.
 
 ## Changelog
 
-# 0.0.15 (Upcoming)
+# 0.0.16 (Upcoming)
+
+# 0.0.15 (Released [Sep 29 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.15))
 
 - update and document `status` package
 
