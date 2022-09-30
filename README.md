@@ -9,6 +9,8 @@ Documentation is a work in progress.
 
 # 0.0.17 (Upcoming)
 
+- add compatibility mode to `status`
+
 # 0.0.16 (Released [Sep 30 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.16))
 
 - promote `status` to top-level package

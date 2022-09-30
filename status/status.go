@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gosuri/uilive"
+	"golang.org/x/term"
 )
 
 // Status represents an interactive status display that can write to multiple lines at once.
@@ -26,10 +27,15 @@ import (
 //
 //
 // Using the status to Write messages outside of the Start / Stop process results in no-ops.
+//
+// Status should only be used on interactive terminals.
+// On other [io.Writer]s, a so-called compatibility mode can be used, that writes updates to the terminal line by line.
+// See [NewWithCompat].
 type Status struct {
 	state uint64 // see state* comments below
 
-	w *uilive.Writer // underlying uilive writer
+	w      *uilive.Writer // underlying uilive writer
+	compat bool           // compatibility mode enabled
 
 	counter int32 // the first free message id, increased atomically
 
@@ -80,7 +86,8 @@ func New(writer io.Writer, count int) *Status {
 	st := &Status{
 		state: stateNewCalled,
 
-		w: uilive.New(),
+		w:      uilive.New(),
+		compat: false,
 
 		counter: int32(count),
 
@@ -100,6 +107,17 @@ func New(writer io.Writer, count int) *Status {
 	}
 
 	st.w.Out = writer
+	return st
+}
+
+// NewWithCompat is like [New], but places the Status into a compatibility mode if and only if writer does not represent a terminal.
+//
+// In compatibility mode, Status automatically prints each line to the output, instead of putting them onto separate lines.
+func NewWithCompat(writer io.Writer, count int) (st *Status) {
+	st = New(writer, count)
+	if file, ok := writer.(interface{ Fd() uintptr }); !ok || !term.IsTerminal(int(file.Fd())) {
+		st.compat = true
+	}
 	return st
 }
 
@@ -124,8 +142,28 @@ func (st *Status) Start() {
 const minFlushDelay = 50 * time.Millisecond
 
 // flush flushes the output of this Status to the underlying writer.
-// flush respects [minFlushDelay], unless force is set to true.
-func (st *Status) flush(force bool) {
+// see [flushCompat] and [flushNormal]
+func (st *Status) flush(force bool, changed int) {
+	if st.compat {
+		st.flushCompat(changed)
+		return
+	}
+	st.flushNormal(force)
+}
+
+// flishCompat flushes the provided updated message, if it is valid.
+func (st *Status) flushCompat(changed int) {
+	line, ok := st.messages[changed]
+	if !ok {
+		return
+	}
+	fmt.Fprintln(st.w.Out, line)
+}
+
+// flushNormal implements flushing in normal mode.
+// Respects [minFlushDelay], unless force is set to true.
+func (st *Status) flushNormal(force bool) {
+
 	now := time.Now()
 	if !force && now.Sub(st.lastFlush) < minFlushDelay {
 		return
@@ -160,7 +198,7 @@ func (st *Status) Stop() {
 
 	close(st.actions)
 	<-st.done
-	st.flush(true) // force a flush!
+	st.flush(true, int(atomic.AddInt32(&st.counter, 1))) // force an invalid flush!
 }
 
 // Set sets the status line with the given id to contain message.
@@ -192,7 +230,15 @@ func (st *Status) Set(id int, message string) {
 // Line may be called at any time.
 // Line should not be called multiple times with the same id.
 func (st *Status) Line(prefix string, id int) io.WriteCloser {
+	// setup a delay for flushing partial lines after writes.
+	// when in compatibility mode, this should be turned off.
+	delay := 10 * minFlushDelay
+	if st.compat {
+		delay = 0
+	}
 	return &LineBuffer{
+		FlushPartialLineAfter: delay,
+
 		Line: func(message string) { st.Set(id, prefix+message) },
 
 		FlushLineOnClose: true,
@@ -268,7 +314,7 @@ func (st *Status) listen() {
 
 			// store the message, and do a normal flush!
 			st.messages[msg.id] = msg.message
-			st.flush(false)
+			st.flush(false, msg.id)
 		case openAction:
 			// duplicate id, shouldn't occur
 			if _, ok := st.idsI[msg.id]; ok {
@@ -283,7 +329,7 @@ func (st *Status) listen() {
 			st.messages[msg.id] = msg.message
 
 			// force a flush so that we see it
-			st.flush(true)
+			st.flush(true, msg.id)
 		case closeAction:
 			// make sure that the line exists!
 			index, ok := st.idsI[msg.id]
@@ -305,7 +351,7 @@ func (st *Status) listen() {
 			delete(st.messages, msg.id)
 
 			// and flush all the other lines
-			st.flush(true)
+			st.flush(true, msg.id)
 		}
 	}
 }

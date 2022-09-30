@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"sync"
+	"time"
 )
 
 // LineBuffer is an [io.Writer] that calls a function Line for every newline-delimited line written to it.
@@ -21,6 +22,14 @@ type LineBuffer struct {
 	// Write methods block until the Line function has returned.
 	// Therefore Line must not trigger another Write into the LineBuffer.
 	Line func(line string)
+
+	// FlushPartialLineAfter forces flushing output after a specific amount of time.
+	// Set to 0 to disable.
+	//
+	// If the line has not been completed, the current partial line will be flushed.
+	// A completed line will always be written.
+	FlushPartialLineAfter time.Duration
+	lastFlush             time.Time
 
 	// FlushLineOnClose indicates if Line should be called a final time when calling close.
 	// Line will only be called when the last write did not end in a newline character.
@@ -110,12 +119,13 @@ func (lb *LineBuffer) flush() {
 		lb.buffer.Reset()
 		return
 	}
+
+	now := time.Now()
 	for {
 		// find the index of any '\n'
 		index := bytes.IndexByte(lb.buffer.Bytes(), runeN)
 		if index == -1 {
-			lb.buffer.Grow(0) // trigger an internal re-slice!
-			return
+			break
 		}
 
 		// take the line, and trim any trailing '\r'
@@ -126,6 +136,30 @@ func (lb *LineBuffer) flush() {
 
 		// call the line function!
 		lb.Line(string(line))
+		lb.lastFlush = now
+	}
+
+	lb.buffer.Grow(0) // trigger an internal re-slice!
+
+	// check if we need to flush a line
+	if lb.FlushPartialLineAfter > 0 {
+		if now.Sub(lb.lastFlush) > lb.FlushPartialLineAfter {
+			lb.forceFlush()
+			lb.lastFlush = now
+		}
+	}
+}
+
+// forceFlush forcibly flushes the current line from the buffer.
+// There is no guarantee that the line is complete.
+// The buffer is not changed.
+func (lb *LineBuffer) forceFlush() {
+	rest := lb.buffer.Bytes()
+	if len(rest) > 0 && rest[len(rest)-1] == runeR {
+		rest = rest[:len(rest)-1]
+	}
+	if len(rest) > 0 {
+		lb.Line(string(rest))
 	}
 }
 
@@ -149,13 +183,7 @@ func (lb *LineBuffer) Close() error {
 
 	// flush the final line if requested
 	if lb.FlushLineOnClose {
-		rest := lb.buffer.Bytes()
-		if len(rest) > 0 && rest[len(rest)-1] == runeR {
-			rest = rest[:len(rest)-1]
-		}
-		if len(rest) > 0 {
-			lb.Line(string(rest))
-		}
+		lb.forceFlush()
 	}
 	lb.buffer.Reset()
 
