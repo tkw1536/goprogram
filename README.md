@@ -7,7 +7,9 @@ Documentation is a work in progress.
 
 ## Changelog
 
-# 0.0.17 (Upcoming)
+# 0.0.18 (Upcoming)
+
+# 0.0.17 (Released [Sep 30 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.17))
 
 - add compatibility mode to `status`
 
