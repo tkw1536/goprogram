@@ -9,6 +9,7 @@ Documentation is a work in progress.
 
 # 0.0.16 (Upcoming)
 
+- promote `status` to top-level package
 - add more utility functions to `stream`
 
 # 0.0.15 (Released [Sep 29 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.15))

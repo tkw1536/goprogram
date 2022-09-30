@@ -19,11 +19,16 @@ type LineBuffer struct {
 	// The parameter has a trailing '\r\n' or '\n' trimmed.
 	//
 	// Write methods block until the Line function has returned.
-	// Therefor Line must not trigger another Write into the LineBuffer.
+	// Therefore Line must not trigger another Write into the LineBuffer.
 	Line func(line string)
 
+	// FlushLineOnClose indicates if Line should be called a final time when calling close.
+	// Line will only be called when the last write did not end in a newline character.
+	FlushLineOnClose bool
+
 	// CloseLine is called when the Close function of this LineBuffer is called for the first time.
-	// CloseLine may be nil
+	//
+	// CloseLine may be nil, in which case it is not called.
 	CloseLine func()
 }
 
@@ -80,6 +85,8 @@ func (lb *LineBuffer) WriteString(s string) (int, error) {
 	return lb.buffer.WriteString(s)
 }
 
+// ReadFrom reads all available bytes from r into this LineBuffer, until an error is encountered.
+// io.EOF is not considered an error.
 func (lb *LineBuffer) ReadFrom(r io.Reader) (n int64, err error) {
 	lb.m.Lock()
 	defer lb.m.Unlock()
@@ -107,6 +114,7 @@ func (lb *LineBuffer) flush() {
 		// find the index of any '\n'
 		index := bytes.IndexByte(lb.buffer.Bytes(), runeN)
 		if index == -1 {
+			lb.buffer.Grow(0) // trigger an internal re-slice!
 			return
 		}
 
@@ -124,6 +132,7 @@ func (lb *LineBuffer) flush() {
 var errLineBufferClosed = errors.New("LineBuffer: Close() was called")
 
 // Close closes this LineBuffer, ensuring any future calls to [Write] or [Close] and friends return an error.
+// When there was an unfinished line, close may cause a final flush of the buffer
 // Close may block and wait for any concurrent calls to [Write] and friends active at the time of the Close call to finish.
 //
 // Writing to this LineBuffer after Close has returned a nil error no longer call the [Line] function.
@@ -132,12 +141,23 @@ func (lb *LineBuffer) Close() error {
 	lb.m.Lock()
 	defer lb.m.Unlock()
 
-	// we already closed, so we shouldn't close again.
+	// mark the buffer as closed, unless
 	if lb.closed {
 		return nil
 	}
-
 	lb.closed = true
+
+	// flush the final line if requested
+	if lb.FlushLineOnClose {
+		rest := lb.buffer.Bytes()
+		if len(rest) > 0 && rest[len(rest)-1] == runeR {
+			rest = rest[:len(rest)-1]
+		}
+		if len(rest) > 0 {
+			lb.Line(string(rest))
+		}
+	}
+	lb.buffer.Reset()
 
 	// call the CloseLine function (if any)
 	if lb.CloseLine != nil {

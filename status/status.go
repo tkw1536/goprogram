@@ -1,4 +1,4 @@
-// Package status provides status, line and group
+// Package status provides Status, LineBuffer and Group
 package status
 
 import (
@@ -26,17 +26,16 @@ import (
 //
 //
 // Using the status to Write messages outside of the Start / Stop process results in no-ops.
-//
-//
-//
 type Status struct {
-	state uint64 // see state* message
+	state uint64 // see state* comments below
 
 	w *uilive.Writer // underlying uilive writer
 
 	counter int32 // the first free message id, increased atomically
 
-	ids      []int          // list of active message ids
+	ids  []int       // ordered list of active message ids
+	idsI map[int]int // inverse list of active message ids
+
 	messages map[int]string // content of all the messages
 
 	lastFlush time.Time // last time we flushed
@@ -45,52 +44,59 @@ type Status struct {
 	done    chan struct{}
 }
 
-// state of the state
+// state* describe the livecycle of a Status
 const (
 	stateInvalid uint64 = iota
-	stateInit
-	stateAlive
-	stateDone
+	stateNewCalled
+	stateStartCalled
+	stateStopCalled
 )
 
-type actionTp uint8
+// lineAction describe the types of actions for lines
+type lineAction uint8
 
 const (
-	writeLineAction actionTp = iota
-	closeLineAction
-	addLineAction
+	setAction lineAction = iota
+	openAction
+	closeAction
 )
 
-// action is sent to update a specific status line
+// action describes actions to perform on a [Status]
 type action struct {
-	action actionTp
-	index  int    // index is the index of the object to operate on
-	data   string // data is the string to update
+	action  lineAction // what kind of action to perform
+	id      int        // id of line to perform action on
+	message string     // content of the line
 }
 
 // New creates a new writer with the provided number of status lines.
 //
 // The ids of the status lines are guaranteed to be 0...(count-1).
-// Count is assumed to be at least 0.
+// When count is less than 0, it is set to 0.
 func New(writer io.Writer, count int) *Status {
 	if count < 0 {
 		count = 0
 	}
 
 	st := &Status{
-		state: stateInit,
+		state: stateNewCalled,
 
 		w: uilive.New(),
 
-		counter:  int32(count),
-		ids:      make([]int, count),
+		counter: int32(count),
+
+		ids:  make([]int, count),
+		idsI: make(map[int]int, count),
+
 		messages: make(map[int]string, count),
 
 		actions: make(chan action, count),
 		done:    make(chan struct{}),
 	}
+
+	// setup new ids
 	for i := range st.ids {
 		st.ids[i] = i
+		st.idsI[i] = i
 	}
 
 	st.w.Out = writer
@@ -108,7 +114,7 @@ func (st *Status) Start() {
 	if atomic.LoadUint64(&st.state) == stateInvalid {
 		panic("Status: Not created using New")
 	}
-	if !atomic.CompareAndSwapUint64(&st.state, stateInit, stateAlive) {
+	if !atomic.CompareAndSwapUint64(&st.state, stateNewCalled, stateStartCalled) {
 		panic("Status: Start() called multiple times")
 	}
 
@@ -148,7 +154,7 @@ func (st *Status) flush(force bool) {
 // Stop must be called after [Start] has been called.
 // Start may not be called more than once.
 func (st *Status) Stop() {
-	if !atomic.CompareAndSwapUint64(&st.state, stateAlive, stateDone) {
+	if !atomic.CompareAndSwapUint64(&st.state, stateStartCalled, stateStopCalled) {
 		panic("Status: Stop() called out-of-order")
 	}
 
@@ -167,81 +173,85 @@ func (st *Status) Stop() {
 //
 // Set may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored, and return an invalid line id.
-func (st *Status) Set(message string, id int) {
-	if atomic.LoadUint64(&st.state) != stateAlive {
+func (st *Status) Set(id int, message string) {
+	if atomic.LoadUint64(&st.state) != stateStartCalled {
 		return
 	}
 
 	st.actions <- action{
-		action: writeLineAction,
-		index:  id,
-		data:   message,
+		action:  setAction,
+		id:      id,
+		message: message,
 	}
 }
 
 // Line returns an [io.WriteCloser] linked to the status line with the provided id.
 // Writing a complete newline-delimited line to it behaves just like [Set] with that line prefixed with prefix would.
-// Calling [io.WriteCloser.Close] behaves just like [Done] would.
+// Calling [io.WriteCloser.Close] behaves just like [Close] would.
 //
 // Line may be called at any time.
-func (st *Status) Line(prefix string, index int) io.WriteCloser {
+// Line should not be called multiple times with the same id.
+func (st *Status) Line(prefix string, id int) io.WriteCloser {
 	return &LineBuffer{
-		Line:      func(line string) { st.Set(prefix+line, index) },
-		CloseLine: func() { st.Done(index) },
+		Line: func(message string) { st.Set(id, prefix+message) },
+
+		FlushLineOnClose: true,
+		CloseLine:        func() { st.Close(id) },
 	}
 }
 
-// Add adds a new status line and returns it's id.
+// Open adds a new status line and returns its' id.
+// The new status line is initially set to message.
 // It may be further updated with calls to [Set], or removed with [Done].
-// Add may block until the addition has been processed.
+// Open may block until the addition has been processed.
 //
-// Add may safely be called concurrently with other methods.
+// Open may safely be called concurrently with other methods.
 //
-// Add may only be called after [Start] has been called, but before [Stop].
+// Open may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored, and return an invalid line id.
-func (st *Status) Add(content string) (id int) {
+func (st *Status) Open(message string) (id int) {
 
 	// even when not active, generate a new id
 	// this guarantees that other calls are no-ops.
 	id = int(atomic.AddInt32(&st.counter, 1))
-	if atomic.LoadUint64(&st.state) != stateAlive {
+	if atomic.LoadUint64(&st.state) != stateStartCalled {
 		return
 	}
 
 	st.actions <- action{
-		action: addLineAction,
-		index:  id,
-		data:   content,
+		action:  openAction,
+		id:      id,
+		message: message,
 	}
 	return
 }
 
-// AddLine behaves like a call to [Add] followed by a call to [Line].
+// OpenLine behaves like a call to [Open] followed by a call to [Line].
 //
-// AddLine may only be called after [Start] has been called, but before [Stop].
+// OpenLine may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored, and return a no-op io.Writer.
-func (st *Status) AddLine(prefix string) io.WriteCloser {
-	return st.Line(prefix, st.Add(prefix))
+func (st *Status) OpenLine(prefix, data string) io.WriteCloser {
+	return st.Line(prefix, st.Open(prefix+data))
 }
 
-// Done removes the status line with the provided id from this status.
+// Close removes the status line with the provided id from this status.
 // The last value of the status line is written to the top of the output.
-// Done may block until the removal has been processed.
+// Close may block until the removal has been processed.
 //
-// Calling Done on a line which is not active results is a no-op.
+// Calling Close on a line which is not active results is a no-op.
 //
-// Done may safely be called concurrently with other methods.
+// Close may safely be called concurrently with other methods.
 //
-// Done may only be called after [Start] has been called, but before [Stop].
+// Close may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored.
-func (st *Status) Done(id int) {
-	if atomic.LoadUint64(&st.state) != stateAlive {
+func (st *Status) Close(id int) {
+	if atomic.LoadUint64(&st.state) != stateStartCalled {
 		return
 	}
 
 	st.actions <- action{
-		action: closeLineAction,
-		index:  id,
+		action: closeAction,
+		id:     id,
 	}
 }
 
@@ -250,30 +260,52 @@ func (st *Status) listen() {
 	defer close(st.done)
 	for msg := range st.actions {
 		switch msg.action {
-		case writeLineAction:
-			for _, activeID := range st.ids {
-				if activeID == msg.index {
-					// update the message content
-					st.messages[activeID] = msg.data
-					break
-				}
+		case setAction:
+			// if the id doesn't exist, do nothing!
+			if _, ok := st.idsI[msg.id]; !ok {
+				break
 			}
+
+			// store the message, and do a normal flush!
+			st.messages[msg.id] = msg.message
 			st.flush(false)
-		case closeLineAction:
-			for i, activeID := range st.ids {
-				if activeID == msg.index {
-					// write out the line to the bypass!
-					fmt.Fprintln(st.w.Bypass(), st.messages[activeID])
-					delete(st.messages, activeID)
-					st.ids = append(st.ids[:i], st.ids[i+1:]...)
-					break
-				}
+		case openAction:
+			// duplicate id, shouldn't occur
+			if _, ok := st.idsI[msg.id]; ok {
+				break
 			}
-			st.flush(true) // force a flush!
-		case addLineAction:
-			st.ids = append(st.ids, msg.index)
-			st.messages[msg.index] = msg.data
-			st.flush(true) // force a flush!
+
+			// add the item to the ids!
+			st.ids = append(st.ids, msg.id)
+			st.idsI[msg.id] = len(st.ids) - 1
+
+			// setup the initial message
+			st.messages[msg.id] = msg.message
+
+			// force a flush so that we see it
+			st.flush(true)
+		case closeAction:
+			// make sure that the line exists!
+			index, ok := st.idsI[msg.id]
+			if !ok {
+				break
+			}
+
+			// update the list of active ids
+			st.ids = append(st.ids[:index], st.ids[index+1:]...)
+			for key, value := range st.ids {
+				st.idsI[value] = key
+			}
+			delete(st.idsI, msg.id)
+
+			// rebuild the inverse index map
+
+			// flush out the current message!
+			fmt.Fprintln(st.w.Bypass(), st.messages[msg.id])
+			delete(st.messages, msg.id)
+
+			// and flush all the other lines
+			st.flush(true)
 		}
 	}
 }
