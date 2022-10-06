@@ -59,16 +59,20 @@ func (err Error) WithMessage(message string) Error {
 
 // WithMessageF returns a copy of this error with the same Code but different Message.
 // The new message is the current message, formatted using a call to SPrintf and the arguments.
-func (err Error) WithMessageF(args ...interface{}) Error {
+func (err Error) WithMessageF(args ...any) Error {
 	docfmt.AssertValid(err.Message)
-	// TODO: Runtime check if there is a single error argument
-	// and recommend using err.Wrap() instead
+	docfmt.AssertValidArgs(args...)
 	return err.WithMessage(fmt.Sprintf(err.Message, args...))
 }
 
 // Wrap creates a new error with same exit code, wrapping the inner error.
+// When inner is nil, returns an empty error.
+//
 // The message of the new error will contain the Error() result of the inner error.
 func (err Error) Wrap(inner error) Error {
+	if inner == nil {
+		return Error{}
+	}
 	err.Message = fmt.Sprintf("%s: %s", err.Message, inner)
 	err.err = inner
 	return err
