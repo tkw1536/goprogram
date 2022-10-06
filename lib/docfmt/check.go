@@ -10,9 +10,9 @@ import (
 // When checking is disabled, no runtime checking is performed.
 // When checking is enabled and a message fails to pass validation, calls panic()
 func AssertValid(message string) {
-	if enabled {
+	if Enabled {
 		if errors := Validate(message); len(errors) != 0 {
-			panic(&ValidationError{
+			panic(ValidationError{
 				Message: message,
 				Results: errors,
 			})
@@ -29,13 +29,29 @@ type ValidationError struct {
 	Message string
 }
 
-func (ce ValidationError) Error() string {
+func (ve ValidationError) Error() string {
 	// NOTE(twiesing): This function is untested because it is used only for developing
 
-	messages := make([]string, len(ce.Results))
-	for i, res := range ce.Results {
+	messages := make([]string, len(ve.Results))
+	for i, res := range ve.Results {
 		messages[i] = res.Error()
 	}
 
-	return fmt.Sprintf("message %q failed validation: %s", ce.Message, strings.Join(messages, "\n"))
+	return fmt.Sprintf("message %q failed validation: %s", ve.Message, strings.Join(messages, "\n"))
+}
+
+// AssertValidArgs checks that args does not contain exactly one argument of type error.
+//
+// When checking is disabled, no runtime checking is performed.
+// When checking is enabled and the check is failed, calls panic()
+func AssertValidArgs(args ...any) {
+	if Enabled {
+		if len(args) != 1 {
+			return
+		}
+		if _, ok := args[0].(error); ok {
+			panic("AssertValidArgs: single error argument provided")
+		}
+
+	}
 }

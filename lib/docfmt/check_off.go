@@ -2,4 +2,5 @@
 
 package docfmt
 
-const enabled = false
+// Enabled indiciates if runtime checking is enabled
+const Enabled = false

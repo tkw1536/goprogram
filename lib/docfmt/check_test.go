@@ -13,10 +13,10 @@ func TestAssertValid(t *testing.T) {
 			var wantPanic bool
 			var wantError interface{}
 
-			if enabled {
+			if Enabled {
 				wantPanic = tt.wantError != nil
 				if wantPanic {
-					wantError = &ValidationError{
+					wantError = ValidationError{
 						Message: tt.input,
 						Results: tt.wantError,
 					}

@@ -6,9 +6,6 @@ import (
 )
 
 func TestSplitParts(t *testing.T) {
-	type args struct {
-		message string
-	}
 	tests := []struct {
 		input     string
 		wantParts []string
@@ -30,9 +27,6 @@ func TestSplitParts(t *testing.T) {
 }
 
 func TestSplitWords(t *testing.T) {
-	type args struct {
-		part string
-	}
 	tests := []struct {
 		input     string
 		wantWords []string
