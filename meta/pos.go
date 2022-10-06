@@ -66,10 +66,10 @@ func (pos Positional) WriteSpecTo(w io.Writer) {
 }
 
 const (
-	errParseTakesNoArguments      = "No arguments permitted"
-	errParseTakesExactlyArguments = "Exactly %d argument(s) required"
-	errParseTakesMinArguments     = "At least %d argument(s) required"
-	errParseTakesBetweenArguments = "Between %d and %d argument(s) required"
+	errParseTakesNoArguments      = "no arguments permitted"
+	errParseTakesExactlyArguments = "exactly %d argument(s) required"
+	errParseTakesMinArguments     = "at least %d argument(s) required"
+	errParseTakesBetweenArguments = "between %d and %d argument(s) required"
 )
 
 // Validate checks if the correct number of positional arguments have been passed.

@@ -8,9 +8,6 @@ package docfmt
 import "testing"
 
 func TestFormat(t *testing.T) {
-	type args struct {
-		message string
-	}
 	tests := []struct {
 		input string
 		want  string

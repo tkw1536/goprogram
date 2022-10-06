@@ -25,10 +25,12 @@ func (io IOStream) StdinIsATerminal() bool {
 	return streamIsTerminal(io.Stdin)
 }
 
+// StdoutIsATerminal checks if standard output is a terminal
 func (io IOStream) StdoutIsATerminal() bool {
 	return streamIsTerminal(io.Stdout)
 }
 
+// StderrIsATerminal checks if standard error is a terminal
 func (io IOStream) StderrIsATerminal() bool {
 	return streamIsTerminal(io.Stderr)
 }
@@ -73,7 +75,7 @@ func (io IOStream) EPrintln(args ...interface{}) (n int, err error) {
 const ioDefaultWrap = 80
 
 // NewIOStream creates a new IOStream with the provided readers and writers.
-// If any of them are set to an empty stream, they are set to util.NullStream.
+// If any of them are set to an empty stream, they are set to Null.
 // When wrap is set to 0, it is set to a reasonable default.
 //
 // It furthermore wraps output as set by wrap.

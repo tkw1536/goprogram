@@ -61,7 +61,7 @@ func TestPositional_Validate(t *testing.T) {
 			"one argument, too few",
 			Positional{Min: 1, Max: 1},
 			0,
-			"Exactly 1 argument(s) required",
+			"exactly 1 argument(s) required",
 		},
 		{
 			"one argument, exactly enough",
@@ -73,7 +73,7 @@ func TestPositional_Validate(t *testing.T) {
 			"one argument, too many",
 			Positional{Min: 1, Max: 1},
 			2,
-			"Exactly 1 argument(s) required",
+			"exactly 1 argument(s) required",
 		},
 
 		// taking 1 or 2 args
@@ -81,7 +81,7 @@ func TestPositional_Validate(t *testing.T) {
 			"1-2 arguments, too few",
 			Positional{Min: 1, Max: 2},
 			0,
-			"Between 1 and 2 argument(s) required",
+			"between 1 and 2 argument(s) required",
 		},
 		{
 			"1-2 arguments, enough",
@@ -99,7 +99,7 @@ func TestPositional_Validate(t *testing.T) {
 			"1-2 arguments, too many",
 			Positional{Min: 1, Max: 2},
 			3,
-			"Between 1 and 2 argument(s) required",
+			"between 1 and 2 argument(s) required",
 		},
 
 		// taking 2 args
@@ -107,13 +107,13 @@ func TestPositional_Validate(t *testing.T) {
 			"two arguments, too few",
 			Positional{Min: 2, Max: 2},
 			0,
-			"Exactly 2 argument(s) required",
+			"exactly 2 argument(s) required",
 		},
 		{
 			"two arguments, too few (2)",
 			Positional{Min: 2, Max: 2},
 			1,
-			"Exactly 2 argument(s) required",
+			"exactly 2 argument(s) required",
 		},
 		{
 			"two arguments, enough",
@@ -125,7 +125,7 @@ func TestPositional_Validate(t *testing.T) {
 			"two arguments, too many",
 			Positional{Min: 2, Max: 2},
 			3,
-			"Exactly 2 argument(s) required",
+			"exactly 2 argument(s) required",
 		},
 
 		// at least one argument
@@ -133,7 +133,7 @@ func TestPositional_Validate(t *testing.T) {
 			"at least 1 arguments, not enough",
 			Positional{Min: 1, Max: -1},
 			0,
-			"At least 1 argument(s) required",
+			"at least 1 argument(s) required",
 		},
 		{
 			"at least 1 arguments, enough",

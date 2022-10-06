@@ -2,12 +2,18 @@
 
 ![CI Status](https://github.com/tkw1536/goprogram/workflows/CI/badge.svg)
 
-A go 1.18 package to create programs, originally designed for [ggman](https://github.com/tkw1536/ggman).
-Documentation is a work in progress.
+A go >= 1.19.2 package to create programs, originally designed for [ggman](https://github.com/tkw1536/ggman).
 
 ## Changelog
 
-# 0.0.18 (Upcoming)
+# 0.1.1 (Upcoming)
+
+# 0.1.0 (Released [Oct 6 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.1.0))
+
+- add `collection` utility package
+- add stream package to `status`
+- improve `docfmt` package
+- various internal improvements
 
 # 0.0.17 (Released [Sep 30 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.0.17))
 
