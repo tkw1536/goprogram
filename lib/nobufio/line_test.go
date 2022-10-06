@@ -1,4 +1,4 @@
-package stream
+package nobufio
 
 import (
 	"fmt"
