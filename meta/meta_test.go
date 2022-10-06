@@ -113,9 +113,6 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 }
 
 func TestMeta_writeCommandsTo(t *testing.T) {
-	type args struct {
-		commands []string
-	}
 	tests := []struct {
 		name string
 		meta Meta
