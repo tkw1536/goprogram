@@ -6,7 +6,11 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
-# 0.1.1 (Upcoming)
+# 0.1.2 (Upcoming)
+
+# 0.1.1 (Released [Oct 7 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.1.1))
+
+- remove memory leak from `slices.Filter` got types which need garbage collection
 
 # 0.1.0 (Released [Oct 6 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.1.0))
 
