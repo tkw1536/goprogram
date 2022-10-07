@@ -1,7 +1,9 @@
 // Package stream provides NullStream
 package stream
 
-import "io"
+import (
+	"io"
+)
 
 // Null is an io.ReadWriteCloser.
 //
@@ -13,6 +15,19 @@ var Null io.ReadWriteCloser = nullStream{}
 
 type nullStream struct{}
 
-func (nullStream) Read(bytes []byte) (int, error)  { return 0, io.EOF }
-func (nullStream) Write(bytes []byte) (int, error) { return len(bytes), nil }
-func (nullStream) Close() error                    { return nil }
+func (nullStream) Read(bytes []byte) (int, error) {
+	return 0, io.EOF
+}
+func (nullStream) ReadFrom(r io.Reader) (n int64, err error) {
+	return io.Discard.(io.ReaderFrom).ReadFrom(r)
+}
+
+func (nullStream) Write(bytes []byte) (int, error) {
+	return len(bytes), nil
+}
+func (nullStream) WriteString(s string) (int, error) {
+	return len(s), nil
+}
+func (nullStream) Close() error {
+	return nil
+}
