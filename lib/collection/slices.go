@@ -33,6 +33,10 @@ func Filter[T any](S []T, filter func(T) bool) []T {
 			results = append(results, value)
 		}
 	}
+	var zero T
+	for i := len(results); i < len(S); i++ {
+		S[i] = zero
+	}
 	return results
 }
 
