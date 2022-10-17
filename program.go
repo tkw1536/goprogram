@@ -65,15 +65,15 @@ type Program[E any, P any, F any, R Requirement[F]] struct {
 //
 // For help pages, see MainUsage, CommandUsage, AliasUsage.
 // For version pages, see FmtVersion.
-func (p Program[E, P, F, R]) Main(stream stream.IOStream, params P, argv []string) (err error) {
+func (p Program[E, P, F, R]) Main(str stream.IOStream, params P, argv []string) (err error) {
 	// whenever an error occurs, we want it printed
 	defer func() {
-		err = stream.Die(err)
+		err = str.Die(err)
 	}()
 
 	// create a new context
 	context := Context[E, P, F, R]{
-		IOStream: stream,
+		IOStream: str,
 		Program:  p,
 	}
 

@@ -21,18 +21,18 @@ type IOStream struct {
 }
 
 // StdinIsATerminal checks if standard input is a terminal
-func (io IOStream) StdinIsATerminal() bool {
-	return streamIsTerminal(io.Stdin)
+func (str IOStream) StdinIsATerminal() bool {
+	return streamIsTerminal(str.Stdin)
 }
 
 // StdoutIsATerminal checks if standard output is a terminal
-func (io IOStream) StdoutIsATerminal() bool {
-	return streamIsTerminal(io.Stdout)
+func (str IOStream) StdoutIsATerminal() bool {
+	return streamIsTerminal(str.Stdout)
 }
 
 // StderrIsATerminal checks if standard error is a terminal
-func (io IOStream) StderrIsATerminal() bool {
-	return streamIsTerminal(io.Stderr)
+func (str IOStream) StderrIsATerminal() bool {
+	return streamIsTerminal(str.Stderr)
 }
 
 // streamIsTerminal checks if stream is a terminal
@@ -41,34 +41,34 @@ func streamIsTerminal(stream any) bool {
 	return ok && term.IsTerminal(int(file.Fd()))
 }
 
-// Printf is like [fmt.Printf] but prints to io.Stdout.
-func (io IOStream) Printf(format string, args ...interface{}) (n int, err error) {
-	return fmt.Fprintf(io.Stdout, format, args...)
+// Printf is like [fmt.Printf] but prints to str.Stdout.
+func (str IOStream) Printf(format string, args ...interface{}) (n int, err error) {
+	return fmt.Fprintf(str.Stdout, format, args...)
 }
 
 // EPrintf is like [fmt.Printf] but prints to io.Stderr.
-func (io IOStream) EPrintf(format string, args ...interface{}) (n int, err error) {
-	return fmt.Fprintf(io.Stderr, format, args...)
+func (str IOStream) EPrintf(format string, args ...interface{}) (n int, err error) {
+	return fmt.Fprintf(str.Stderr, format, args...)
 }
 
-// Print is like [fmt.Print] but prints to io.Stdout.
-func (io IOStream) Print(args ...interface{}) (n int, err error) {
-	return fmt.Fprint(io.Stdout, args...)
+// Print is like [fmt.Print] but prints to str.Stdout.
+func (str IOStream) Print(args ...interface{}) (n int, err error) {
+	return fmt.Fprint(str.Stdout, args...)
 }
 
-// EPrint is like [fmt.Print] but prints to io.Stderr.
-func (io IOStream) EPrint(args ...interface{}) (n int, err error) {
-	return fmt.Fprint(io.Stderr, args...)
+// EPrint is like [fmt.Print] but prints to str.Stderr.
+func (str IOStream) EPrint(args ...interface{}) (n int, err error) {
+	return fmt.Fprint(str.Stderr, args...)
 }
 
-// Println is like [fmt.Println] but prints to io.Stdout.
-func (io IOStream) Println(args ...interface{}) (n int, err error) {
-	return fmt.Fprintln(io.Stdout, args...)
+// Println is like [fmt.Println] but prints to str.Stdout.
+func (str IOStream) Println(args ...interface{}) (n int, err error) {
+	return fmt.Fprintln(str.Stdout, args...)
 }
 
 // EPrintln is like [fmt.Println] but prints to io.Stderr.
-func (io IOStream) EPrintln(args ...interface{}) (n int, err error) {
-	return fmt.Fprintln(io.Stderr, args...)
+func (str IOStream) EPrintln(args ...interface{}) (n int, err error) {
+	return fmt.Fprintln(str.Stderr, args...)
 }
 
 // ioDefaultWrap is the default value for Wrap of an IOStream.
@@ -101,26 +101,26 @@ func NewIOStream(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
 }
 
 // Streams creates a new IOStream with the provided streams and wrap.
-// If any parameter is the zero value, copies the values from io.
-func (io IOStream) Streams(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
+// If any parameter is the zero value, copies the values from str.
+func (str IOStream) Streams(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
 	if Stdout == nil {
-		Stdout = io.Stdout
+		Stdout = str.Stdout
 	}
 	if Stderr == nil {
-		Stderr = io.Stderr
+		Stderr = str.Stderr
 	}
 	if Stdin == nil {
-		Stdin = io.Stdin
+		Stdin = str.Stdin
 	}
 	if wrap == 0 {
-		wrap = io.wrap
+		wrap = str.wrap
 	}
 	return NewIOStream(Stdout, Stderr, Stdin, wrap)
 }
 
 // NonInteractive creates a new IOStream with [Null] as standard input.
-func (io IOStream) NonInteractive() IOStream {
-	return io.Streams(nil, nil, Null, 0)
+func (str IOStream) NonInteractive() IOStream {
+	return str.Streams(nil, nil, Null, 0)
 }
 
 var newLine = []byte("\n")
@@ -130,12 +130,12 @@ var newLine = []byte("\n")
 //	io.Stdout.Write([]byte(s + "\n"))
 //
 // but wrapped at a reasonable length
-func (io IOStream) StdoutWriteWrap(s string) (int, error) {
-	n, err := wrap.Write(io.Stdout, io.wrap, s)
+func (str IOStream) StdoutWriteWrap(s string) (int, error) {
+	n, err := wrap.Write(str.Stdout, str.wrap, s)
 	if err != nil {
 		return n, err
 	}
-	m, err := io.Stdout.Write(newLine)
+	m, err := str.Stdout.Write(newLine)
 	n += m
 	return n, err
 }
@@ -145,12 +145,12 @@ func (io IOStream) StdoutWriteWrap(s string) (int, error) {
 //	io.Stdout.Write([]byte(s + "\n"))
 //
 // but wrapped at length Wrap.
-func (io IOStream) StderrWriteWrap(s string) (int, error) {
-	n, err := wrap.Write(io.Stderr, io.wrap, s)
+func (str IOStream) StderrWriteWrap(s string) (int, error) {
+	n, err := wrap.Write(str.Stderr, str.wrap, s)
 	if err != nil {
 		return n, err
 	}
-	m, err := io.Stderr.Write(newLine)
+	m, err := str.Stderr.Write(newLine)
 	n += m
 	return n, err
 }
@@ -166,7 +166,7 @@ var errDieUnknown = exit.Error{
 // Then if err.Message is not the empty string, it prints it to io.Stderr with wrapping.
 //
 // If err is nil, it does nothing and returns nil.
-func (io IOStream) Die(err error) error {
+func (str IOStream) Die(err error) error {
 	var e exit.Error
 	switch ee := err.(type) {
 	case nil:
@@ -179,7 +179,7 @@ func (io IOStream) Die(err error) error {
 
 	// print the error message to standard error in a wrapped way
 	if message := e.Error(); message != "" {
-		io.StderrWriteWrap(docfmt.Format(message))
+		str.StderrWriteWrap(docfmt.Format(message))
 	}
 
 	return e

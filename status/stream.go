@@ -18,7 +18,7 @@ import (
 // The [Status] will send output to the standard output of str.
 //
 // StreamGroup returns the first non-nil error returned by each call to handler; or nil otherwise.
-func StreamGroup[T any](str stream.IOStream, count int, handler func(value T, stream stream.IOStream) error, items []T, opts ...StreamGroupOption[T]) error {
+func StreamGroup[T any](str stream.IOStream, count int, handler func(value T, str stream.IOStream) error, items []T, opts ...StreamGroupOption[T]) error {
 
 	// create a group
 	var group Group[T, error]
