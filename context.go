@@ -1,6 +1,8 @@
 package goprogram
 
 import (
+	"context"
+
 	"github.com/tkw1536/goprogram/parser"
 	"github.com/tkw1536/goprogram/stream"
 )
@@ -8,8 +10,8 @@ import (
 // Context represents an execution environment for a command.
 // it takes the same type parameters as a command and program.
 type Context[E any, P any, F any, R Requirement[F]] struct {
-	// IOStream describes the input and output the command reads from and writes to.
-	stream.IOStream
+	stream.IOStream // IOStream describes the input and output the command reads from and writes to.
+	Context         context.Context
 
 	// Args holds arguments passed to this command.
 	Args Arguments[F]
@@ -28,6 +30,56 @@ type Context[E any, P any, F any, R Requirement[F]] struct {
 
 	// inExec indicates if the current command is being called from within a program.Exec call.
 	inExec bool
+
+	// cleanup receives cleanup handlers
+	cleanup chan ContextCleanupFunc[E, P, F, R]
+}
+
+// ContextCleanupFunc represents a function that is called to cleanup a context.
+// It is called with the context to be cleaned up.
+//
+// ContextCleanupFunc is guaranteed to be called even if the underlying operation associated with the context calls panic().
+// This also holds if other ContextCleanupFuncs panic.
+// There is no guarantee on the order in which functions are called.
+//
+// A nil ContextCleanupFunc is permitted.
+type ContextCleanupFunc[E any, P any, F any, R Requirement[F]] func(context *Context[E, P, F, R])
+
+// AddCleanupHandler adds f to be called when this context is no longer needed.
+// f may be nil, in which case the call is ignored.
+//
+// Multiple handlers may be called in any order.
+// f may not invoke AddCleanupHandler.
+func (context Context[E, P, F, R]) AddCleanupFunction(f ContextCleanupFunc[E, P, F, R]) {
+	context.cleanup <- f
+}
+
+// handleCleanup initializes a new cleanup channel and begins handling cleanup functions.
+func (context *Context[E, P, F, R]) handleCleanup() func() {
+	context.cleanup = make(chan ContextCleanupFunc[E, P, F, R])
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+
+		// collect all the cleanup functions
+		var cleanups []ContextCleanupFunc[E, P, F, R]
+		for handler := range context.cleanup {
+			if handler == nil {
+				continue
+			}
+			cleanups = append(cleanups, handler)
+		}
+
+		// defer them in the correct order!
+		for i := len(cleanups) - 1; i >= 0; i-- {
+			defer cleanups[i](context)
+		}
+
+	}()
+	return func() {
+		close(context.cleanup)
+		<-done
+	}
 }
 
 // InExec returns true if this execution environment was started from within a program.Exec command.

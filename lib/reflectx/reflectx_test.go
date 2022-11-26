@@ -84,9 +84,9 @@ func ExampleIterateFields() {
 
 	fmt.Println(
 		"returned:",
-		IterateFields(TypeOf[SomeStruct](), func(f reflect.StructField, index int) (cancel bool) {
+		IterateFields(TypeOf[SomeStruct](), func(f reflect.StructField, index int) (stop bool) {
 			fmt.Println("encounted field", f.Name, "with index", index)
-			return false // do not cancel!
+			return false // do not stop
 		}),
 	)
 
@@ -113,9 +113,9 @@ func ExampleIterateAllFields() {
 
 	fmt.Println(
 		"returned:",
-		IterateAllFields(TypeOf[SomeStruct](), func(f reflect.StructField, index ...int) (cancel bool) {
+		IterateAllFields(TypeOf[SomeStruct](), func(f reflect.StructField, index ...int) (stop bool) {
 			fmt.Println("encounted field", f.Name, "with index", index)
-			return false // do not cancel!
+			return false // do not stop
 		}),
 	)
 

@@ -2,6 +2,8 @@
 package goprogram
 
 import (
+	"context"
+
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/stream"
@@ -28,6 +30,21 @@ type Program[E any, P any, F any, R Requirement[F]] struct {
 	// Used to generate help and version pages
 	Info meta.Info
 
+	// The NewContext function is called to create a new context for a command.
+	// It may optionally return a ContextCleanupFunc.
+	//
+	// It is passed the parameters as well as a parent context.
+	// The parameters are only passed when Main() is invoked; otherwise they are the zero value.
+	//
+	// The parent context is either a new context, or the context from the parent command this command was invoked from.
+	//
+	// When NewContext is nil, the parent context is used.
+	//
+	// If the context is closed before a command would be invoked, then the command is not invoked.
+	//
+	// See also [env.NewOSContext].
+	NewContext func(params *P, parent context.Context) (context.Context, ContextCleanupFunc[E, P, F, R], error)
+
 	// The NewEnvironment function is used to create a new environment.
 	// The returned error must be nil or of type exit.Error.
 	//
@@ -49,6 +66,30 @@ type Program[E any, P any, F any, R Requirement[F]] struct {
 	keywords map[string]Keyword[F]
 	aliases  map[string]Alias
 	commands map[string]Command[E, P, F, R]
+}
+
+var errProgramMakeContext = exit.Error{
+	ExitCode: exit.ExitContext,
+	Message:  "unable to initialize context: %s",
+}
+
+// initContext initialises the context of the context
+func (p Program[E, P, F, R]) initContextContext(params *P, context *Context[E, P, F, R]) error {
+	if p.NewContext == nil {
+		return nil
+	}
+
+	// make a new context
+	ctx, cleanup, err := p.NewContext(params, context.Context)
+	if err != nil {
+		return err
+	}
+
+	// store it and add the cleanup function
+	context.Context = ctx
+	context.AddCleanupFunction(cleanup)
+
+	return nil
 }
 
 // Main invokes this program and returns an error of type exit.Error or nil.
@@ -73,8 +114,15 @@ func (p Program[E, P, F, R]) Main(str stream.IOStream, params P, argv []string) 
 
 	// create a new context
 	context := Context[E, P, F, R]{
+		Context:  context.Background(),
 		IOStream: str,
 		Program:  p,
+	}
+	defer context.handleCleanup()()
+
+	// initialize the underlying context
+	if err := p.initContextContext(&params, &context); err != nil {
+		return err
 	}
 
 	// parse flags!
@@ -95,12 +143,13 @@ func (p Program[E, P, F, R]) Main(str stream.IOStream, params P, argv []string) 
 // It does not re-parse arguments preceeding the keyword, alias or command.
 //
 // This function is intended to safely run a command from within another command.
-func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, pos ...string) error {
+func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, pos ...string) (err error) {
 	// NOTE(twiesing): This function is untested, because it is nearly identical to Main
 
 	// create a new context
 	econtext := Context[E, P, F, R]{
 		IOStream: context.IOStream,
+		Context:  context.Context,
 		Program:  p,
 
 		Args: Arguments[F]{
@@ -113,14 +162,30 @@ func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, p
 
 		inExec: true,
 	}
+	defer context.handleCleanup()()
+
+	// initialize the underlying context
+	if err := p.initContextContext(nil, &context); err != nil {
+		return err
+	}
 
 	// reset the arguments to the context
 	return p.run(econtext, func(Context[E, P, F, R]) (E, error) { return context.Environment, nil })
 }
 
+var errProgramUnknownCommand = exit.Error{
+	ExitCode: exit.ExitUnknownCommand,
+	Message:  "unknown command: must be one of %s",
+}
+
+var errProgramContext = exit.Error{
+	ExitCode: exit.ExitContext,
+	Message:  "context was closed before main could run: %s",
+}
+
 // run implements Main and Exec
-func (p Program[E, P, F, R]) run(context Context[E, P, F, R], makeEnv func(context Context[E, P, F, R]) (E, error)) (err error) {
-	// expand keywords
+func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment func(context Context[E, P, F, R]) (E, error)) (err error) {
+	// expand keyword
 	keyword, hasKeyword := p.keywords[context.Args.Command]
 	if hasKeyword {
 		// invoke BeforeKeyword (if any)
@@ -187,7 +252,7 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], makeEnv func(conte
 	}
 
 	// create the environment
-	if context.Environment, err = makeEnv(context); err != nil {
+	if context.Environment, err = setupEnvironment(context); err != nil {
 		return err
 	}
 
@@ -197,6 +262,11 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], makeEnv func(conte
 		if err != nil {
 			return err
 		}
+	}
+
+	// check that the context isn't closed!
+	if err := context.Context.Err(); err != nil {
+		return errProgramContext.Wrap(err)
 	}
 
 	// do the command!
@@ -211,9 +281,4 @@ func (p Program[E, P, F, R]) makeEnvironment(params P, context Context[E, P, F, 
 	}
 
 	return p.NewEnvironment(params, context)
-}
-
-var errProgramUnknownCommand = exit.Error{
-	ExitCode: exit.ExitUnknownCommand,
-	Message:  "unknown command: must be one of %s",
 }

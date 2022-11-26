@@ -33,6 +33,9 @@ const (
 	// ExitCommandArguments indicates that the user attempted to pass invalid command-specific arguments to a subcommand.
 	ExitCommandArguments ExitCode = 4
 
+	// ExitContext indicates an error with the underlying command context.
+	ExitContext ExitCode = 254
+
 	// ExitPanic indicates that the go code called panic() inside the executation of the current program.
 	// This typically implies a bug inside a program.
 	ExitPanic ExitCode = 255

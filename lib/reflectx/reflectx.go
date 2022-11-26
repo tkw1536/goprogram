@@ -81,12 +81,12 @@ func Copy[T any](value T, copyElem bool) T {
 //
 // Unlike IterateAllFields, this function does not recurse into embedded structs.
 // See also IterateFields.
-func IterateFields(T reflect.Type, f func(field reflect.StructField, index int) (cancel bool)) (cancelled bool) {
+func IterateFields(T reflect.Type, f func(field reflect.StructField, index int) (stop bool)) (cancelled bool) {
 	if T.Kind() != reflect.Struct {
 		panic("IterateFields: tp is not a Struct")
 	}
 
-	return iterateFields(false, nil, T, func(field reflect.StructField, index ...int) (cancel bool) {
+	return iterateFields(false, nil, T, func(field reflect.StructField, index ...int) (stop bool) {
 		return f(field, index[0])
 	})
 }
@@ -97,14 +97,14 @@ func IterateFields(T reflect.Type, f func(field reflect.StructField, index int) 
 // When T is not a struct type, IterateAllFields panics.
 // When T contains an embedded struct, calls IterateAllFields recursively.
 //
-// The return value of f indicates if the iteration should be cancelled early.
+// The return value of f indicates if the iteration should be stopped early.
 // If f returns true, no further calls to f are made.
 //
 // IterateAllFields returns if the iteration was aborted early.
 //
 // Unlike IterateFields, this function recurses into embedded structs.
 // See also IterateFields.
-func IterateAllFields(T reflect.Type, f func(field reflect.StructField, index ...int) (cancel bool)) (cancelled bool) {
+func IterateAllFields(T reflect.Type, f func(field reflect.StructField, index ...int) (stop bool)) (stopped bool) {
 	if T.Kind() != reflect.Struct {
 		panic("IterateAllFields: tp is not a Struct")
 	}
