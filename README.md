@@ -6,7 +6,9 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
-# 0.1.2 (Upcoming)
+# 0.2.1 (Upcoming)
+
+# 0.2.0 (Released [Nov 27 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.2.0))
 
 - extend context handling
 - add additional type parameters to `collection/slice`
