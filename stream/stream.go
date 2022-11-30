@@ -75,7 +75,7 @@ func (str IOStream) EPrintln(args ...interface{}) (n int, err error) {
 const ioDefaultWrap = 80
 
 // NewIOStream creates a new IOStream with the provided readers and writers.
-// If any of them are set to an empty stream, they are set to Null.
+// If any of them are set to nil, they are set to Null.
 // When wrap is set to 0, it is set to a reasonable default.
 //
 // It furthermore wraps output as set by wrap.
@@ -98,6 +98,13 @@ func NewIOStream(Stdout, Stderr io.Writer, Stdin io.Reader, wrap int) IOStream {
 		Stderr: Stderr,
 		wrap:   wrap,
 	}
+}
+
+// NonInteractive creates a new non-interactive writer from a single output stream.
+//
+// It is roughly equivalent to NewIOStream(Writer, Writer, nil, 0)
+func NonInteractive(Writer io.Writer) IOStream {
+	return NewIOStream(Writer, Writer, nil, 0).NonInteractive()
 }
 
 // Streams creates a new IOStream with the provided streams and wrap.

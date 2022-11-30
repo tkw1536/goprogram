@@ -8,6 +8,9 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 # 0.2.1 (Upcoming)
 
+- add `stream.NonInteractive` method
+- add `WriterGroup` to status
+
 # 0.2.0 (Released [Nov 27 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.2.0))
 
 - extend context handling
