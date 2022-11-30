@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gosuri/uilive"
+	"github.com/tkw1536/goprogram/stream"
 	"golang.org/x/term"
 )
 
@@ -18,13 +19,12 @@ import (
 //
 // A typical usage is as follows:
 //
-//   st := New(os.Stdout, 10)
-//   st.Start()
-//   defer st.Stop()
+//	st := New(os.Stdout, 10)
+//	st.Start()
+//	defer st.Stop()
 //
-//   // ... whatever usage here ...
-//   st.Set("line 0", 0)
-//
+//	// ... whatever usage here ...
+//	st.Set("line 0", 0)
 //
 // Using the status to Write messages outside of the Start / Stop process results in no-ops.
 //
@@ -79,6 +79,12 @@ type action struct {
 // The ids of the status lines are guaranteed to be 0...(count-1).
 // When count is less than 0, it is set to 0.
 func New(writer io.Writer, count int) *Status {
+	// when a zero writer was passed, we don't need a status.
+	// and everything should become a no-op.
+	if writer == io.Discard || writer == stream.Null {
+		return nil
+	}
+
 	if count < 0 {
 		count = 0
 	}
@@ -129,6 +135,11 @@ func NewWithCompat(writer io.Writer, count int) (st *Status) {
 //
 // Start may not be called more than once, extra calls may result in a panic.
 func (st *Status) Start() {
+	// nil check for no-op status
+	if st == nil {
+		return
+	}
+
 	if atomic.LoadUint64(&st.state) == stateInvalid {
 		panic("Status: Not created using New")
 	}
@@ -192,6 +203,11 @@ func (st *Status) flushNormal(force bool) {
 // Stop must be called after [Start] has been called.
 // Start may not be called more than once.
 func (st *Status) Stop() {
+	// nil check for no-op status
+	if st == nil {
+		return
+	}
+
 	if !atomic.CompareAndSwapUint64(&st.state, stateStartCalled, stateStopCalled) {
 		panic("Status: Stop() called out-of-order")
 	}
@@ -230,6 +246,11 @@ func (st *Status) Set(id int, message string) {
 // Line may be called at any time.
 // Line should not be called multiple times with the same id.
 func (st *Status) Line(prefix string, id int) io.WriteCloser {
+	// nil check for no-op status
+	if st == nil {
+		return stream.Null
+	}
+
 	// setup a delay for flushing partial lines after writes.
 	// when in compatibility mode, this should be turned off.
 	delay := 10 * minFlushDelay
@@ -256,6 +277,10 @@ func (st *Status) Line(prefix string, id int) io.WriteCloser {
 // Open may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored, and return an invalid line id.
 func (st *Status) Open(message string) (id int) {
+	// nil check for no-op status
+	if st == nil {
+		return 0
+	}
 
 	// even when not active, generate a new id
 	// this guarantees that other calls are no-ops.
@@ -277,6 +302,10 @@ func (st *Status) Open(message string) (id int) {
 // OpenLine may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored, and return a no-op io.Writer.
 func (st *Status) OpenLine(prefix, data string) io.WriteCloser {
+	// nil check for no-op status
+	if st == nil {
+		return stream.Null
+	}
 	return st.Line(prefix, st.Open(prefix+data))
 }
 
@@ -291,6 +320,10 @@ func (st *Status) OpenLine(prefix, data string) io.WriteCloser {
 // Close may only be called after [Start] has been called, but before [Stop].
 // Other calls are silently ignored.
 func (st *Status) Close(id int) {
+	// nil check for no-op status
+	if st == nil {
+		return
+	}
 	if atomic.LoadUint64(&st.state) != stateStartCalled {
 		return
 	}
@@ -303,6 +336,11 @@ func (st *Status) Close(id int) {
 
 // listen listens for updates
 func (st *Status) listen() {
+	// nil check for no-op status
+	if st == nil {
+		return
+	}
+
 	defer close(st.done)
 	for msg := range st.actions {
 		switch msg.action {
@@ -359,5 +397,10 @@ func (st *Status) listen() {
 // Bypass returns a writer that completely bypasses this Status, and writes directly to the underlying writer.
 // [Start] must have been called.
 func (st *Status) Bypass() io.Writer {
+	// nil check for no-op status
+	if st == nil {
+		return io.Discard
+	}
+
 	return st.w.Bypass()
 }
