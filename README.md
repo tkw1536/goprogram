@@ -6,7 +6,9 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
-# 0.2.1 (Upcoming)
+# 0.2.2 (Upcoming)
+
+# 0.2.1 (Released [Nov 30 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.2.1))
 
 - add `stream.NonInteractive` method
 - add `WriterGroup` to status
