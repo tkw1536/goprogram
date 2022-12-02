@@ -6,7 +6,9 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
-# 0.2.2 (Upcoming)
+# 0.2.3 (Upcoming)
+
+# 0.2.2 (Released [Dec 2 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.2.2))
 
 - allow accessing full context object from simple context
 
