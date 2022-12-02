@@ -38,6 +38,8 @@ type Program[E any, P any, F any, R Requirement[F]] struct {
 	//
 	// The parent context is either a new context, or the context from the parent command this command was invoked from.
 	//
+	// To access the full context object within the NewContext function, use GetContext.
+	//
 	// When NewContext is nil, the parent context is used.
 	//
 	// If the context is closed before a command would be invoked, then the command is not invoked.
@@ -75,12 +77,14 @@ var errProgramMakeContext = exit.Error{
 
 // initContext initialises the context of the context
 func (p Program[E, P, F, R]) initContextContext(params *P, context *Context[E, P, F, R]) error {
+	context.Context = context.withContext(context.Context)
+
 	if p.NewContext == nil {
 		return nil
 	}
 
 	// make a new context
-	ctx, cleanup, err := p.NewContext(params, context.Context)
+	ctx, cleanup, err := p.NewContext(params, context.withContext(context.Context))
 	if err != nil {
 		return err
 	}
@@ -120,13 +124,13 @@ func (p Program[E, P, F, R]) Main(str stream.IOStream, params P, argv []string) 
 	}
 	defer context.handleCleanup()()
 
-	// initialize the underlying context
-	if err := p.initContextContext(&params, &context); err != nil {
+	// parse flags!
+	if err := context.Args.parseProgramFlags(argv); err != nil {
 		return err
 	}
 
-	// parse flags!
-	if err := context.Args.parseProgramFlags(argv); err != nil {
+	// initialize the underlying context
+	if err := p.initContextContext(&params, &context); err != nil {
 		return err
 	}
 

@@ -35,6 +35,28 @@ type Context[E any, P any, F any, R Requirement[F]] struct {
 	cleanup chan ContextCleanupFunc[E, P, F, R]
 }
 
+type goProgramKey struct{}
+
+var contextKey goProgramKey
+
+// GetContext returns the goprogram context stored inside of ctx.
+// When ctx has no contex associated, returns nil.
+func GetContext[E any, P any, F any, R Requirement[F]](ctx context.Context) *Context[E, P, F, R] {
+	value := ctx.Value(contextKey)
+	if value == nil {
+		return nil
+	}
+	if vctx, ok := value.(*Context[E, P, F, R]); ok {
+		return vctx
+	}
+	return nil
+}
+
+// withContext creates a new context that stores contextKey in parent.
+func (ctx *Context[E, P, F, R]) withContext(parent context.Context) context.Context {
+	return context.WithValue(parent, contextKey, ctx)
+}
+
 // ContextCleanupFunc represents a function that is called to cleanup a context.
 // It is called with the context to be cleaned up.
 //
