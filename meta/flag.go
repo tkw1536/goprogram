@@ -31,8 +31,12 @@ type Flag struct {
 	Value string // "digit"
 	Usage string // "A digit used within something"
 
-	// Default value of the flag (as a string)
+	// Default value of the flag, as shown to the user.
+	// When multiple default values are set, they are joined as a string.
 	Default string // "42"
+
+	// Valid choices for the option
+	Choices []string
 }
 
 // WriteSpecTo writes a short specification of f into w.
@@ -111,7 +115,7 @@ const (
 //
 // and
 //
-//	DESCRIPTION (default DEFAULT)
+//	DESCRIPTION (choices CHOICE1, CHOICE2. default DEFAULT)
 //
 // .
 //
@@ -123,10 +127,30 @@ func (opt Flag) WriteMessageTo(w io.Writer) {
 	io.WriteString(w, usageMsg2)
 
 	io.WriteString(w, docfmt.Format(opt.Usage))
-	if dflt := opt.Default; dflt != "" {
-		io.WriteString(w, " (default ")
-		io.WriteString(w, dflt)
-		io.WriteString(w, ")")
+
+	{
+		dflt := opt.Default
+		hasDefault := dflt != ""
+		choices := opt.Choices
+		hasChoices := len(choices) > 0
+
+		if hasDefault || hasChoices {
+			io.WriteString(w, " (")
+			if hasChoices {
+				io.WriteString(w, "choices: ")
+				text.Join(w, opt.Choices, ", ")
+				if hasDefault {
+					io.WriteString(w, "; ")
+				}
+			}
+
+			if hasDefault {
+				io.WriteString(w, "default ")
+				io.WriteString(w, dflt)
+			}
+
+			io.WriteString(w, ")")
+		}
 	}
 
 	io.WriteString(w, usageMsg3)

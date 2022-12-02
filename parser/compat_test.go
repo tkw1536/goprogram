@@ -36,6 +36,8 @@ func TestNewFlag(t *testing.T) {
 				Value:   "test",
 				Usage:   "something",
 				Default: "",
+
+				Choices: nil,
 			},
 		},
 
@@ -58,6 +60,33 @@ func TestNewFlag(t *testing.T) {
 				Value:   "test",
 				Usage:   "something",
 				Default: "a",
+				Choices: nil,
+			},
+		},
+
+		{
+			"option with choices",
+			&flags.Option{
+				Required: false,
+
+				LongName: "long",
+
+				ValueName:   "test",
+				Description: "something",
+				Default:     []string{"a"},
+
+				Choices: []string{"a", "b", "c"},
+			},
+			meta.Flag{
+				Required: false,
+
+				Long: []string{"long"},
+
+				Value:   "test",
+				Usage:   "something",
+				Default: "a",
+
+				Choices: []string{"a", "b", "c"},
 			},
 		},
 	}

@@ -32,6 +32,11 @@ func NewFlag(option *flags.Option) (flag meta.Flag) {
 	if len(dflt) != 0 {
 		flag.Default = strings.Join(dflt, ", ")
 	}
+	if option.DefaultMask != "" {
+		flag.Default = option.DefaultMask
+	}
+
+	flag.Choices = option.Choices
 
 	return
 }

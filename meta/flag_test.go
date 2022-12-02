@@ -113,6 +113,11 @@ func TestFlag_WriteMessageTo(t *testing.T) {
 			Flag{Usage: "this one is named", Value: "name", Short: []string{"s"}, Long: []string{"long"}, Default: "default"},
 			"\n\n   -s, --long name\n      This one is named (default default)",
 		},
+		{
+			"short and long named option with default and choices",
+			Flag{Usage: "this one is named", Value: "name", Short: []string{"s"}, Long: []string{"long"}, Default: "default", Choices: []string{"choice1", "choice2"}},
+			"\n\n   -s, --long name\n      This one is named (choices: choice1, choice2; default default)",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
