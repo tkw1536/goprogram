@@ -120,5 +120,5 @@ func (context *Context[E, P, F, R]) parseCommandFlags() (err error) {
 
 var errParseArgCount = exit.Error{
 	ExitCode: exit.ExitCommandArguments,
-	Message:  "Wrong number of positional arguments for %s: %d additional arguments were provided",
+	Message:  "wrong number of positional arguments for %s: %d additional arguments were provided",
 }

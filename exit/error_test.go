@@ -128,7 +128,7 @@ func TestError_Wrap(t *testing.T) {
 		args   args
 		want   Error
 	}{
-		{"wraps an inner error", fields{ExitCode: 1, Message: "Something went wrong"}, args{inner}, Error{ExitCode: 1, Message: "Something went wrong: inner error", err: inner}},
+		{"wraps an inner error", fields{ExitCode: 1, Message: "something went wrong"}, args{inner}, Error{ExitCode: 1, Message: "something went wrong: inner error", err: inner}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
