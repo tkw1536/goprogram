@@ -186,6 +186,10 @@ func (str IOStream) Die(err error) error {
 
 	// print the error message to standard error in a wrapped way
 	if message := e.Error(); message != "" {
+		if IsNullWriter(str.Stderr) {
+			docfmt.Format(message)
+			return e
+		}
 		str.StderrWriteWrap(docfmt.Format(message))
 	}
 

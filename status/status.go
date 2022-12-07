@@ -81,7 +81,7 @@ type action struct {
 func New(writer io.Writer, count int) *Status {
 	// when a zero writer was passed, we don't need a status.
 	// and everything should become a no-op.
-	if writer == io.Discard || writer == stream.Null {
+	if stream.IsNullWriter(writer) {
 		return nil
 	}
 

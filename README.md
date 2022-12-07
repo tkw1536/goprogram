@@ -8,6 +8,7 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 # 0.2.3 (Upcoming)
 
+- add `IsNullWriter` function
 - add choices of options to help page
 
 # 0.2.2 (Released [Dec 2 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.2.2))
