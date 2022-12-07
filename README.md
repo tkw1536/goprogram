@@ -8,6 +8,8 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 # 0.2.4 (Upcoming)
 
+- quoted word validation bugfix
+
 # 0.2.3 (Released [Dec 7 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.2.3))
 
 - add `cmd/errlint` static checker

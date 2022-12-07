@@ -50,7 +50,7 @@ const (
 //   - a word may only contain lower case letter (ForbiddenCharacter)
 //   - a word starting with ` and ending with ' is always valid, because it is a quoted word
 //   - a word starting with ` and not ending with ' must be a word quoted in go syntax, and may not have any extra content (WordIncorrectQuote)
-//   - a word may have a leading '(' or a trailing ')', then the other runes apply accordingly
+//   - a word may have a leading '(' or a trailing ')', assuming other rules apply accordingly
 //   - a word may contain a trailing comma
 //   - a word may only contain capital letters when all runes in it are capital letters, or if the last letter is an s and the rest are capital.
 //   - a word may consist of only digits when all runes in it are digits
@@ -126,12 +126,6 @@ func validateWord(word string) ValidationKind {
 		return ValidationOK
 	}
 
-	// a word starting with " must be golang quoted
-	if len(runes) > 0 && (runes[0] == '"' || runes[0] == '`') {
-		prefix, err := strconv.QuotedPrefix(word)
-		return check(err == nil && prefix == word, WordIncorrectQuote)
-	}
-
 	// leading '(' allowed
 	if len(runes) != 0 && runes[0] == '(' {
 		runes = runes[1:]
@@ -145,6 +139,13 @@ func validateWord(word string) ValidationKind {
 	// trailing comma allowed
 	if len(runes) != 0 && runes[len(runes)-1] == ',' {
 		runes = runes[:len(runes)-1]
+	}
+
+	// a word starting with " must be golang quoted
+	if len(runes) > 0 && (runes[0] == '"' || runes[0] == '`') {
+		word := string(runes)
+		prefix, err := strconv.QuotedPrefix(word)
+		return check(err == nil && prefix == word, WordIncorrectQuote)
 	}
 
 	// format string

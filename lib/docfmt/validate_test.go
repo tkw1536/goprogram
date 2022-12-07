@@ -50,6 +50,7 @@ var wordTests = []struct {
 	{"`something'", ValidationOK, "`' delimited word is allowed", true},
 	{`"hello W0rld-"`, ValidationOK, " \"-quoted word is ok", true},
 	{"`hello W0rld-`", ValidationOK, " `-quoted word is ok", true},
+	{"`hello W0rld-`,", ValidationOK, " `-quoted word with suffix is ok", true},
 
 	{"_", WordForbiddenRune, "dash not allowed", true},
 	{"a1", WordForbiddenRune, "mixed letter numbers not allowed", true},
