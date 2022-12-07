@@ -8,6 +8,7 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 # 0.2.4 (Upcoming)
 
+- CI: Run `errlint` automatically
 - quoted word validation bugfix
 
 # 0.2.3 (Released [Dec 7 2022](https://github.com/tkw1536/goprogram/releases/tag/v0.2.3))
