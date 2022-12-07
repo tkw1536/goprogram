@@ -1,6 +1,6 @@
 // Package docfmt implements formatting and checking of user format strings.
 //
-// Strings are checked at runtime for proper formatting
+// Strings are checked at runtime for proper formatting, or by a (simple) static analyzer.
 // Checking is disabled by default, but can be enabled by building with the "doccheck" tag.
 // See Check.
 package docfmt

@@ -8,6 +8,7 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 # 0.2.3 (Upcoming)
 
+- add `cmd/errlint`
 - add `IsNullWriter` function
 - add choices of options to help page
 
