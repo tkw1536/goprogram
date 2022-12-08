@@ -28,7 +28,7 @@ type tEnvironment string
 type tParameters string
 
 type echoStruct = struct {
-	Arguments []string `description:"Arguments"`
+	Arguments []string `description:"arguments"`
 }
 
 func makeEchoCommand(name string) iCommand {
