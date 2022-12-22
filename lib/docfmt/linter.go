@@ -13,6 +13,8 @@ import (
 const (
 	goprogramPackage     = "github.com/tkw1536/goprogram"
 	exitPackage          = "github.com/tkw1536/goprogram/exit"
+	errorsPackage        = "errors"
+	errorsNewFunc        = "New"
 	descriptionType      = "Description"
 	errorType            = "Error"
 	messageFieldName     = "Message"
@@ -27,6 +29,7 @@ const (
 //   - incorrectly formatted exit.Error messages and calls to WithMessage / WithMessageF
 //   - incorrectly formatted ggman.Description{Description} instantiations
 //   - incorrectly set description struct tags
+//   - incorrect calls to errors.New
 var DocFmtAnalyzer = &analysis.Analyzer{
 	Name: "docfmt",
 	Doc:  "reports exit.Error instances with statically unsafe messages",
@@ -58,7 +61,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 				return
 			})
 
-			lintFirstStringArg(pass, file, exitPackage, errorType, withMessageFunc, func(str string) (results []lintResult) {
+			lintMethodIthStringArg(pass, file, exitPackage, errorType, withMessageFunc, 0, func(str string) (results []lintResult) {
 				for _, err := range Validate(str) {
 					results = append(results, lintResult{
 						Message: "%s(%q) failed validation: %s",
@@ -72,7 +75,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 				return
 			})
 
-			lintFirstStringArg(pass, file, exitPackage, errorType, withMessageFFunc, func(str string) (results []lintResult) {
+			lintMethodIthStringArg(pass, file, exitPackage, errorType, withMessageFFunc, 0, func(str string) (results []lintResult) {
 				for _, err := range Validate(str) {
 					results = append(results, lintResult{
 						Message: "%s(%q) failed validation: %s",
@@ -91,6 +94,20 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 					results = append(results, lintResult{
 						Message: "description %q failed validation: %s",
 						Args: []any{
+							str,
+							err.Error(),
+						},
+					})
+				}
+				return
+			})
+
+			lintFuncIthStringArg(pass, file, errorsPackage, errorsNewFunc, 0, func(str string) (results []lintResult) {
+				for _, err := range Validate(str) {
+					results = append(results, lintResult{
+						Message: "%s(%q) failed validation: %s",
+						Args: []any{
+							withMessageFFunc,
 							str,
 							err.Error(),
 						},
@@ -193,23 +210,24 @@ func lintLiteralStructField(pass *analysis.Pass, file ast.Node, pkg, tp, field s
 	})
 }
 
-func lintFirstStringArg(pass *analysis.Pass, file ast.Node, pkg, tp, fname string, lint func(string) []lintResult) {
+func lintMethodIthStringArg(pass *analysis.Pass, file ast.Node, pkg, tp, mname string, i int, lint func(string) []lintResult) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		call, ok := n.(*ast.CallExpr)
 		if !ok {
 			return true
 		}
 
-		name, args, ok := isCallOf(pass, call, pkg, tp)
+		name, args, ok := isMethodCall(pass, call, pkg, tp)
 		if !ok {
 			return true
 		}
 
-		if len(args) == 0 || (name != fname) {
+		// not enough arguments
+		if len(args) <= i || (name != mname) {
 			return true
 		}
 
-		node := args[0]
+		node := args[i]
 
 		str, ok := astStringLiteral(node)
 		if !ok {
@@ -229,15 +247,78 @@ func lintFirstStringArg(pass *analysis.Pass, file ast.Node, pkg, tp, fname strin
 	})
 }
 
-// isCallOf checks if the given expression calls a function of the given (pkg, tp) struct type.
+func lintFuncIthStringArg(pass *analysis.Pass, file ast.Node, pkg, fname string, i int, lint func(string) []lintResult) {
+	ast.Inspect(file, func(n ast.Node) bool {
+		call, ok := n.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+
+		name, args, ok := isFuncCall(pass, call, pkg)
+		if !ok {
+			return true
+		}
+
+		if len(args) <= i || (name != fname) {
+			return true
+		}
+
+		node := args[i]
+
+		str, ok := astStringLiteral(node)
+		if !ok {
+			return true
+		}
+
+		// lint and report errors
+		for _, res := range lint(str) {
+			pass.Reportf(
+				node.Pos(),
+				res.Message,
+				res.Args...,
+			)
+		}
+
+		return true
+	})
+}
+
+// isMethodCall checks if the given expression calls a method of the given (pkg, tp) struct type.
 // If so returns the name of the function called, and the argument passed.
-func isCallOf(pass *analysis.Pass, call *ast.CallExpr, pkg, tp string) (string, []ast.Expr, bool) {
+func isMethodCall(pass *analysis.Pass, call *ast.CallExpr, pkg, tp string) (string, []ast.Expr, bool) {
 	selector, ok := call.Fun.(*ast.SelectorExpr)
 	if !ok {
 		return "", nil, false
 	}
 
 	if !isStructType(pass.TypesInfo.TypeOf(selector.X), pkg, tp) {
+		return "", nil, false
+	}
+
+	return selector.Sel.Name, call.Args, true
+}
+
+// isFuncCall checks if the given expression calls a function of the given pkg.
+// If so returns the name of the function called, and the argument passed.
+func isFuncCall(pass *analysis.Pass, call *ast.CallExpr, pkg string) (string, []ast.Expr, bool) {
+	selector, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return "", nil, false
+	}
+	identifier, ok := selector.X.(*ast.Ident)
+	if !ok {
+		return "", nil, false
+	}
+	obj := pass.TypesInfo.ObjectOf(identifier)
+	if obj == nil {
+		return "", nil, false
+	}
+	pname, ok := obj.(*types.PkgName)
+	if pname == nil || !ok {
+		return "", nil, false
+	}
+
+	if pname.Imported().Path() != pkg {
 		return "", nil, false
 	}
 
