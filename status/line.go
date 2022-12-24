@@ -163,7 +163,7 @@ func (lb *LineBuffer) forceFlush() {
 	}
 }
 
-var errLineBufferClosed = errors.New("LineBuffer: Close() was called")
+var errLineBufferClosed = errors.New("`LineBuffer`: close was called")
 
 // Close closes this LineBuffer, ensuring any future calls to [Write] or [Close] and friends return an error.
 // When there was an unfinished line, close may cause a final flush of the buffer
