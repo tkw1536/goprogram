@@ -4,7 +4,7 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/tkw1536/goprogram/lib/docfmt"
+	"github.com/tkw1536/pkglib/docfmt"
 )
 
 // Meta holds meta-information about an entire program or a subcommand.

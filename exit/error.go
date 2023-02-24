@@ -3,7 +3,7 @@ package exit
 import (
 	"fmt"
 
-	"github.com/tkw1536/goprogram/lib/docfmt"
+	"github.com/tkw1536/pkglib/docfmt"
 )
 
 // Error represents any error state by a program.

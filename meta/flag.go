@@ -3,8 +3,8 @@ package meta
 import (
 	"io"
 
-	"github.com/tkw1536/goprogram/lib/docfmt"
-	"github.com/tkw1536/goprogram/lib/text"
+	"github.com/tkw1536/pkglib/docfmt"
+	"github.com/tkw1536/pkglib/text"
 	"golang.org/x/exp/slices"
 )
 

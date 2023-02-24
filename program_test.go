@@ -11,11 +11,11 @@ import (
 	"time"
 
 	"github.com/tkw1536/goprogram/exit"
-	"github.com/tkw1536/goprogram/lib/testlib"
-	"github.com/tkw1536/goprogram/lib/wrap"
 	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/parser"
 	"github.com/tkw1536/goprogram/stream"
+	"github.com/tkw1536/pkglib/testlib"
+	"github.com/tkw1536/pkglib/wrap"
 )
 
 // This file contains dummy implementations of everything required to assemble a program.

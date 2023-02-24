@@ -6,8 +6,8 @@ import (
 	"io"
 
 	"github.com/tkw1536/goprogram/exit"
-	"github.com/tkw1536/goprogram/lib/docfmt"
-	"github.com/tkw1536/goprogram/lib/wrap"
+	"github.com/tkw1536/pkglib/docfmt"
+	"github.com/tkw1536/pkglib/wrap"
 	"golang.org/x/term"
 )
 

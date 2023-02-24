@@ -6,8 +6,8 @@ import (
 	"reflect"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/tkw1536/goprogram/lib/reflectx"
 	"github.com/tkw1536/goprogram/meta"
+	"github.com/tkw1536/pkglib/reflectx"
 )
 
 // Parse represents a parser for arguments.

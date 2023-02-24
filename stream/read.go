@@ -1,6 +1,6 @@
 package stream
 
-import "github.com/tkw1536/goprogram/lib/nobufio"
+import "github.com/tkw1536/pkglib/nobufio"
 
 // ReadLine is like [nobufio.ReadLine] on the standard input
 func (str IOStream) ReadLine() (string, error) {

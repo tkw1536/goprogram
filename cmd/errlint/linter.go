@@ -1,4 +1,4 @@
-package docfmt
+package main
 
 import (
 	"go/ast"
@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strconv"
 
+	"github.com/tkw1536/pkglib/docfmt"
 	"golang.org/x/tools/go/analysis"
 )
 
@@ -36,7 +37,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 	Run: func(pass *analysis.Pass) (interface{}, error) {
 		for _, file := range pass.Files {
 			lintLiteralStructField(pass, file, exitPackage, errorType, messageFieldName, func(str string) (results []lintResult) {
-				for _, err := range Validate(str) {
+				for _, err := range docfmt.Validate(str) {
 					results = append(results, lintResult{
 						Message: "message %q failed validation: %s",
 						Args: []any{
@@ -49,7 +50,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintLiteralStructField(pass, file, goprogramPackage, descriptionType, descriptionFieldName, func(str string) (results []lintResult) {
-				for _, err := range Validate(str) {
+				for _, err := range docfmt.Validate(str) {
 					results = append(results, lintResult{
 						Message: "description %q failed validation: %s",
 						Args: []any{
@@ -62,7 +63,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintMethodIthStringArg(pass, file, exitPackage, errorType, withMessageFunc, 0, func(str string) (results []lintResult) {
-				for _, err := range Validate(str) {
+				for _, err := range docfmt.Validate(str) {
 					results = append(results, lintResult{
 						Message: "%s(%q) failed validation: %s",
 						Args: []any{
@@ -76,7 +77,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintMethodIthStringArg(pass, file, exitPackage, errorType, withMessageFFunc, 0, func(str string) (results []lintResult) {
-				for _, err := range Validate(str) {
+				for _, err := range docfmt.Validate(str) {
 					results = append(results, lintResult{
 						Message: "%s(%q) failed validation: %s",
 						Args: []any{
@@ -90,7 +91,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintStructTag(pass, file, descriptionTagName, func(str string) (results []lintResult) {
-				for _, err := range Validate(str) {
+				for _, err := range docfmt.Validate(str) {
 					results = append(results, lintResult{
 						Message: "description %q failed validation: %s",
 						Args: []any{
@@ -103,7 +104,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintFuncIthStringArg(pass, file, errorsPackage, errorsNewFunc, 0, func(str string) (results []lintResult) {
-				for _, err := range Validate(str) {
+				for _, err := range docfmt.Validate(str) {
 					results = append(results, lintResult{
 						Message: "%s(%q) failed validation: %s",
 						Args: []any{

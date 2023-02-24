@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tkw1536/goprogram/lib/testlib"
+	"github.com/tkw1536/pkglib/testlib"
 )
 
 func TestAsError(t *testing.T) {
