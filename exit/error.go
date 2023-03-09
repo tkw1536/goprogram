@@ -77,3 +77,17 @@ func (err Error) Wrap(inner error) Error {
 	err.err = inner
 	return err
 }
+
+// DeferWrap ensures that the error pointed to by e is either nil or an Error.
+// If e is neither err.Wrap(*e) is called.
+func (err Error) DeferWrap(e *error) {
+	if e == nil || *e == nil {
+		return
+	}
+
+	if _, ok := (*e).(Error); ok {
+		return
+	}
+
+	*e = err.Wrap(*e)
+}

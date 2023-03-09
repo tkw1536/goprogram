@@ -8,6 +8,8 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 # 0.3.1 (Upcoming)
 
+- add `Error.DeferWrap` function
+
 # 0.3.0 (Released [Feb 24 2023](https://github.com/tkw1536/goprogram/releases/tag/v0.3.0))
 
 - move utility packages to pkglib
