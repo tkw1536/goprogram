@@ -4,8 +4,10 @@ import (
 	"go/ast"
 	"go/token"
 	"go/types"
+	"os"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/tkw1536/pkglib/docfmt"
 	"golang.org/x/tools/go/analysis"
@@ -25,19 +27,31 @@ const (
 	withMessageFFunc     = "WithMessageF"
 )
 
+var exceptions []string
+
+func init() {
+	values := os.Getenv("GOPROGRAM_ERRLINT_EXCEPTIONS")
+	if values == "" {
+		return
+	}
+	exceptions = strings.Split(values, ",")
+}
+
 // DocFmtAnalyzer reports incorrectly formatted calls to docfmt.
 // These are:
 //   - incorrectly formatted exit.Error messages and calls to WithMessage / WithMessageF
 //   - incorrectly formatted ggman.Description{Description} instantiations
 //   - incorrectly set description struct tags
 //   - incorrect calls to errors.New
+//
+// Furthermore, the environment variable GOPROGRAM_ERRLINT_EXCEPTIONS may contain comma-seperated words to be ignored.
 var DocFmtAnalyzer = &analysis.Analyzer{
 	Name: "docfmt",
 	Doc:  "reports exit.Error instances with statically unsafe messages",
 	Run: func(pass *analysis.Pass) (interface{}, error) {
 		for _, file := range pass.Files {
 			lintLiteralStructField(pass, file, exitPackage, errorType, messageFieldName, func(str string) (results []lintResult) {
-				for _, err := range docfmt.Validate(str) {
+				for _, err := range docfmt.Validate(str, exceptions...) {
 					results = append(results, lintResult{
 						Message: "message %q failed validation: %s",
 						Args: []any{
@@ -50,7 +64,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintLiteralStructField(pass, file, goprogramPackage, descriptionType, descriptionFieldName, func(str string) (results []lintResult) {
-				for _, err := range docfmt.Validate(str) {
+				for _, err := range docfmt.Validate(str, exceptions...) {
 					results = append(results, lintResult{
 						Message: "description %q failed validation: %s",
 						Args: []any{
@@ -63,7 +77,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintMethodIthStringArg(pass, file, exitPackage, errorType, withMessageFunc, 0, func(str string) (results []lintResult) {
-				for _, err := range docfmt.Validate(str) {
+				for _, err := range docfmt.Validate(str, exceptions...) {
 					results = append(results, lintResult{
 						Message: "%s(%q) failed validation: %s",
 						Args: []any{
@@ -77,7 +91,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintMethodIthStringArg(pass, file, exitPackage, errorType, withMessageFFunc, 0, func(str string) (results []lintResult) {
-				for _, err := range docfmt.Validate(str) {
+				for _, err := range docfmt.Validate(str, exceptions...) {
 					results = append(results, lintResult{
 						Message: "%s(%q) failed validation: %s",
 						Args: []any{
@@ -91,7 +105,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintStructTag(pass, file, descriptionTagName, func(str string) (results []lintResult) {
-				for _, err := range docfmt.Validate(str) {
+				for _, err := range docfmt.Validate(str, exceptions...) {
 					results = append(results, lintResult{
 						Message: "description %q failed validation: %s",
 						Args: []any{
@@ -104,7 +118,7 @@ var DocFmtAnalyzer = &analysis.Analyzer{
 			})
 
 			lintFuncIthStringArg(pass, file, errorsPackage, errorsNewFunc, 0, func(str string) (results []lintResult) {
-				for _, err := range docfmt.Validate(str) {
+				for _, err := range docfmt.Validate(str, exceptions...) {
 					results = append(results, lintResult{
 						Message: "%s(%q) failed validation: %s",
 						Args: []any{

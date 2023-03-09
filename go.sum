@@ -6,8 +6,8 @@ github.com/jessevdk/go-flags v1.5.0 h1:1jKYvbxEjfUl0fmqTCOfonvskHHXMjBySTLW4y9LF
 github.com/jessevdk/go-flags v1.5.0/go.mod h1:Fw0T6WPc1dYxT4mKEZRfG5kJhaTDP9pj1c2EWnYs/m4=
 github.com/mattn/go-isatty v0.0.17 h1:BTarxUcIeDqL27Mc+vyvdWYSL28zpIhv3RoTdsLMPng=
 github.com/mattn/go-isatty v0.0.17/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
-github.com/tkw1536/pkglib v0.0.0-20230224175108-1cbd65a3dfd0 h1:Wdxw9X/MugeJOLP48YP606qIAqh8s8scRDODsvk+JPs=
-github.com/tkw1536/pkglib v0.0.0-20230224175108-1cbd65a3dfd0/go.mod h1:C7CwFZnJSAwAiV8j9FMjwnATFvwJsHy2wnTnnLFAg48=
+github.com/tkw1536/pkglib v0.0.0-20230309100913-ec9fed77413a h1:j6Z6uDiEyY8a0M+W3QJ0rv7KXoPqBjJ4yRS51RF3d44=
+github.com/tkw1536/pkglib v0.0.0-20230309100913-ec9fed77413a/go.mod h1:R+8tKMAkSXC1+XGzxNUKx2DnPJqObycYeo4PKjWYkMg=
 golang.org/x/exp v0.0.0-20230223210539-50820d90acfd h1:wtFuj4DoOcAdb82Zh2PI90xiaqgp7maYA7KxjQXVtkY=
 golang.org/x/exp v0.0.0-20230223210539-50820d90acfd/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
 golang.org/x/mod v0.8.0 h1:LUYupSeNrTNCGzR/hVBk2NHZO4hXcVaW1k4Qx7rjPx8=
