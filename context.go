@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/tkw1536/goprogram/parser"
-	"github.com/tkw1536/goprogram/stream"
+	"github.com/tkw1536/pkglib/stream"
 )
 
 // Context represents an execution environment for a command.

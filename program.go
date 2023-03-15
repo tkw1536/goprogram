@@ -6,7 +6,7 @@ import (
 
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/meta"
-	"github.com/tkw1536/goprogram/stream"
+	"github.com/tkw1536/pkglib/stream"
 )
 
 // Program represents an executable program.
@@ -70,11 +70,6 @@ type Program[E any, P any, F any, R Requirement[F]] struct {
 	commands map[string]Command[E, P, F, R]
 }
 
-var errProgramMakeContext = exit.Error{
-	ExitCode: exit.ExitContext,
-	Message:  "unable to initialize context: %s",
-}
-
 // initContext initialises the context of the context
 func (p Program[E, P, F, R]) initContextContext(params *P, context *Context[E, P, F, R]) error {
 	context.Context = context.withContext(context.Context)
@@ -113,7 +108,7 @@ func (p Program[E, P, F, R]) initContextContext(params *P, context *Context[E, P
 func (p Program[E, P, F, R]) Main(str stream.IOStream, params P, argv []string) (err error) {
 	// whenever an error occurs, we want it printed
 	defer func() {
-		err = str.Die(err)
+		err = exit.Die(str, err)
 	}()
 
 	// create a new context
