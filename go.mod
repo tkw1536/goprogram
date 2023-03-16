@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/alessio/shellescape v1.4.1
 	github.com/jessevdk/go-flags v1.5.0
-	github.com/tkw1536/pkglib v0.0.0-20230315183422-bdc7380721a8
+	github.com/tkw1536/pkglib v0.0.0-20230316111730-af32f59c9194
 	golang.org/x/exp v0.0.0-20230307190834-24139beb5833
 	golang.org/x/tools v0.7.0
 )
