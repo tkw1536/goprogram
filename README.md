@@ -8,6 +8,8 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 # 0.4.0 (upcoming)
 
+- introduce `WrapError` function
+- update dependencies
 - fix a lot of documentation typos
 
 # 0.3.5 (Released [Mar 16 2023](https://github.com/tkw1536/goprogram/releases/tag/v0.3.5))
