@@ -1,4 +1,4 @@
-// Package parser implements compatiblity with the "github.com/jessevdk/go-flags" package
+// Package parser implements compatibility with the "github.com/jessevdk/go-flags" package
 package parser
 
 import (

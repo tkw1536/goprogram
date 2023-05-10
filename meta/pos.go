@@ -15,11 +15,11 @@ type Positional struct {
 
 	// Min and Max indicate how many positional arguments are expected for this command.
 	// Min must be >= 0. Max must be either Min, or -1.
-	// Max == -1 inidicates an unlimited number of repeats.
+	// Max == -1 indicates an unlimited number of repeats.
 	Min, Max int
 }
 
-// ValidRange checks if posititional has valid min and max values.
+// ValidRange checks if positional has valid min and max values.
 func (pos Positional) ValidRange() bool {
 	extra := pos.Max - pos.Min
 	return pos.Min >= 0 && (pos.Max <= 0 || extra >= 0)

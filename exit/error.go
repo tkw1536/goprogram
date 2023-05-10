@@ -9,7 +9,7 @@ import (
 // Error represents any error state by a program.
 // It implements the builtin error interface.
 //
-// The zero value represents that no error occured and is ready to use.
+// The zero value represents that no error occurred and is ready to use.
 type Error struct {
 	// Exit code of the program (if applicable)
 	ExitCode

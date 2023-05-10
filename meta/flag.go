@@ -61,7 +61,7 @@ func (opt Flag) WriteLongSpecTo(w io.Writer) {
 
 // spec implements SpecShort and SpecLong.
 //
-// sep indicates how to seperate arguments.
+// sep indicates how to separate arguments.
 // longFirst indicates that long argument names should be listed before short arguments.
 // optionalBraces indicates if braces should be placed around the argument if it is optional.
 func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces bool) {
@@ -119,7 +119,7 @@ const (
 //
 // .
 //
-// This function is implicity tested via other tests.
+// This function is implicitly tested via other tests.
 func (opt Flag) WriteMessageTo(w io.Writer) {
 
 	io.WriteString(w, usageMsg1)

@@ -40,7 +40,7 @@ type goProgramKey struct{}
 var contextKey goProgramKey
 
 // GetContext returns the goprogram context stored inside of ctx.
-// When ctx has no contex associated, returns nil.
+// When ctx has no context associated, returns nil.
 func GetContext[E any, P any, F any, R Requirement[F]](ctx context.Context) *Context[E, P, F, R] {
 	value := ctx.Value(contextKey)
 	if value == nil {

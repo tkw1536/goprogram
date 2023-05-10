@@ -17,18 +17,18 @@ func (code ExitCode) Return() {
 }
 
 const (
-	// ExitZero indicates that no error occured.
+	// ExitZero indicates that no error occurred.
 	// It is the zero value of type ExitCode.
 	ExitZero ExitCode = 0
 
-	// ExitGeneric indicates a generic error occured within this invocation.
+	// ExitGeneric indicates a generic error occurred within this invocation.
 	// This typically implies a subcommand-specific behavior wants to return failure to the caller.
 	ExitGeneric ExitCode = 1
 
 	// ExitUnknownCommand indicates that the user attempted to call a subcommand that is not defined.
 	ExitUnknownCommand ExitCode = 2
 
-	// ExitGeneralArguments indiciates that the user attempted to pass invalid general arguments to the program.
+	// ExitGeneralArguments indicates that the user attempted to pass invalid general arguments to the program.
 	ExitGeneralArguments ExitCode = 3
 	// ExitCommandArguments indicates that the user attempted to pass invalid command-specific arguments to a subcommand.
 	ExitCommandArguments ExitCode = 4
@@ -36,7 +36,7 @@ const (
 	// ExitContext indicates an error with the underlying command context.
 	ExitContext ExitCode = 254
 
-	// ExitPanic indicates that the go code called panic() inside the executation of the current program.
+	// ExitPanic indicates that the go code called panic() inside the execution of the current program.
 	// This typically implies a bug inside a program.
 	ExitPanic ExitCode = 255
 )

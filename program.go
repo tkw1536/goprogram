@@ -70,7 +70,7 @@ type Program[E any, P any, F any, R Requirement[F]] struct {
 	commands map[string]Command[E, P, F, R]
 }
 
-// initContext initialises the context of the context
+// initContext initializes the context of the context
 func (p Program[E, P, F, R]) initContextContext(params *P, context *Context[E, P, F, R]) error {
 	context.Context = context.withContext(context.Context)
 
@@ -139,7 +139,7 @@ func (p Program[E, P, F, R]) Main(str stream.IOStream, params P, argv []string) 
 // Exec executes this program from within a given context.
 //
 // It does not create a new environment.
-// It does not re-parse arguments preceeding the keyword, alias or command.
+// It does not re-parse arguments preceding the keyword, alias or command.
 //
 // This function is intended to safely run a command from within another command.
 func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, pos ...string) (err error) {

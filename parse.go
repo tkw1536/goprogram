@@ -69,13 +69,13 @@ func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 	context.parser = context.Description.ParserConfig.NewCommandParser(command)
 
 	// specifically intercept the "--help" and "-h" arguments.
-	// this prevents any kind of side effect from occuring.
+	// this prevents any kind of side effect from occurring.
 	if slices.Contains(context.Args.pos, "--help") || slices.Contains(context.Args.pos, "-h") {
 		context.Args.Universals.Help = true
 		return nil
 	}
 
-	// check that the requirements for the command are fullfilled
+	// check that the requirements for the command are fulfilled
 	if err := context.Description.Requirements.Validate(context.Args); err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func (context *Context[E, P, F, R]) parseCommandFlags() (err error) {
 		err = nil
 	}
 
-	// if an error occured, return it!
+	// if an error occurred, return it!
 	if err != nil {
 		err = errWrongArguments.WithMessageF(context.Args.Command, err.Error())
 	}

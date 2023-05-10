@@ -8,7 +8,7 @@ import (
 )
 
 // Register an alias for a program.
-// See the test suite for instaniated types.
+// See the test suite for instantiated types.
 func ExampleAlias() {
 	// create a new program that only has an echo command
 	// this code is reused across the test suite, hence not shown here.

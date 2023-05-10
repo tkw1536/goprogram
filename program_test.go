@@ -76,7 +76,7 @@ func (t tRequirements) Validate(args Arguments[tFlags]) error {
 	return ValidateAllowedFlags[tFlags](t, args)
 }
 
-// instiantiated types for the test suite
+// instantiated types for the test suite
 type iProgram = Program[tEnvironment, tParameters, tFlags, tRequirements]
 type iCommand = Command[tEnvironment, tParameters, tFlags, tRequirements]
 type iContext = Context[tEnvironment, tParameters, tFlags, tRequirements]

@@ -64,11 +64,11 @@ type Description[F any, R Requirement[F]] struct {
 //
 // A caller may use EmptyRequirement if no such abstraction is desired.
 type Requirement[F any] interface {
-	// AllowsFlag checks if the provided flag may be passed to fullfill this requirement
+	// AllowsFlag checks if the provided flag may be passed to fullfil this requirement
 	// By default it is used only for help page generation, and may be inaccurate.
 	AllowsFlag(flag meta.Flag) bool
 
-	// Validate validates if this requirement is fullfilled for the provided global flags.
+	// Validate validates if this requirement is fulfilled for the provided global flags.
 	// It should return either nil, or an error of type exit.Error.
 	//
 	// Validate does not take into account AllowsOption, see ValidateAllowedOptions.
