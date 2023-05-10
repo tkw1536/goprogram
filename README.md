@@ -6,7 +6,9 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
-# 0.4.0 (upcoming)
+# 0.4.1 (Upcoming)
+
+# 0.4.0 (Released [May 10 2023](https://github.com/tkw1536/goprogram/releases/tag/v0.4.0))
 
 - introduce `WrapError` function
 - update dependencies
