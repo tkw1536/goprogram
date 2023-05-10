@@ -65,13 +65,25 @@ func (err Error) WithMessageF(args ...any) Error {
 	return err.WithMessage(fmt.Sprintf(err.Message, args...))
 }
 
-// Wrap creates a new error with same exit code, wrapping the inner error.
-// When inner is nil, returns an empty error.
+// Wrap behaves like WrapError, except that when inner is nil, en empty error is returned.
+// This method exists for legacy reasons.
+//
+// Deprecated: Use WrapError instead.
+func (err Error) Wrap(inner error) Error {
+	if e, ok := err.WrapError(inner).(Error); ok {
+		return e
+	}
+	return Error{}
+}
+
+// WrapError creates a new Error with same exit code, wrapping the inner error.
+// When inner is nil, returns nil.
+// This function will return either nil, or an error of type Error.
 //
 // The message of the new error will contain the Error() result of the inner error.
-func (err Error) Wrap(inner error) Error {
+func (err Error) WrapError(inner error) error {
 	if inner == nil {
-		return Error{}
+		return nil
 	}
 	err.Message = fmt.Sprintf("%s: %s", err.Message, inner)
 	err.err = inner

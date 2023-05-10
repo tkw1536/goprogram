@@ -265,7 +265,7 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 
 	// check that the context isn't closed!
 	if err := context.Context.Err(); err != nil {
-		return errProgramContext.Wrap(err)
+		return errProgramContext.WrapError(err)
 	}
 
 	// do the command!
