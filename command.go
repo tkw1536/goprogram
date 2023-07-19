@@ -113,7 +113,7 @@ func (p Program[E, P, F, R]) Command(name string) (Command[E, P, F, R], bool) {
 	// NOTE(twiesing): This function is not tested because it is so trivial
 	cmd, ok := p.commands[name]
 	if ok {
-		cmd, _ = reflectx.MakePointerCopy(cmd)
+		cmd, _ = reflectx.CopyInterface(cmd)
 	}
 	return cmd, ok
 }
