@@ -1,6 +1,8 @@
 // Package goprogram provides a program abstraction that can be used to create programs.
 package goprogram
 
+// spellchecker:words goprogram twiesing
+
 import (
 	"context"
 
@@ -202,10 +204,10 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 	// handle universals
 	switch {
 	case context.Args.Universals.Help:
-		context.StdoutWriteWrap(p.MainUsage().String())
+		context.Println(p.MainUsage().String())
 		return nil
 	case context.Args.Universals.Version:
-		context.StdoutWriteWrap(p.Info.FmtVersion())
+		context.Println(p.Info.FmtVersion())
 		return nil
 	}
 
@@ -236,10 +238,10 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 	// write out help information (if given)
 	if context.Args.Universals.Help {
 		if hasAlias {
-			context.StdoutWriteWrap(p.AliasUsage(context, alias).String())
+			context.Println(p.AliasUsage(context, alias).String())
 			return nil
 		}
-		context.StdoutWriteWrap(p.CommandUsage(context).String())
+		context.Println(p.CommandUsage(context).String())
 		return nil
 	}
 

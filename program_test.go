@@ -1,5 +1,7 @@
 package goprogram
 
+// spellchecker:words positionals
+
 import (
 	"bytes"
 	"fmt"
@@ -15,7 +17,6 @@ import (
 	"github.com/tkw1536/goprogram/parser"
 	"github.com/tkw1536/pkglib/stream"
 	"github.com/tkw1536/pkglib/testlib"
-	"github.com/tkw1536/pkglib/wrap"
 )
 
 // This file contains dummy implementations of everything required to assemble a program.
@@ -129,12 +130,10 @@ func TestProgram_Main(t *testing.T) {
 		panic(err)
 	}
 
-	wrapLength := 80
-
 	// create buffers for input and output
 	var stdoutBuffer bytes.Buffer
 	var stderrBuffer bytes.Buffer
-	stream := stream.NewIOStream(&stdoutBuffer, &stderrBuffer, nil, wrapLength)
+	stream := stream.NewIOStream(&stdoutBuffer, &stderrBuffer, nil)
 
 	// define requirements to allow only the Global1 (or any) arguments
 	reqOne := tRequirements(func(flag meta.Flag) bool {
@@ -157,10 +156,6 @@ func TestProgram_Main(t *testing.T) {
 
 		// alias to register (if any)
 		alias Alias
-
-		// should the output and error test case data be wrapped automatically
-		wrapError bool
-		wrapOut   bool
 
 		wantStdout string
 		wantStderr string
@@ -190,7 +185,7 @@ func TestProgram_Main(t *testing.T) {
 			args:        []string{"--help"},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nCOMMAND [ARGS...]\n\nSomething something dark side\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] COMMAND [ARGS...]\n\nSomething something dark side\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
 			wantCode:   0,
 		},
 
@@ -199,7 +194,7 @@ func TestProgram_Main(t *testing.T) {
 			args:        []string{"--help", "fake", "whatever"},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nCOMMAND [ARGS...]\n\nSomething something dark side\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] COMMAND [ARGS...]\n\nSomething something dark side\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
 			wantCode:   0,
 		},
 
@@ -209,7 +204,6 @@ func TestProgram_Main(t *testing.T) {
 			positionals: makeTPM_Positionals[struct{}](),
 
 			wantStdout: "exe version 42.0.0, built 1970-01-01 00:00:00 +0000 UTC, using " + runtime.Version() + "\n",
-			wrapOut:    true,
 			wantCode:   0,
 		},
 
@@ -219,7 +213,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nfake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] fake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
 			wantCode:   0,
 		},
 
@@ -229,7 +223,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nfake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] fake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
 			wantCode:   0,
 		},
 
@@ -245,7 +239,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nAlias for `exe fake`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nAlias for `exe fake`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake`\n",
 			wantCode:   0,
 		},
 
@@ -261,7 +255,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nAlias for `exe fake`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nAlias for `exe fake`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake`\n",
 			wantCode:   0,
 		},
 
@@ -279,7 +273,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--]\nalias [--] [ARG ...]\n\nSome useful alias\n\nalias for `exe fake something else`. See `exe fake --help` for detailed help\npage about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake something else`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nSome useful alias\n\nalias for `exe fake something else`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake something else`\n",
 			wantCode:   0,
 		},
 
@@ -291,7 +285,7 @@ func TestProgram_Main(t *testing.T) {
 				Args []string `required:"1-2"`
 			}](),
 
-			wantStderr: "Wrong arguments for fake: The required argument `Args (at least 1 argument)`\nwas not provided\n",
+			wantStderr: "Wrong arguments for fake: The required argument `Args (at least 1 argument)` was not provided\n",
 			wantCode:   4,
 		},
 
@@ -592,18 +586,8 @@ func TestProgram_Main(t *testing.T) {
 				t.Errorf("Program.Main() code = %v, wantCode %v", gotCode, tt.wantCode)
 			}
 
-			// wrap if requested
-			if tt.wrapOut {
-				tt.wantStdout = wrap.String(wrapLength, tt.wantStdout)
-			}
-
 			if gotStdout != tt.wantStdout {
 				t.Errorf("Program.Main() stdout = %q, wantStdout %q", gotStdout, tt.wantStdout)
-			}
-
-			// wrap if requested
-			if tt.wrapError {
-				tt.wantStderr = wrap.String(wrapLength, tt.wantStderr)
 			}
 
 			if gotStderr != tt.wantStderr {

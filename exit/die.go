@@ -33,7 +33,7 @@ func Die(str stream.IOStream, err error) error {
 			docfmt.Format(message)
 			return e
 		}
-		str.StderrWriteWrap(docfmt.Format(message))
+		str.EPrintln(docfmt.Format(message))
 	}
 
 	return e

@@ -8,6 +8,8 @@ import (
 	"github.com/tkw1536/goprogram/parser"
 )
 
+// spellchecker:words positionals
+
 func TestProgram_MainUsage(t *testing.T) {
 	program := makeProgram()
 

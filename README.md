@@ -6,6 +6,10 @@ A go >= 1.19.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.5.0 (Upcoming)
+
+- remove automatic wrapping 
+
 # 0.4.1 (Released [Jul 19 2023](https://github.com/tkw1536/goprogram/releases/tag/v0.4.1))
 
 - update to new pkglib
