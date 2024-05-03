@@ -1,9 +1,13 @@
+//spellchecker:words meta
 package meta
 
+//spellchecker:words strings testing
 import (
 	"strings"
 	"testing"
 )
+
+//spellchecker:words positionals
 
 func TestUsage_WriteMessageTo(t *testing.T) {
 	tests := []struct {

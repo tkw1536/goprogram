@@ -1,11 +1,15 @@
+//spellchecker:words goprogram
 package goprogram
 
+//spellchecker:words context github goprogram parser pkglib stream
 import (
 	"context"
 
 	"github.com/tkw1536/goprogram/parser"
 	"github.com/tkw1536/pkglib/stream"
 )
+
+//spellchecker:words jessevdk
 
 // Context represents an execution environment for a command.
 // it takes the same type parameters as a command and program.
@@ -46,8 +50,8 @@ func GetContext[E any, P any, F any, R Requirement[F]](ctx context.Context) *Con
 	if value == nil {
 		return nil
 	}
-	if vctx, ok := value.(*Context[E, P, F, R]); ok {
-		return vctx
+	if vCtx, ok := value.(*Context[E, P, F, R]); ok {
+		return vCtx
 	}
 	return nil
 }

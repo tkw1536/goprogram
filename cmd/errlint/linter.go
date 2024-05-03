@@ -1,5 +1,7 @@
+//spellchecker:words main
 package main
 
+//spellchecker:words token types reflect strconv strings github pkglib docfmt golang tools analysis
 import (
 	"go/ast"
 	"go/token"
@@ -12,6 +14,8 @@ import (
 	"github.com/tkw1536/pkglib/docfmt"
 	"golang.org/x/tools/go/analysis"
 )
+
+//spellchecker:words goprogram reportf errlint ggman elts
 
 const (
 	goprogramPackage     = "github.com/tkw1536/goprogram"
@@ -44,7 +48,7 @@ func init() {
 //   - incorrectly set description struct tags
 //   - incorrect calls to errors.New
 //
-// Furthermore, the environment variable GOPROGRAM_ERRLINT_EXCEPTIONS may contain comma-seperated words to be ignored.
+// Furthermore, the environment variable GOPROGRAM_ERRLINT_EXCEPTIONS may contain comma-separated words to be ignored.
 var DocFmtAnalyzer = &analysis.Analyzer{
 	Name: "docfmt",
 	Doc:  "reports exit.Error instances with statically unsafe messages",
@@ -225,7 +229,7 @@ func lintLiteralStructField(pass *analysis.Pass, file ast.Node, pkg, tp, field s
 	})
 }
 
-func lintMethodIthStringArg(pass *analysis.Pass, file ast.Node, pkg, tp, mname string, i int, lint func(string) []lintResult) {
+func lintMethodIthStringArg(pass *analysis.Pass, file ast.Node, pkg, tp, mName string, i int, lint func(string) []lintResult) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		call, ok := n.(*ast.CallExpr)
 		if !ok {
@@ -238,7 +242,7 @@ func lintMethodIthStringArg(pass *analysis.Pass, file ast.Node, pkg, tp, mname s
 		}
 
 		// not enough arguments
-		if len(args) <= i || (name != mname) {
+		if len(args) <= i || (name != mName) {
 			return true
 		}
 
@@ -262,7 +266,7 @@ func lintMethodIthStringArg(pass *analysis.Pass, file ast.Node, pkg, tp, mname s
 	})
 }
 
-func lintFuncIthStringArg(pass *analysis.Pass, file ast.Node, pkg, fname string, i int, lint func(string) []lintResult) {
+func lintFuncIthStringArg(pass *analysis.Pass, file ast.Node, pkg, fName string, i int, lint func(string) []lintResult) {
 	ast.Inspect(file, func(n ast.Node) bool {
 		call, ok := n.(*ast.CallExpr)
 		if !ok {
@@ -274,7 +278,7 @@ func lintFuncIthStringArg(pass *analysis.Pass, file ast.Node, pkg, fname string,
 			return true
 		}
 
-		if len(args) <= i || (name != fname) {
+		if len(args) <= i || (name != fName) {
 			return true
 		}
 
@@ -328,12 +332,12 @@ func isFuncCall(pass *analysis.Pass, call *ast.CallExpr, pkg string) (string, []
 	if obj == nil {
 		return "", nil, false
 	}
-	pname, ok := obj.(*types.PkgName)
-	if pname == nil || !ok {
+	pName, ok := obj.(*types.PkgName)
+	if pName == nil || !ok {
 		return "", nil, false
 	}
 
-	if pname.Imported().Path() != pkg {
+	if pName.Imported().Path() != pkg {
 		return "", nil, false
 	}
 

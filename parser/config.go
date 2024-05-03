@@ -1,5 +1,7 @@
+//spellchecker:words parser
 package parser
 
+//spellchecker:words reflect github jessevdk flags
 import (
 	"reflect"
 
@@ -19,7 +21,7 @@ func (cfg Config) NewCommandParser(command any) (p Parser) {
 
 	// the command must be backed by a pointed-to struct
 	// when this is not the case, we don't need to create a parser
-	if ptrval := reflect.TypeOf(command); command == nil || ptrval.Kind() != reflect.Ptr || ptrval.Elem().Kind() != reflect.Struct {
+	if ptrVal := reflect.TypeOf(command); command == nil || ptrVal.Kind() != reflect.Ptr || ptrVal.Elem().Kind() != reflect.Struct {
 		return
 	}
 

@@ -1,5 +1,7 @@
+//spellchecker:words exit
 package exit
 
+//spellchecker:words github pkglib docfmt stream
 import (
 	"github.com/tkw1536/pkglib/docfmt"
 	"github.com/tkw1536/pkglib/stream"

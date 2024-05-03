@@ -1,6 +1,9 @@
 // Package parser implements compatibility with the "github.com/jessevdk/go-flags" package
+//
+//spellchecker:words parser
 package parser
 
+//spellchecker:words errors reflect github jessevdk flags goprogram meta pkglib reflectx
 import (
 	"errors"
 	"reflect"
@@ -10,11 +13,13 @@ import (
 	"github.com/tkw1536/pkglib/reflectx"
 )
 
+//spellchecker:words positionals
+
 // Parse represents a parser for arguments.
 //
 // It is internally backed by the "github.com/jessevdk/go-flags" package.
 type Parser struct {
-	// NOTE(twiesing): This entire struct is not directly tested
+	// NOTE: This entire struct is not directly tested
 	// Instead the tests are performed using higher-level integration tests
 	parser *flags.Parser
 	tp     reflect.Type
@@ -30,7 +35,7 @@ func (p Parser) ParseArgs(args []string) ([]string, error) {
 		return args, nil
 	}
 
-	// NOTE(twiesing): In a future version we probably want to wrap the error here
+	// NOTE: In a future version we probably want to wrap the error here
 	// For now, the error is returned as-is with IsHelp() and IsUnknownFlag methods.
 	return p.parser.ParseArgs(args)
 }

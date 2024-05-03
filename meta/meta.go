@@ -1,11 +1,15 @@
+//spellchecker:words meta
 package meta
 
+//spellchecker:words strconv github pkglib docfmt
 import (
 	"io"
 	"strconv"
 
 	"github.com/tkw1536/pkglib/docfmt"
 )
+
+//spellchecker:words positionals
 
 // Meta holds meta-information about an entire program or a subcommand.
 // It is used to generate a usage page.

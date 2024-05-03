@@ -1,5 +1,7 @@
+//spellchecker:words parser
 package parser
 
+//spellchecker:words reflect strings github jessevdk flags goprogram meta
 import (
 	"reflect"
 	"strings"
@@ -7,6 +9,8 @@ import (
 	"github.com/jessevdk/go-flags"
 	"github.com/tkw1536/goprogram/meta"
 )
+
+//spellchecker:words positionals
 
 // NewFlag creates a new flag based on an option from the flags package.
 func NewFlag(option *flags.Option) (flag meta.Flag) {
@@ -28,9 +32,9 @@ func NewFlag(option *flags.Option) (flag meta.Flag) {
 
 	flag.Usage = option.Description
 
-	dflt := option.Default
-	if len(dflt) != 0 {
-		flag.Default = strings.Join(dflt, ", ")
+	Default := option.Default
+	if len(Default) != 0 {
+		flag.Default = strings.Join(Default, ", ")
 	}
 	if option.DefaultMask != "" {
 		flag.Default = option.DefaultMask

@@ -1,5 +1,7 @@
+//spellchecker:words meta
 package meta
 
+//spellchecker:words runtime time
 import (
 	"fmt"
 	"runtime"

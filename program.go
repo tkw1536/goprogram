@@ -1,8 +1,9 @@
 // Package goprogram provides a program abstraction that can be used to create programs.
+//
+//spellchecker:words goprogram
 package goprogram
 
-// spellchecker:words goprogram twiesing
-
+//spellchecker:words context github goprogram exit meta pkglib stream
 import (
 	"context"
 
@@ -145,10 +146,10 @@ func (p Program[E, P, F, R]) Main(str stream.IOStream, params P, argv []string) 
 //
 // This function is intended to safely run a command from within another command.
 func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, pos ...string) (err error) {
-	// NOTE(twiesing): This function is untested, because it is nearly identical to Main
+	// NOTE: This function is untested, because it is nearly identical to Main
 
 	// create a new context
-	econtext := Context[E, P, F, R]{
+	execContext := Context[E, P, F, R]{
 		IOStream: context.IOStream,
 		Context:  context.Context,
 		Program:  p,
@@ -171,7 +172,7 @@ func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, p
 	}
 
 	// reset the arguments to the context
-	return p.run(econtext, func(Context[E, P, F, R]) (E, error) { return context.Environment, nil })
+	return p.run(execContext, func(Context[E, P, F, R]) (E, error) { return context.Environment, nil })
 }
 
 var errProgramUnknownCommand = exit.Error{

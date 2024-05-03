@@ -1,5 +1,7 @@
+//spellchecker:words meta
 package meta
 
+//spellchecker:words github pkglib docfmt text golang slices
 import (
 	"io"
 
@@ -129,8 +131,8 @@ func (opt Flag) WriteMessageTo(w io.Writer) {
 	io.WriteString(w, docfmt.Format(opt.Usage))
 
 	{
-		dflt := opt.Default
-		hasDefault := dflt != ""
+		Default := opt.Default
+		hasDefault := Default != ""
 		choices := opt.Choices
 		hasChoices := len(choices) > 0
 
@@ -146,7 +148,7 @@ func (opt Flag) WriteMessageTo(w io.Writer) {
 
 			if hasDefault {
 				io.WriteString(w, "default ")
-				io.WriteString(w, dflt)
+				io.WriteString(w, Default)
 			}
 
 			io.WriteString(w, ")")

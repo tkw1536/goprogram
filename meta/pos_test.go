@@ -1,11 +1,13 @@
+//spellchecker:words meta
 package meta
 
+//spellchecker:words strings testing
 import (
 	"strings"
 	"testing"
 )
 
-func TestPostional_WriteSpecTo(t *testing.T) {
+func TestPositional_WriteSpecTo(t *testing.T) {
 	tests := []struct {
 		name string
 		pos  Positional

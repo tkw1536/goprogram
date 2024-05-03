@@ -1,5 +1,7 @@
+//spellchecker:words goprogram
 package goprogram
 
+//spellchecker:words reflect testing github goprogram meta parser
 import (
 	"reflect"
 	"testing"
@@ -8,7 +10,7 @@ import (
 	"github.com/tkw1536/goprogram/parser"
 )
 
-// spellchecker:words positionals
+//spellchecker:words positionals tpcu
 
 func TestProgram_MainUsage(t *testing.T) {
 	program := makeProgram()

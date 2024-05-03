@@ -1,5 +1,7 @@
+//spellchecker:words exit
 package exit
 
+//spellchecker:words errors reflect testing github pkglib testlib
 import (
 	"errors"
 	"fmt"

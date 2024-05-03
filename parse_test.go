@@ -1,5 +1,7 @@
+//spellchecker:words goprogram
 package goprogram
 
+//spellchecker:words reflect testing
 import (
 	"reflect"
 	"testing"

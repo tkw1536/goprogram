@@ -1,4 +1,7 @@
+//spellchecker:words goprogram
 package goprogram
+
+//spellchecker:words Positionals
 
 // Keywords are special "commands" that manipulate arguments and positionals before execution.
 //

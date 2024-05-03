@@ -1,5 +1,7 @@
+//spellchecker:words exit
 package exit
 
+//spellchecker:words github pkglib docfmt
 import (
 	"fmt"
 

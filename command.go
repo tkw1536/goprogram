@@ -1,5 +1,7 @@
+//spellchecker:words goprogram
 package goprogram
 
+//spellchecker:words reflect github goprogram exit meta parser pkglib reflectx golang slices
 import (
 	"reflect"
 
@@ -9,6 +11,8 @@ import (
 	"github.com/tkw1536/pkglib/reflectx"
 	"golang.org/x/exp/slices"
 )
+
+//spellchecker:words jessevdk
 
 // Command represents a command associated with a program.
 // It takes the same type parameters as a program.
@@ -110,7 +114,7 @@ func (p Program[E, P, F, R]) Commands() []string {
 
 // Command returns the command with the provided name and if it exists
 func (p Program[E, P, F, R]) Command(name string) (Command[E, P, F, R], bool) {
-	// NOTE(twiesing): This function is not tested because it is so trivial
+	// NOTE: This function is not tested because it is so trivial
 	cmd, ok := p.commands[name]
 	if ok {
 		cmd, _ = reflectx.CopyInterface(cmd)

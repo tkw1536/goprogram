@@ -1,11 +1,15 @@
+//spellchecker:words goprogram
 package goprogram
 
+//spellchecker:words github alessio shellescape goprogram meta
 import (
 	"fmt"
 
 	"github.com/alessio/shellescape"
 	"github.com/tkw1536/goprogram/meta"
 )
+
+//spellchecker:words positionals ggman
 
 // MainUsage returns a help page about ggman
 func (p Program[E, P, F, R]) MainUsage() meta.Meta {

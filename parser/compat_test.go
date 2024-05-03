@@ -1,5 +1,7 @@
+//spellchecker:words parser
 package parser
 
+//spellchecker:words reflect testing github jessevdk flags goprogram meta
 import (
 	"reflect"
 	"testing"

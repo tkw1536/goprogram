@@ -1,5 +1,7 @@
+//spellchecker:words goprogram
 package goprogram
 
+//spellchecker:words reflect testing github pkglib stream
 import (
 	"reflect"
 	"testing"

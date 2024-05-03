@@ -1,7 +1,9 @@
+//spellchecker:words goprogram
 package goprogram
 
-// spellchecker:words positionals
+//spellchecker:words positionals
 
+//spellchecker:words bytes path filepath reflect runtime testing time github goprogram exit meta parser pkglib stream testlib
 import (
 	"bytes"
 	"fmt"
@@ -39,7 +41,7 @@ func makeEchoCommand(name string) iCommand {
 			Requirements: func(flag meta.Flag) bool { return true },
 		},
 
-		MafterParse: func() error { return nil },
+		MAfterParse: func() error { return nil },
 	}
 	cmd.MRun = func(command tCommand[echoStruct], context iContext) error {
 		defer func() { command.Positionals.Arguments = nil }() // for the next time
@@ -94,7 +96,7 @@ type tCommand[Pos any] struct {
 
 	MDesc iDescription
 
-	MafterParse func() error
+	MAfterParse func() error
 	MRun        func(command tCommand[Pos], context iContext) error
 }
 
@@ -103,11 +105,11 @@ func (t tCommand[Pos]) Description() iDescription {
 }
 
 func (t tCommand[Pos]) AfterParse() error {
-	if t.MafterParse == nil {
+	if t.MAfterParse == nil {
 		fmt.Println("AfterParse()")
 		return nil
 	}
-	return t.MafterParse()
+	return t.MAfterParse()
 }
 func (t tCommand[Pos]) Run(ctx iContext) error {
 	if t.MRun == nil {
@@ -120,7 +122,7 @@ func (t tCommand[Pos]) Run(ctx iContext) error {
 // makeTPM_Positionals makes a new command with the provided positional arguments
 func makeTPM_Positionals[Pos any]() iCommand {
 	return &tCommand[Pos]{
-		MafterParse: func() error { return nil },
+		MAfterParse: func() error { return nil },
 	}
 }
 
@@ -173,10 +175,10 @@ func TestProgram_Main(t *testing.T) {
 
 		{
 			name:        "unknown general args",
-			args:        []string{"--this-flag-doesnt-exist", "--", "fake"},
+			args:        []string{"--this-flag-does-not-exist", "--", "fake"},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStderr: "Unable to parse arguments: Unknown flag `this-flag-doesnt-exist'\n",
+			wantStderr: "Unable to parse arguments: Unknown flag `this-flag-does-not-exist'\n",
 			wantCode:   3,
 		},
 
@@ -353,7 +355,7 @@ func TestProgram_Main(t *testing.T) {
 		},
 		{
 			name: "'fake' with disallowed global",
-			args: []string{"--global-one", "notallowed", "fake", "hello", "world"},
+			args: []string{"--global-one", "not-allowed", "fake", "hello", "world"},
 			desc: iDescription{Requirements: reqOne},
 			positionals: makeTPM_Positionals[struct {
 				Args []string `required:"1-2"`
@@ -444,8 +446,8 @@ func TestProgram_Main(t *testing.T) {
 		},
 
 		{
-			name:        "'notexistent' command",
-			args:        []string{"notexistent"},
+			name:        "'notExistent' command",
+			args:        []string{"notExistent"},
 			positionals: makeTPM_Positionals[struct{}](),
 
 			wantStderr: "Unknown command: Must be one of \"fake\"\n",
@@ -453,14 +455,14 @@ func TestProgram_Main(t *testing.T) {
 		},
 
 		{
-			name: "'notexistent' command (with alias)",
+			name: "'notExistent' command (with alias)",
 
 			alias: Alias{
 				Name:    "alias",
 				Command: "fake",
 			},
 
-			args:        []string{"notexistent"},
+			args:        []string{"notExistent"},
 			positionals: makeTPM_Positionals[struct{}](),
 
 			wantStderr: "Unknown command: Must be one of \"fake\"\n",

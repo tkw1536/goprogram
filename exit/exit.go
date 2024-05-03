@@ -1,4 +1,6 @@
 // Package exit defines exit and error behavior of programs and commands.
+//
+//spellchecker:words exit
 package exit
 
 import (
@@ -12,7 +14,7 @@ type ExitCode uint8
 
 // Return returns this ExitCode to the operating system by invoking os.Exit().
 func (code ExitCode) Return() {
-	// NOTE(twiesing): This function is untested
+	// NOTE: This function is untested
 	os.Exit(int(code))
 }
 
