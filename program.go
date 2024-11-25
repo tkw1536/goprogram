@@ -185,6 +185,11 @@ var errProgramContext = exit.Error{
 	Message:  "context was closed before main could run: %s",
 }
 
+var errProgramIO = exit.Error{
+	ExitCode: exit.ExitContext,
+	Message:  "failed to write to context",
+}
+
 // run implements Main and Exec
 func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment func(context Context[E, P, F, R]) (E, error)) (err error) {
 	// expand keyword
@@ -205,11 +210,11 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 	// handle universals
 	switch {
 	case context.Args.Universals.Help:
-		context.Println(p.MainUsage().String())
-		return nil
+		_, err = context.Println(p.MainUsage().String())
+		return errProgramIO.WrapError(err)
 	case context.Args.Universals.Version:
-		context.Println(p.Info.FmtVersion())
-		return nil
+		_, err = context.Println(p.Info.FmtVersion())
+		return errProgramIO.WrapError(err)
 	}
 
 	// expand the alias (if any)
@@ -239,11 +244,11 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 	// write out help information (if given)
 	if context.Args.Universals.Help {
 		if hasAlias {
-			context.Println(p.AliasUsage(context, alias).String())
-			return nil
+			_, err = context.Println(p.AliasUsage(context, alias).String())
+			return errProgramIO.WrapError(err)
 		}
-		context.Println(p.CommandUsage(context).String())
-		return nil
+		_, err = context.Println(p.CommandUsage(context).String())
+		return errProgramIO.WrapError(err)
 	}
 
 	// call the AfterParse hook

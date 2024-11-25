@@ -3,6 +3,8 @@ package exit
 
 //spellchecker:words github pkglib docfmt stream
 import (
+	"fmt"
+
 	"github.com/tkw1536/pkglib/docfmt"
 	"github.com/tkw1536/pkglib/stream"
 )
@@ -30,12 +32,12 @@ func Die(str stream.IOStream, err error) error {
 	}
 
 	// print the error message to standard error in a wrapped way
-	if message := e.Error(); message != "" {
+	if message := fmt.Sprint(e); message != "" {
 		if stream.IsNullWriter(str.Stderr) {
 			docfmt.Format(message)
 			return e
 		}
-		str.EPrintln(docfmt.Format(message))
+		_, _ = str.EPrintln(docfmt.Format(message)) // no way to report the failure
 	}
 
 	return e
