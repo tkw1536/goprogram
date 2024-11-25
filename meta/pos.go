@@ -31,7 +31,7 @@ func (pos Positional) ValidRange() bool {
 // defaultPositionalValue is the default name used for a positional argument.
 const defaultPositionalValue = "ARGUMENT"
 
-var errPositionalInvalidRange = errors.New("Positional: invalid range")
+var errPositionalInvalidRange = errors.New("positional: invalid range")
 
 // WriteSpecTo writes a specification of this argument into w.
 // A specification looks like "arg [arg...]".
