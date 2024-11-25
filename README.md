@@ -2,9 +2,14 @@
 
 ![CI Status](https://github.com/tkw1536/goprogram/workflows/CI/badge.svg)
 
-A go >= 1.19.2 package to create programs, originally designed for [ggman](https://github.com/tkw1536/ggman).
+A go >= 1.23.3 package to create programs, originally designed for [ggman](https://github.com/tkw1536/ggman).
 
 ## Changelog
+
+# 0.6.0 (Released [Nov 25 2024](https://github.com/tkw1536/goprogram/releases/tag/v0.6.0))
+
+- run a linter and fix issues
+- update to go 1.23.3
 
 # 0.5.1 (Released [May 3 2024](https://github.com/tkw1536/goprogram/releases/tag/v0.5.1))
 
