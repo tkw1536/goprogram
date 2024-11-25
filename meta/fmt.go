@@ -22,7 +22,7 @@ func (meta Meta) String() string {
 	builder.Reset()
 	defer builderPool.Put(builder)
 
-	meta.WriteMessageTo(builder)
+	_ = meta.WriteMessageTo(builder) // error should never occur
 	return builder.String()
 }
 
@@ -35,6 +35,6 @@ func JoinCommands(commands []string) string {
 	builder.Reset()
 	defer builderPool.Put(builder)
 
-	Meta{Commands: commands}.writeCommandsTo(builder)
+	_ = Meta{Commands: commands}.writeCommandsTo(builder) // error should never occur
 	return builder.String()
 }

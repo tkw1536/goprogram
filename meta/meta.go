@@ -32,12 +32,11 @@ type Meta struct {
 }
 
 // WriteMessageTo writes the human-readable message of this meta into w
-func (meta Meta) WriteMessageTo(w io.Writer) {
+func (meta Meta) WriteMessageTo(w io.Writer) error {
 	if meta.Command != "" {
-		meta.writeCommandMessageTo(w)
-		return
+		return meta.writeCommandMessageTo(w)
 	}
-	meta.writeProgramMessageTo(w)
+	return meta.writeProgramMessageTo(w)
 }
 
 // subSpec is spec for a subcommand
@@ -51,27 +50,43 @@ const (
 	subMsg2 = ". See individual commands for more help."
 )
 
-func (meta Meta) writeProgramMessageTo(w io.Writer) {
+func (meta Meta) writeProgramMessageTo(w io.Writer) error {
 	//
 	// Command specification
 	//
 
 	// main command
-	io.WriteString(w, "Usage: ")
-	io.WriteString(w, meta.Executable)
-
-	for _, arg := range meta.GlobalFlags {
-		io.WriteString(w, " ")
-		arg.WriteSpecTo(w)
+	if _, err := io.WriteString(w, "Usage: "); err != nil {
+		return err
+	}
+	if _, err := io.WriteString(w, meta.Executable); err != nil {
+		return err
 	}
 
-	io.WriteString(w, " [--] ")
-	io.WriteString(w, subSpec)
+	for _, arg := range meta.GlobalFlags {
+		if _, err := io.WriteString(w, " "); err != nil {
+			return err
+		}
+		if err := arg.WriteSpecTo(w); err != nil {
+			return err
+		}
+	}
+
+	if _, err := io.WriteString(w, " [--] "); err != nil {
+		return err
+	}
+	if _, err := io.WriteString(w, subSpec); err != nil {
+		return err
+	}
 
 	// description (if any)
 	if meta.Description != "" {
-		io.WriteString(w, "\n\n")
-		io.WriteString(w, docfmt.Format(meta.Description))
+		if _, err := io.WriteString(w, "\n\n"); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, docfmt.Format(meta.Description)); err != nil {
+			return err
+		}
 	}
 
 	//
@@ -79,103 +94,175 @@ func (meta Meta) writeProgramMessageTo(w io.Writer) {
 	//
 
 	for _, arg := range meta.GlobalFlags {
-		arg.WriteMessageTo(w)
+		if err := arg.WriteMessageTo(w); err != nil {
+			return err
+		}
 	}
 
 	// write a usage message for the commands
 
-	io.WriteString(w, usageMsg1)
-	io.WriteString(w, subSpec)
-	io.WriteString(w, usageMsg2)
+	if _, err := io.WriteString(w, usageMsg1); err != nil {
+		return err
+	}
+	if _, err := io.WriteString(w, subSpec); err != nil {
+		return err
+	}
+	if _, err := io.WriteString(w, usageMsg2); err != nil {
+		return err
+	}
 
 	// replace the list of commands in subMsgTpl
-	io.WriteString(w, subMsg1)
-	meta.writeCommandsTo(w)
-	io.WriteString(w, subMsg2)
+	if _, err := io.WriteString(w, subMsg1); err != nil {
+		return err
+	}
+	if err := meta.writeCommandsTo(w); err != nil {
+		return err
+	}
+	if _, err := io.WriteString(w, subMsg2); err != nil {
+		return err
+	}
 
-	io.WriteString(w, usageMsg3)
+	if _, err := io.WriteString(w, usageMsg3); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // WriteCommandsTo writes the list of commands to w.
-func (meta Meta) writeCommandsTo(w io.Writer) {
+func (meta Meta) writeCommandsTo(w io.Writer) error {
 	if len(meta.Commands) == 0 {
-		return
+		return nil
 	}
-	io.WriteString(w, strconv.Quote(meta.Commands[0]))
+	if _, err := io.WriteString(w, strconv.Quote(meta.Commands[0])); err != nil {
+		return err
+	}
 	for _, cmd := range meta.Commands[1:] {
-		io.WriteString(w, ", ")
-		io.WriteString(w, strconv.Quote(cmd))
+		if _, err := io.WriteString(w, ", "); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, strconv.Quote(cmd)); err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
-func (page Meta) writeCommandMessageTo(w io.Writer) {
+func (page Meta) writeCommandMessageTo(w io.Writer) error {
 
 	//
 	// Command specification
 	//
 
 	// main command
-	io.WriteString(w, "Usage: ")
-	io.WriteString(w, page.Executable)
+	if _, err := io.WriteString(w, "Usage: "); err != nil {
+		return err
+	}
+	if _, err := io.WriteString(w, page.Executable); err != nil {
+		return err
+	}
 
 	for _, arg := range page.GlobalFlags {
-		io.WriteString(w, " ")
-		arg.WriteSpecTo(w)
+		if _, err := io.WriteString(w, " "); err != nil {
+			return err
+		}
+		if err := arg.WriteSpecTo(w); err != nil {
+			return err
+		}
 	}
 
 	if len(page.GlobalFlags) >= 0 {
-		io.WriteString(w, " [--]")
+		if _, err := io.WriteString(w, " [--]"); err != nil {
+			return err
+		}
 	}
 
 	// subcommand
-	io.WriteString(w, " ")
-	io.WriteString(w, page.Command)
+	if _, err := io.WriteString(w, " "); err != nil {
+		return err
+	}
+	if _, err := io.WriteString(w, page.Command); err != nil {
+		return err
+	}
 
 	for _, arg := range page.CommandFlags {
-		io.WriteString(w, " ")
-		arg.WriteSpecTo(w)
+		if _, err := io.WriteString(w, " "); err != nil {
+			return err
+		}
+		if err := arg.WriteSpecTo(w); err != nil {
+			return err
+		}
 	}
 
 	if len(page.Positionals) != 0 {
-		io.WriteString(w, " [--]")
+		if _, err := io.WriteString(w, " [--]"); err != nil {
+			return err
+		}
 
 		for _, p := range page.Positionals {
-			io.WriteString(w, " ")
-			p.WriteSpecTo(w)
+			if _, err := io.WriteString(w, " "); err != nil {
+				return err
+			}
+			if err := p.WriteSpecTo(w); err != nil {
+				return err
+			}
 		}
 	}
 
 	// description (if any)
 	if page.Description != "" {
-		io.WriteString(w, "\n\n")
-		io.WriteString(w, docfmt.Format(page.Description))
+		if _, err := io.WriteString(w, "\n\n"); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, docfmt.Format(page.Description)); err != nil {
+			return err
+		}
 	}
 
 	//
 	// Argument description
 	//
 
-	io.WriteString(w, "\n\nGlobal Arguments:")
+	if _, err := io.WriteString(w, "\n\nGlobal Arguments:"); err != nil {
+		return err
+	}
 	for _, opt := range page.GlobalFlags {
-		opt.WriteMessageTo(w)
+		if err := opt.WriteMessageTo(w); err != nil {
+			return err
+		}
 	}
 
 	// no command arguments provided!
 	if len(page.CommandFlags) == 0 && len(page.Positionals) == 0 {
-		return
+		return nil
 	}
 
-	io.WriteString(w, "\n\nCommand Arguments:")
+	if _, err := io.WriteString(w, "\n\nCommand Arguments:"); err != nil {
+		return err
+	}
 
 	for _, opt := range page.CommandFlags {
-		opt.WriteMessageTo(w)
+		if err := opt.WriteMessageTo(w); err != nil {
+			return err
+		}
 	}
 
 	for _, p := range page.Positionals {
-		io.WriteString(w, usageMsg1)
-		p.WriteSpecTo(w)
-		io.WriteString(w, usageMsg2)
-		io.WriteString(w, docfmt.Format(p.Usage))
-		io.WriteString(w, usageMsg3)
+		if _, err := io.WriteString(w, usageMsg1); err != nil {
+			return err
+		}
+		if err := p.WriteSpecTo(w); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, usageMsg2); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, docfmt.Format(p.Usage)); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, usageMsg3); err != nil {
+			return err
+		}
 	}
+	return nil
 }

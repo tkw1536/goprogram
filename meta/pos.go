@@ -31,13 +31,15 @@ func (pos Positional) ValidRange() bool {
 // defaultPositionalValue is the default name used for a positional argument.
 const defaultPositionalValue = "ARGUMENT"
 
+var errPositionalInvalidRange = errors.New("Positional: invalid range")
+
 // WriteSpecTo writes a specification of this argument into w.
 // A specification looks like "arg [arg...]".
-func (pos Positional) WriteSpecTo(w io.Writer) {
+func (pos Positional) WriteSpecTo(w io.Writer) error {
 	extra := pos.Max - pos.Min
 
 	if !pos.ValidRange() {
-		panic("Positional: invalid range")
+		return errPositionalInvalidRange
 	}
 
 	if pos.Value == "" {
@@ -46,26 +48,41 @@ func (pos Positional) WriteSpecTo(w io.Writer) {
 
 	// nothing to generate!
 	if pos.Max == 0 && extra == 0 {
-		return
+		return nil
 	}
 
 	// arg arg arg
-	text.RepeatJoin(w, pos.Value, " ", pos.Min)
+	if _, err := text.RepeatJoin(w, pos.Value, " ", pos.Min); err != nil {
+		return err
+	}
 	if pos.Min > 0 && extra != 0 {
-		io.WriteString(w, " ")
+		if _, err := io.WriteString(w, " "); err != nil {
+			return err
+		}
 	}
 
 	if pos.Max < 0 {
 		// [arg ...]
-		io.WriteString(w, "[")
-		io.WriteString(w, pos.Value)
-		io.WriteString(w, " ...]")
-		return
+		if _, err := io.WriteString(w, "["); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, pos.Value); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, " ...]"); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	// [arg [arg]]
-	text.RepeatJoin(w, "["+pos.Value, " ", extra)
-	text.Repeat(w, "]", extra)
+	if _, err := text.RepeatJoin(w, "["+pos.Value, " ", extra); err != nil {
+		return err
+	}
+	if _, err := text.Repeat(w, "]", extra); err != nil {
+		return err
+	}
+	return nil
 }
 
 const (
