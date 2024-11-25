@@ -20,8 +20,8 @@ func ExampleAlias() {
 	// register an alias "hello" which expands into hello world
 	p.RegisterAlias(Alias{Name: "hello", Command: "echo", Args: []string{"hello world"}})
 
-	p.Main(stream.FromEnv(), "", []string{"hello"})
-	p.Main(stream.FromEnv(), "", []string{"hello", "again"})
+	_ = p.Main(stream.FromEnv(), "", []string{"hello"})
+	_ = p.Main(stream.FromEnv(), "", []string{"hello", "again"})
 
 	// Output: [hello world]
 	// [hello world again]

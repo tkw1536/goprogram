@@ -18,7 +18,7 @@ func ExampleCommand() {
 	p.Register(makeEchoCommand("echo"))
 
 	// Execute the command with some arguments
-	p.Main(stream.FromEnv(), "", []string{"echo", "hello", "world"})
+	_ = p.Main(stream.FromEnv(), "", []string{"echo", "hello", "world"})
 
 	// Output: [hello world]
 }

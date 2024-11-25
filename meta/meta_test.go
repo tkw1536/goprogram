@@ -107,8 +107,9 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var builder strings.Builder
-			tt.meta.WriteMessageTo(&builder)
-
+			if err := tt.meta.WriteMessageTo(&builder); err != nil {
+				t.Errorf("Usage.WriteMessageTo() returned non-nil error")
+			}
 			if got := builder.String(); got != tt.want {
 				t.Errorf("Usage.WriteMessageTo() = %q, want %q", got, tt.want)
 			}
@@ -129,7 +130,9 @@ func TestMeta_writeCommandsTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var builder strings.Builder
-			tt.meta.writeCommandsTo(&builder)
+			if err := tt.meta.writeCommandsTo(&builder); err != nil {
+				t.Errorf("Meta.writeCommandsTo() returned non-nil error")
+			}
 			if got := builder.String(); got != tt.want {
 				t.Errorf("Meta.writeCommandsTo() = %v, want %v", got, tt.want)
 			}

@@ -33,7 +33,7 @@ func TestAsError(t *testing.T) {
 }
 
 func TestAsErrorPanic(t *testing.T) {
-	_, gotPanic := testlib.DoesPanic(func() { AsError(errors.New("not an error")) })
+	_, gotPanic := testlib.DoesPanic(func() { _ = AsError(errors.New("not an error")) })
 	wantPanic := interface{}("AsError: err must be nil or Error")
 	if wantPanic != gotPanic {
 		t.Errorf("AsError: got panic = %v, want = %v", gotPanic, wantPanic)

@@ -32,8 +32,9 @@ func TestPositional_WriteSpecTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var builder strings.Builder
-			tt.pos.WriteSpecTo(&builder)
-
+			if err := tt.pos.WriteSpecTo(&builder); err != nil {
+				t.Errorf("Positional.WriteSpecTo() returned non-nil error")
+			}
 			if got := builder.String(); got != tt.want {
 				t.Errorf("Positional.WriteSpecTo() = %q, want %q", got, tt.want)
 			}
