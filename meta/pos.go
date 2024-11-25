@@ -3,6 +3,7 @@ package meta
 
 //spellchecker:words github pkglib text
 import (
+	"errors"
 	"fmt"
 	"io"
 
@@ -84,7 +85,7 @@ func (pos Positional) Validate(count int) error {
 	if count < pos.Min || ((pos.Max != -1) && (count > pos.Max)) {
 		switch {
 		case pos.Min == pos.Max && pos.Min == 0: // 0 arguments, but some given
-			return fmt.Errorf(errParseTakesNoArguments)
+			return errors.New(errParseTakesNoArguments)
 		case pos.Min == pos.Max: // exact number of arguments is wrong
 			return fmt.Errorf(errParseTakesExactlyArguments, pos.Min)
 		case pos.Max == -1: // less than min arguments

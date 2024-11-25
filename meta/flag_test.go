@@ -48,7 +48,9 @@ func TestFlag_WriteSpecTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var builder strings.Builder
-			tt.flag.WriteSpecTo(&builder)
+			if err := tt.flag.WriteSpecTo(&builder); err != nil {
+				t.Errorf("Flag.WriteSpecTo() returned err != nil")
+			}
 			if got := builder.String(); got != tt.want {
 				t.Errorf("Flag.WriteSpecTo() = %q, want %q", got, tt.want)
 			}
@@ -81,7 +83,9 @@ func TestFlag_WriteLongSpecTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var builder strings.Builder
-			tt.flag.WriteLongSpecTo(&builder)
+			if err := tt.flag.WriteLongSpecTo(&builder); err != nil {
+				t.Errorf("Flag.WriteLongSpecTo() returned non-nil error")
+			}
 			if got := builder.String(); got != tt.want {
 				t.Errorf("Flag.WriteLongSpecTo() = %q, want %q", got, tt.want)
 			}
@@ -124,7 +128,9 @@ func TestFlag_WriteMessageTo(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var builder strings.Builder
-			tt.flag.WriteMessageTo(&builder)
+			if err := tt.flag.WriteMessageTo(&builder); err != nil {
+				t.Errorf("Flag.WriteMessageTo() returned non-nil error")
+			}
 			if got := builder.String(); got != tt.want {
 				t.Errorf("Flag.WriteMessageTo() = %q, want %q", got, tt.want)
 			}

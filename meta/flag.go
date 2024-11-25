@@ -47,8 +47,8 @@ type Flag struct {
 //	--flag|-f value
 //
 // WriteSpecTo adds braces around the argument if it is optional.
-func (f Flag) WriteSpecTo(w io.Writer) {
-	f.spec(w, "|", true, true)
+func (f Flag) WriteSpecTo(w io.Writer) error {
+	return f.spec(w, "|", true, true)
 }
 
 // WriteLongSpecTo writes a long specification of f into w.
@@ -57,8 +57,8 @@ func (f Flag) WriteSpecTo(w io.Writer) {
 //	-f, --flag value
 //
 // WriteLongSpecTo does not add any brackets around the argument.
-func (opt Flag) WriteLongSpecTo(w io.Writer) {
-	opt.spec(w, ", ", false, false)
+func (opt Flag) WriteLongSpecTo(w io.Writer) error {
+	return opt.spec(w, ", ", false, false)
 }
 
 // spec implements SpecShort and SpecLong.
@@ -66,11 +66,18 @@ func (opt Flag) WriteLongSpecTo(w io.Writer) {
 // sep indicates how to separate arguments.
 // longFirst indicates that long argument names should be listed before short arguments.
 // optionalBraces indicates if braces should be placed around the argument if it is optional.
-func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces bool) {
+func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces bool) (err error) {
 	// if the argument is optional put braces around it!
 	if optionalBraces && !opt.Required {
-		io.WriteString(w, "[")
-		defer io.WriteString(w, "]")
+		if _, err := io.WriteString(w, "["); err != nil {
+			return err
+		}
+		defer func() {
+			if err != nil {
+				return
+			}
+			_, err = io.WriteString(w, "]")
+		}()
 	}
 
 	// collect long and short arguments and combine them
@@ -91,13 +98,21 @@ func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces boo
 	} else {
 		args = append(sa, la...)
 	}
-	text.Join(w, args, sep)
+	if _, err := text.Join(w, args, sep); err != nil {
+		return err
+	}
 
 	// write the value (if any)
 	if value := opt.Value; value != "" {
-		io.WriteString(w, " ")
-		io.WriteString(w, value)
+		if _, err := io.WriteString(w, " "); err != nil {
+			return err
+		}
+		if _, err := io.WriteString(w, value); err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // usageMsgTpl is the template for long usage messages
@@ -122,13 +137,21 @@ const (
 // .
 //
 // This function is implicitly tested via other tests.
-func (opt Flag) WriteMessageTo(w io.Writer) {
+func (opt Flag) WriteMessageTo(w io.Writer) error {
 
-	io.WriteString(w, usageMsg1)
-	opt.WriteLongSpecTo(w)
-	io.WriteString(w, usageMsg2)
+	if _, err := io.WriteString(w, usageMsg1); err != nil {
+		return err
+	}
+	if err := opt.WriteLongSpecTo(w); err != nil {
+		return err
+	}
+	if _, err := io.WriteString(w, usageMsg2); err != nil {
+		return err
+	}
 
-	io.WriteString(w, docfmt.Format(opt.Usage))
+	if _, err := io.WriteString(w, docfmt.Format(opt.Usage)); err != nil {
+		return err
+	}
 
 	{
 		Default := opt.Default
@@ -137,23 +160,41 @@ func (opt Flag) WriteMessageTo(w io.Writer) {
 		hasChoices := len(choices) > 0
 
 		if hasDefault || hasChoices {
-			io.WriteString(w, " (")
+			if _, err := io.WriteString(w, " ("); err != nil {
+				return err
+			}
 			if hasChoices {
-				io.WriteString(w, "choices: ")
-				text.Join(w, opt.Choices, ", ")
+				if _, err := io.WriteString(w, "choices: "); err != nil {
+					return err
+				}
+				if _, err := text.Join(w, opt.Choices, ", "); err != nil {
+					return err
+				}
 				if hasDefault {
-					io.WriteString(w, "; ")
+					if _, err := io.WriteString(w, "; "); err != nil {
+						return err
+					}
 				}
 			}
 
 			if hasDefault {
-				io.WriteString(w, "default ")
-				io.WriteString(w, Default)
+				if _, err := io.WriteString(w, "default "); err != nil {
+					return err
+				}
+				if _, err := io.WriteString(w, Default); err != nil {
+					return err
+				}
 			}
 
-			io.WriteString(w, ")")
+			if _, err := io.WriteString(w, ")"); err != nil {
+				return err
+			}
 		}
 	}
 
-	io.WriteString(w, usageMsg3)
+	if _, err := io.WriteString(w, usageMsg3); err != nil {
+		return err
+	}
+
+	return nil
 }
