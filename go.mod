@@ -1,18 +1,18 @@
 module github.com/tkw1536/goprogram
 
-go 1.22.2
+go 1.23.3
 
 require (
 	github.com/alessio/shellescape v1.4.2
-	github.com/jessevdk/go-flags v1.5.0
-	github.com/tkw1536/pkglib v0.0.0-20240502214847-155e7295b084
-	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
-	golang.org/x/tools v0.20.0
+	github.com/jessevdk/go-flags v1.6.1
+	github.com/tkw1536/pkglib v0.0.0-20241125083302-9392aba00be6
+	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
+	golang.org/x/tools v0.27.0
 )
 
 require (
-	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/term v0.19.0 // indirect
+	golang.org/x/mod v0.22.0 // indirect
+	golang.org/x/sync v0.9.0 // indirect
+	golang.org/x/sys v0.27.0 // indirect
+	golang.org/x/term v0.26.0 // indirect
 )
