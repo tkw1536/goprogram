@@ -1,7 +1,7 @@
 //spellchecker:words meta
 package meta
 
-//spellchecker:words github pkglib docfmt text golang slices
+//spellchecker:words slices github pkglib docfmt text
 import (
 	"io"
 	"slices"

@@ -3,7 +3,7 @@ module github.com/tkw1536/goprogram
 go 1.23.3
 
 require (
-	github.com/alessio/shellescape v1.4.2
+	al.essio.dev/pkg/shellescape v1.5.1
 	github.com/jessevdk/go-flags v1.6.1
 	github.com/tkw1536/pkglib v0.0.0-20241125083302-9392aba00be6
 	golang.org/x/tools v0.27.0

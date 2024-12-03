@@ -1,11 +1,11 @@
 //spellchecker:words goprogram
 package goprogram
 
-//spellchecker:words github alessio shellescape goprogram meta
+//spellchecker:words essio shellescape github goprogram meta
 import (
 	"fmt"
 
-	"github.com/alessio/shellescape"
+	"al.essio.dev/pkg/shellescape"
 	"github.com/tkw1536/goprogram/meta"
 )
 

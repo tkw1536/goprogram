@@ -1,7 +1,7 @@
 //spellchecker:words goprogram
 package goprogram
 
-//spellchecker:words github goprogram exit parser golang slices
+//spellchecker:words slices github goprogram exit parser
 import (
 	"slices"
 
