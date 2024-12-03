@@ -1,8 +1,8 @@
 //spellchecker:words goprogram
 package goprogram
 
-//spellchecker:words golang slices
-import "golang.org/x/exp/slices"
+//spellchecker:words slices
+import "slices"
 
 // Alias represents an alias for a command.
 //

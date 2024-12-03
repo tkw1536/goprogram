@@ -1,15 +1,15 @@
 //spellchecker:words goprogram
 package goprogram
 
-//spellchecker:words reflect github goprogram exit meta parser pkglib reflectx golang slices
+//spellchecker:words reflect slices github goprogram exit meta parser pkglib reflectx
 import (
 	"reflect"
+	"slices"
 
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/parser"
 	"github.com/tkw1536/pkglib/reflectx"
-	"golang.org/x/exp/slices"
 )
 
 //spellchecker:words jessevdk

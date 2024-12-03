@@ -3,9 +3,10 @@ package goprogram
 
 //spellchecker:words github goprogram exit parser golang slices
 import (
+	"slices"
+
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/parser"
-	"golang.org/x/exp/slices"
 )
 
 //spellchecker:words positionals

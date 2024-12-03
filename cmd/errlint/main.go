@@ -3,7 +3,7 @@
 //spellchecker:words main
 package main
 
-// spellchecker:words errlint docfmt
+//spellchecker:words errlint docfmt
 
 //spellchecker:words golang tools analysis singlechecker
 import (

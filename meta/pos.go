@@ -1,7 +1,7 @@
 //spellchecker:words meta
 package meta
 
-//spellchecker:words github pkglib text
+//spellchecker:words errors github pkglib text
 import (
 	"errors"
 	"fmt"

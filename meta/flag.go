@@ -4,10 +4,10 @@ package meta
 //spellchecker:words github pkglib docfmt text golang slices
 import (
 	"io"
+	"slices"
 
 	"github.com/tkw1536/pkglib/docfmt"
 	"github.com/tkw1536/pkglib/text"
-	"golang.org/x/exp/slices"
 )
 
 // Flag holds meta-information about a single flag of a command.
