@@ -6,6 +6,11 @@ A go >= 1.23.3 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.7.0 (Released [Dec 3 2024](https://github.com/tkw1536/goprogram/releases/tag/v0.7.0))
+
+- use builtin package instead of `golang.org/x/exp/slices`
+- update `shellescape` dependency with new import path
+
 # 0.6.0 (Released [Nov 25 2024](https://github.com/tkw1536/goprogram/releases/tag/v0.6.0))
 
 - run a linter and fix issues
