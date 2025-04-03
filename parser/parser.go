@@ -66,10 +66,10 @@ func (p Parser) argTypes() (types []reflect.StructField) {
 		return nil
 	}
 
-	reflectx.IterateAllFields(p.tp, func(field reflect.StructField, index ...int) (cancel bool) {
+	for field := range reflectx.IterAllFields(p.tp) {
 		// check that we actually have a "positional-args" field
 		if field.Tag.Get("positional-args") == "" || field.Type.Kind() != reflect.Struct {
-			return
+			continue
 		}
 
 		// iterate over all the fields in the nested struct
@@ -78,8 +78,8 @@ func (p Parser) argTypes() (types []reflect.StructField) {
 			types = append(types, field.Type.Field(j))
 		}
 
-		return false
-	})
+		break
+	}
 
 	return
 }

@@ -6,6 +6,10 @@ A go >= 1.23.3 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.7.1 (Released [Apr 3 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.7.1))
+
+- update `pkglib` version
+
 # 0.7.0 (Released [Dec 3 2024](https://github.com/tkw1536/goprogram/releases/tag/v0.7.0))
 
 - use builtin package instead of `golang.org/x/exp/slices`
