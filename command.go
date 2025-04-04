@@ -32,7 +32,7 @@ import (
 type Command[E any, P any, F any, R Requirement[F]] interface {
 	// Run runs this command in the given context.
 	//
-	// It is called only once and must return either nil or an error of type Error.
+	// It is called only once and must return nil or wrap an error of type Error.
 	Run(context Context[E, P, F, R]) error
 
 	// Description returns a description of this command.
@@ -47,7 +47,7 @@ type AfterParseCommand[E any, P any, F any, R Requirement[F]] interface {
 	// AfterParse is called after arguments have been parsed, but before the command is being run.
 	// It may perform additional argument checking and should return an error if needed.
 	//
-	// It is called only once and must return either nil or an error of type Error.
+	// It is called only once and must return either nil or wrap an error of type Error.
 	AfterParse() error
 }
 
