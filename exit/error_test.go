@@ -12,20 +12,34 @@ import (
 )
 
 func TestAsError(t *testing.T) {
-	type args struct {
-		err error
-	}
+	var errStuff = Error{ExitCode: ExitGeneric, Message: "stuff"}
+	var errStuffWrapped = fmt.Errorf("wrapping: %w", errStuff)
+	var errWrapped = Error{ExitCode: ExitGeneric, Message: "wrapping: stuff", err: errStuffWrapped}
+
 	tests := []struct {
 		name string
-		args args
+		err  error
 		want Error
 	}{
-		{"nil error returns zero value", args{nil}, Error{}},
-		{"Error object returns itself", args{Error{ExitCode: ExitGeneric, Message: "stuff"}}, Error{ExitCode: ExitGeneric, Message: "stuff"}},
+		{
+			name: "nil error returns zero value",
+			err:  nil,
+			want: Error{},
+		},
+		{
+			name: "Error object returns itself",
+			err:  errStuff,
+			want: errStuff,
+		},
+		{
+			name: "Wrapped error returns same exit code",
+			err:  errStuffWrapped,
+			want: errWrapped,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := AsError(tt.args.err); !reflect.DeepEqual(got, tt.want) {
+			if got := AsError(tt.err); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AsError() = %v, want %v", got, tt.want)
 			}
 		})
@@ -34,7 +48,7 @@ func TestAsError(t *testing.T) {
 
 func TestAsErrorPanic(t *testing.T) {
 	_, gotPanic := testlib.DoesPanic(func() { _ = AsError(errors.New("not an error")) })
-	wantPanic := interface{}("AsError: err must be nil or Error")
+	wantPanic := interface{}("AsError: err must be nil or wrap type Error")
 	if wantPanic != gotPanic {
 		t.Errorf("AsError: got panic = %v, want = %v", gotPanic, wantPanic)
 	}

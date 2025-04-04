@@ -3,6 +3,7 @@ package exit
 
 //spellchecker:words github pkglib docfmt
 import (
+	"errors"
 	"fmt"
 
 	"github.com/tkw1536/pkglib/docfmt"
@@ -30,22 +31,33 @@ func (err Error) Unwrap() error {
 
 // Error returns the error message belonging to this error.
 func (err Error) Error() string {
-	docfmt.AssertValid(err.Message)
 	return err.Message
 }
 
-// AsError asserts that err is either nil or of type Error and returns it.
-// When err is nil, the zero value of type Error is returned.
+// AsError asserts that err is either nil, wraps an error of type Error, or is of type Error itself.
+// When failing the precondition, panic()s.
+//
+// If nil or of type Error, returns err unchanged.
+// When wrapping an Error, returns a new Error object with the appropriate exit code that wraps the original.
 //
 // If err is not nil and not of type Error, calls panic().
 func AsError(err error) Error {
-	switch e := err.(type) {
-	case nil:
-		return Error{}
-	case Error:
-		return e
+	// when nil, or an error, return as is!
+	if ee, ok := err.(Error); err == nil || ok {
+		return ee
 	}
-	panic("AsError: err must be nil or Error")
+
+	// check if we're wrapping an error!
+	var ee Error
+	if errors.As(err, &ee) {
+		return Error{
+			ExitCode: ee.ExitCode,
+			Message:  err.Error(),
+			err:      err,
+		}
+	}
+
+	panic("AsError: err must be nil or wrap type Error")
 }
 
 // WithMessage returns a copy of this error with the same Code but different Message.
