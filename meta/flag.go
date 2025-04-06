@@ -3,6 +3,7 @@ package meta
 
 //spellchecker:words slices github pkglib docfmt text
 import (
+	"fmt"
 	"io"
 	"slices"
 
@@ -70,7 +71,7 @@ func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces boo
 	// if the argument is optional put braces around it!
 	if optionalBraces && !opt.Required {
 		if _, err := io.WriteString(w, "["); err != nil {
-			return err
+			return fmt.Errorf("unable to write '[': %w", err)
 		}
 		defer func() {
 			if err != nil {
@@ -99,16 +100,16 @@ func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces boo
 		args = append(sa, la...)
 	}
 	if _, err := text.Join(w, args, sep); err != nil {
-		return err
+		return fmt.Errorf("unable to join args: %w", err)
 	}
 
 	// write the value (if any)
 	if value := opt.Value; value != "" {
 		if _, err := io.WriteString(w, " "); err != nil {
-			return err
+			return fmt.Errorf("unable to write ' ': %w", err)
 		}
 		if _, err := io.WriteString(w, value); err != nil {
-			return err
+			return fmt.Errorf("unable to write value: %w", err)
 		}
 	}
 
@@ -138,19 +139,18 @@ const (
 //
 // This function is implicitly tested via other tests.
 func (opt Flag) WriteMessageTo(w io.Writer) error {
-
 	if _, err := io.WriteString(w, usageMsg1); err != nil {
-		return err
+		return fmt.Errorf("unable to write usage text header: %w", err)
 	}
 	if err := opt.WriteLongSpecTo(w); err != nil {
-		return err
+		return fmt.Errorf("unable to write spec: %w", err)
 	}
 	if _, err := io.WriteString(w, usageMsg2); err != nil {
-		return err
+		return fmt.Errorf("unable to write usage text: %w", err)
 	}
 
 	if _, err := io.WriteString(w, docfmt.Format(opt.Usage)); err != nil {
-		return err
+		return fmt.Errorf("unable to format usage message: %w", err)
 	}
 
 	{
@@ -161,39 +161,39 @@ func (opt Flag) WriteMessageTo(w io.Writer) error {
 
 		if hasDefault || hasChoices {
 			if _, err := io.WriteString(w, " ("); err != nil {
-				return err
+				return fmt.Errorf("unable to write '(': %w", err)
 			}
 			if hasChoices {
 				if _, err := io.WriteString(w, "choices: "); err != nil {
-					return err
+					return fmt.Errorf("unable to write 'choices: ': %w", err)
 				}
 				if _, err := text.Join(w, opt.Choices, ", "); err != nil {
-					return err
+					return fmt.Errorf("unable to join choices: %w", err)
 				}
 				if hasDefault {
 					if _, err := io.WriteString(w, "; "); err != nil {
-						return err
+						return fmt.Errorf("unable to write '; ': %w", err)
 					}
 				}
 			}
 
 			if hasDefault {
 				if _, err := io.WriteString(w, "default "); err != nil {
-					return err
+					return fmt.Errorf("unable to write 'default ': %w", err)
 				}
 				if _, err := io.WriteString(w, Default); err != nil {
-					return err
+					return fmt.Errorf("unable to write default value: %w", err)
 				}
 			}
 
 			if _, err := io.WriteString(w, ")"); err != nil {
-				return err
+				return fmt.Errorf("unable to write ')': %w", err)
 			}
 		}
 	}
 
 	if _, err := io.WriteString(w, usageMsg3); err != nil {
-		return err
+		return fmt.Errorf("unable to write usage message trailer: %w", err)
 	}
 
 	return nil

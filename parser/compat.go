@@ -45,7 +45,7 @@ func NewFlag(option *flags.Option) (flag meta.Flag) {
 	return
 }
 
-// AllFlags is a convenience method to get all flags for the provided argument type
+// AllFlags is a convenience method to get all flags for the provided argument type.
 func AllFlags[T any]() []meta.Flag {
 	data := new(T)
 	return Parser{
@@ -54,7 +54,7 @@ func AllFlags[T any]() []meta.Flag {
 	}.Flags()
 }
 
-// NewPositional creates a new Positional from a flag argument
+// NewPositional creates a new Positional from a flag argument.
 func NewPositional(arg *flags.Arg, field reflect.StructField) (pos meta.Positional) {
 	pos.Value = arg.Name
 	pos.Usage = arg.Description

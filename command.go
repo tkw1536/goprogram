@@ -40,7 +40,7 @@ type Command[E any, P any, F any, R Requirement[F]] interface {
 	Description() Description[F, R]
 }
 
-// AfterParseCommand represents a command with an AfterParse function
+// AfterParseCommand represents a command with an AfterParse function.
 type AfterParseCommand[E any, P any, F any, R Requirement[F]] interface {
 	Command[E, P, F, R]
 
@@ -79,7 +79,7 @@ type Requirement[F any] interface {
 	Validate(arguments Arguments[F]) error
 }
 
-// EmptyRequirement represents a requirement that allows any flag and validates all arguments
+// EmptyRequirement represents a requirement that allows any flag and validates all arguments.
 type EmptyRequirement[F any] struct{}
 
 func (EmptyRequirement[F]) AllowsFlag(meta.Flag) bool   { return true }
@@ -102,7 +102,7 @@ func (p *Program[E, P, F, R]) Register(c Command[E, P, F, R]) {
 	p.commands[Name] = c
 }
 
-// Commands returns a list of known commands
+// Commands returns a list of known commands.
 func (p Program[E, P, F, R]) Commands() []string {
 	commands := make([]string, 0, len(p.commands))
 	for cmd := range p.commands {
@@ -112,7 +112,7 @@ func (p Program[E, P, F, R]) Commands() []string {
 	return commands
 }
 
-// Command returns the command with the provided name and if it exists
+// Command returns the command with the provided name and if it exists.
 func (p Program[E, P, F, R]) Command(name string) (Command[E, P, F, R], bool) {
 	// NOTE: This function is not tested because it is so trivial
 	cmd, ok := p.commands[name]
@@ -156,19 +156,18 @@ func ValidateAllowedFlags[F any](r Requirement[F], args Arguments[F]) error {
 	}
 
 	return nil
-
 }
 
 var universalOpts = parser.AllFlags[Universals]()
 
-// globalOptions returns a list of global options for a command with the provided flag type
+// globalOptions returns a list of global options for a command with the provided flag type.
 func globalOptions[F any]() (flags []meta.Flag) {
 	flags = append(flags, universalOpts...)
 	flags = append(flags, parser.AllFlags[F]()...)
 	return
 }
 
-// globalFlagsFor returns a list of global options for a command with the provided flag type
+// globalFlagsFor returns a list of global options for a command with the provided flag type.
 func globalFlagsFor[F any](r Requirement[F]) (flags []meta.Flag) {
 	// filter options to be those that are allowed
 	gFlags := parser.AllFlags[F]()

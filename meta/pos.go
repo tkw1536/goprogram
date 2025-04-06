@@ -53,34 +53,34 @@ func (pos Positional) WriteSpecTo(w io.Writer) error {
 
 	// arg arg arg
 	if _, err := text.RepeatJoin(w, pos.Value, " ", pos.Min); err != nil {
-		return err
+		return fmt.Errorf("unable to repeat and join value: %w", err)
 	}
 	if pos.Min > 0 && extra != 0 {
 		if _, err := io.WriteString(w, " "); err != nil {
-			return err
+			return fmt.Errorf("unable to write space: %w", err)
 		}
 	}
 
 	if pos.Max < 0 {
 		// [arg ...]
 		if _, err := io.WriteString(w, "["); err != nil {
-			return err
+			return fmt.Errorf("unable to write '[': %w", err)
 		}
 		if _, err := io.WriteString(w, pos.Value); err != nil {
-			return err
+			return fmt.Errorf("unable to write value: %w", err)
 		}
 		if _, err := io.WriteString(w, " ...]"); err != nil {
-			return err
+			return fmt.Errorf("unable to write '...]': %w", err)
 		}
 		return nil
 	}
 
 	// [arg [arg]]
 	if _, err := text.RepeatJoin(w, "["+pos.Value, " ", extra); err != nil {
-		return err
+		return fmt.Errorf("unable to repeat and join args: %w", err)
 	}
 	if _, err := text.Repeat(w, "]", extra); err != nil {
-		return err
+		return fmt.Errorf("unable to repeat args: %w", err)
 	}
 	return nil
 }

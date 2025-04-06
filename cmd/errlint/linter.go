@@ -344,7 +344,7 @@ func isFuncCall(pass *analysis.Pass, call *ast.CallExpr, pkg string) (string, []
 	return selector.Sel.Name, call.Args, true
 }
 
-// isStructType checks if tp represents a struct type in the given package with the given name
+// isStructType checks if tp represents a struct type in the given package with the given name.
 func isStructType(tp types.Type, pkg, name string) bool {
 	if a := tp.Underlying(); a != tp && isStructType(a, pkg, name) {
 		return true

@@ -94,7 +94,6 @@ func TestNewFlag(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-
 			got := NewFlag(tt.opt)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewFlag() = %#v, want %#v", got, tt.want)

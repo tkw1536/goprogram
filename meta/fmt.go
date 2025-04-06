@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-// builderPool used by various formatters in this package
+// builderPool used by various formatters in this package.
 var builderPool = &sync.Pool{
 	New: func() interface{} { return new(strings.Builder) },
 }

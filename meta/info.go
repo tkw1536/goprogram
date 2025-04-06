@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-// Info holds information about a program
+// Info holds information about a program.
 type Info struct {
 	BuildVersion string
 	BuildTime    time.Time

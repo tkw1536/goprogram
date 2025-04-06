@@ -13,7 +13,7 @@ import (
 	"github.com/tkw1536/pkglib/reflectx"
 )
 
-//spellchecker:words positionals
+//spellchecker:words positionals nolint wrapcheck
 
 // Parse represents a parser for arguments.
 //
@@ -29,6 +29,8 @@ type Parser struct {
 //
 // The returned error may be nil, a help error, an unknown flag error or otherwise.
 // See also IsHelp, IsUnknownFlag.
+//
+//nolint:wrapcheck
 func (p Parser) ParseArgs(args []string) ([]string, error) {
 	// if we don't have a parser, parsing is a no-op!
 	if p.parser == nil {
@@ -40,19 +42,19 @@ func (p Parser) ParseArgs(args []string) ([]string, error) {
 	return p.parser.ParseArgs(args)
 }
 
-// IsHelp checks if err represents the help flag being passed
+// IsHelp checks if err represents the help flag being passed.
 func IsHelp(err error) bool {
 	var flagError *flags.Error
 	return errors.As(err, &flagError) && flagError.Type == flags.ErrHelp
 }
 
-// IsUnknownFlag checks if err indicates an unknown flag
+// IsUnknownFlag checks if err indicates an unknown flag.
 func IsUnknownFlag(err error) bool {
 	var flagError *flags.Error
 	return errors.As(err, &flagError) && flagError.Type == flags.ErrUnknownFlag
 }
 
-// options collects all options contained in p or inside a group of p
+// options collects all options contained in p or inside a group of p.
 func (p Parser) args() (options []*flags.Arg) {
 	if p.parser == nil {
 		return nil
@@ -74,7 +76,7 @@ func (p Parser) argTypes() (types []reflect.StructField) {
 
 		// iterate over all the fields in the nested struct
 		nf := field.Type.NumField()
-		for j := 0; j < nf; j++ {
+		for j := range nf {
 			types = append(types, field.Type.Field(j))
 		}
 
@@ -100,7 +102,7 @@ func (p Parser) Positionals() []meta.Positional {
 	return poss
 }
 
-// options collects all options contained in p or inside a group of p
+// options collects all options contained in p or inside a group of p.
 func (p Parser) options() (options []*flags.Option) {
 	if p.parser == nil {
 		return nil
@@ -114,7 +116,7 @@ func (p Parser) options() (options []*flags.Option) {
 	return
 }
 
-// Flags returns information about the flags belonging to this parser
+// Flags returns information about the flags belonging to this parser.
 func (p Parser) Flags() []meta.Flag {
 	// collect the options
 	options := p.options()

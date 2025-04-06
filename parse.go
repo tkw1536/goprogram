@@ -9,7 +9,7 @@ import (
 	"github.com/tkw1536/goprogram/parser"
 )
 
-//spellchecker:words positionals
+//spellchecker:words positionals nolint wrapcheck
 
 var errParseArgsNeedOneArgument = exit.Error{
 	ExitCode: exit.ExitGeneralArguments,
@@ -27,6 +27,8 @@ var errParseArgsUnknownError = exit.Error{
 // Any flags are just returned as unparsed positionals.
 //
 // When parsing fails, returns an error of type Error.
+//
+//nolint:wrapcheck
 func (args *Arguments[F]) parseProgramFlags(argv []string) error {
 	var err error
 
@@ -68,6 +70,8 @@ func (args *Arguments[F]) parseProgramFlags(argv []string) error {
 // It expects that neither the Help nor Version flag of Arguments are true.
 //
 // When parsing fails, returns an error of type Error.
+//
+//nolint:wrapcheck
 func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 	context.Description = command.Description()
 
@@ -106,6 +110,8 @@ var errWrongArguments = exit.Error{
 // parseCommandFlags uses the parser to parse flags passed directly to the command.
 //
 // When an error occurs, returns an error of type Error.
+//
+//nolint:wrapcheck
 func (context *Context[E, P, F, R]) parseCommandFlags() (err error) {
 	context.Args.pos, err = context.parser.ParseArgs(context.Args.pos)
 

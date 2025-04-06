@@ -24,7 +24,7 @@ type Error struct {
 	err error
 }
 
-// Unwrap unwraps this error, if any
+// Unwrap unwraps this error, if any.
 func (err Error) Unwrap() error {
 	return err.err
 }

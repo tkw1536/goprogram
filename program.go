@@ -12,6 +12,8 @@ import (
 	"github.com/tkw1536/pkglib/stream"
 )
 
+//spellchecker:words nolint wrapcheck
+
 // Program represents an executable program.
 // A program is intended to be invoked on the command line.
 // Each invocation of a program executes a command.
@@ -73,7 +75,7 @@ type Program[E any, P any, F any, R Requirement[F]] struct {
 	commands map[string]Command[E, P, F, R]
 }
 
-// initContext initializes the context of the context
+// initContext initializes the context of the context.
 func (p Program[E, P, F, R]) initContextContext(params *P, context *Context[E, P, F, R]) error {
 	context.Context = context.withContext(context.Context)
 
@@ -190,7 +192,9 @@ var errProgramIO = exit.Error{
 	Message:  "failed to write to context",
 }
 
-// run implements Main and Exec
+// run implements Main and Exec.
+//
+//nolint:wrapcheck
 func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment func(context Context[E, P, F, R]) (E, error)) (err error) {
 	// expand keyword
 	keyword, hasKeyword := p.keywords[context.Args.Command]

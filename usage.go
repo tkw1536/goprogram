@@ -11,7 +11,7 @@ import (
 
 //spellchecker:words positionals ggman
 
-// MainUsage returns a help page about ggman
+// MainUsage returns a help page about ggman.
 func (p Program[E, P, F, R]) MainUsage() meta.Meta {
 	commands := append(p.Commands(), p.Aliases()...)
 
@@ -24,7 +24,7 @@ func (p Program[E, P, F, R]) MainUsage() meta.Meta {
 	}
 }
 
-// CommandUsage generates the usage information about a specific command
+// CommandUsage generates the usage information about a specific command.
 func (p Program[E, P, F, R]) CommandUsage(context Context[E, P, F, R]) meta.Meta {
 	return meta.Meta{
 		Executable:  p.Info.Executable,
@@ -39,7 +39,7 @@ func (p Program[E, P, F, R]) CommandUsage(context Context[E, P, F, R]) meta.Meta
 	}
 }
 
-// AliasPage returns a usage page for the provided alias
+// AliasPage returns a usage page for the provided alias.
 func (p Program[E, P, F, R]) AliasUsage(context Context[E, P, F, R], alias Alias) meta.Meta {
 	exCmd := "`" + shellescape.QuoteCommand(append([]string{p.Info.Executable}, alias.Expansion()...)) + "`"
 	helpCmd := "`" + shellescape.QuoteCommand([]string{p.Info.Executable, alias.Command, "--help"}) + "`"
@@ -63,7 +63,7 @@ func (p Program[E, P, F, R]) AliasUsage(context Context[E, P, F, R], alias Alias
 		Positionals: []meta.Positional{
 			{
 				Value: "ARG",
-				Usage: fmt.Sprintf("arguments to pass after %s", exCmd),
+				Usage: "arguments to pass after " + exCmd,
 				Min:   0,
 				Max:   -1,
 			},

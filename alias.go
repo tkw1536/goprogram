@@ -23,8 +23,7 @@ type Alias struct {
 	Description string
 }
 
-// Invoke returns command arguments that are to be used when invoking this alias
-// args are additional arguments to pass to the command
+// args are additional arguments to pass to the command.
 func (a Alias) Invoke(args []string) (command string, arguments []string) {
 	// setup command
 	command = a.Command

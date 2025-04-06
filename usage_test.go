@@ -26,17 +26,16 @@ func TestProgram_MainUsage(t *testing.T) {
 	}
 }
 
-// makeTPM_Positionals makes a new parser with the provided positional arguments
+// makeTPM_Positionals makes a new parser with the provided positional arguments.
 func makeTPCU_Positionals[Pos any]() parser.Parser {
 	return parser.Config{}.NewCommandParser(&struct {
-		Boolean     bool `short:"b" value-name:"random" long:"bool" description:"a random boolean argument with short"`
-		Int         int  `long:"int" value-name:"dummy" description:"a dummy integer flag" default:"12"`
+		Boolean     bool `description:"a random boolean argument with short" long:"bool"                        short:"b"  value-name:"random"`
+		Int         int  `default:"12"                                       description:"a dummy integer flag" long:"int" value-name:"dummy"`
 		Positionals Pos  `positional-args:"true"`
 	}{})
 }
 
 func TestProgram_CommandUsage(t *testing.T) {
-
 	program := makeProgram()
 
 	// define requirements to allow only the Global1 (or any) arguments

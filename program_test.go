@@ -67,11 +67,11 @@ func makeProgram() iProgram {
 
 // tFlags holds a set of dummy global flags.
 type tFlags struct {
-	GlobalOne string `short:"a" long:"global-one"`
-	GlobalTwo string `short:"b" long:"global-two"`
+	GlobalOne string `long:"global-one" short:"a"`
+	GlobalTwo string `long:"global-two" short:"b"`
 }
 
-// tRequirements is the implementation of the AllowsFlag function
+// tRequirements is the implementation of the AllowsFlag function.
 type tRequirements func(flag meta.Flag) bool
 
 func (t tRequirements) AllowsFlag(flag meta.Flag) bool { return t(flag) }
@@ -79,7 +79,7 @@ func (t tRequirements) Validate(args Arguments[tFlags]) error {
 	return ValidateAllowedFlags[tFlags](t, args)
 }
 
-// instantiated types for the test suite
+// instantiated types for the test suite.
 type iProgram = Program[tEnvironment, tParameters, tFlags, tRequirements]
 type iCommand = Command[tEnvironment, tParameters, tFlags, tRequirements]
 type iContext = Context[tEnvironment, tParameters, tFlags, tRequirements]
@@ -89,8 +89,8 @@ type iDescription = Description[tFlags, tRequirements]
 // tCommand represents a sample test suite command.
 // It runs the associated private functions, or prints an info message to stdout.
 type tCommand[Pos any] struct {
-	StdoutMsg string `short:"o" long:"stdout" value-name:"message" default:"write to stdout"`
-	StderrMsg string `short:"e" long:"stderr" value-name:"message" default:"write to stderr"`
+	StdoutMsg string `default:"write to stdout" long:"stdout" short:"o" value-name:"message"`
+	StderrMsg string `default:"write to stderr" long:"stderr" short:"e" value-name:"message"`
 
 	Positionals Pos `positional-args:"true"`
 
@@ -119,7 +119,7 @@ func (t tCommand[Pos]) Run(ctx iContext) error {
 	return t.MRun(t, ctx)
 }
 
-// makeTPM_Positionals makes a new command with the provided positional arguments
+// makeTPM_Positionals makes a new command with the provided positional arguments.
 func makeTPM_Positionals[Pos any]() iCommand {
 	return &tCommand[Pos]{
 		MAfterParse: func() error { return nil },
