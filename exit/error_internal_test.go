@@ -85,39 +85,3 @@ func TestError_WrapError(t *testing.T) {
 		})
 	}
 }
-
-func TestError_Wrap(t *testing.T) {
-	t.Parallel()
-
-	type fields struct {
-		ExitCode ExitCode
-		Message  string
-		err      error
-	}
-	type args struct {
-		inner error
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   Error
-	}{
-		{"wraps an inner error", fields{ExitCode: 1, Message: "something went wrong"}, args{errTestInner}, Error{ExitCode: 1, Message: "something went wrong: inner error", err: errTestInner}},
-		{"wraps a nil error", fields{ExitCode: 1, Message: "something went wrong"}, args{nil}, Error{}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			err := Error{
-				ExitCode: tt.fields.ExitCode,
-				Message:  tt.fields.Message,
-				err:      tt.fields.err,
-			}
-			if got := err.Wrap(tt.args.inner); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Error.Wrap() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
