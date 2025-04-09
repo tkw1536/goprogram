@@ -4,7 +4,6 @@ package exit_test
 //spellchecker:words errors reflect testing github pkglib testlib
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -105,27 +104,4 @@ func TestError_WithMessageF(t *testing.T) {
 			}
 		})
 	}
-}
-
-var errSomethingWentWrong = errors.New("something went wrong")
-
-func ExampleError_DeferWrap() {
-	var genericError = exit.Error{ExitCode: exit.ExitGeneric, Message: "generic error"}
-
-	// something returns the error it is passed
-	something := func(in error) (err error) {
-		// ensure that err is of type Error!
-		// this only updates error which are not yet of type Error.
-		defer genericError.DeferWrap(&err)
-
-		return in
-	}
-
-	fmt.Println(something(nil))
-	fmt.Println(something(errSomethingWentWrong))
-	fmt.Println(something(exit.Error{ExitCode: exit.ExitGeneric, Message: "specific error"}))
-
-	// output: <nil>
-	// generic error: something went wrong
-	// specific error
 }

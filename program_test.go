@@ -47,7 +47,10 @@ func makeEchoCommand(name string) iCommand {
 		defer func() { command.Positionals.Arguments = nil }() // for the next time
 
 		_, err := context.Printf("%v\n", command.Positionals.Arguments)
-		return err
+		if err != nil {
+			return fmt.Errorf("failed to write output: %w", err)
+		}
+		return nil
 	}
 	return cmd
 }

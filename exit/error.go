@@ -103,16 +103,3 @@ func (err Error) WrapError(inner error) error {
 	err.err = inner
 	return err
 }
-
-// Deprecated: Manually ensure wrapping.
-func (err Error) DeferWrap(e *error) {
-	if e == nil || *e == nil {
-		return
-	}
-
-	if _, ok := (*e).(Error); ok {
-		return
-	}
-
-	*e = err.Wrap(*e)
-}
