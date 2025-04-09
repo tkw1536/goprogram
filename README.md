@@ -6,6 +6,13 @@ A go >= 1.23.3 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.8.0 (Released [Apr 9 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.7.1))
+
+- update to go1.24.1
+- make exit package work well with wrapped functions
+- so much linting
+- remove a couple of deprecated functions
+
 # 0.7.1 (Released [Apr 3 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.7.1))
 
 - update `pkglib` version
