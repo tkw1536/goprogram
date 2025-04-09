@@ -9,6 +9,8 @@ import (
 	"github.com/tkw1536/pkglib/docfmt"
 )
 
+//spellchecker:words nolint errorlint
+
 // Error represents any error state by a program.
 // It implements the builtin error interface.
 //
@@ -42,22 +44,39 @@ func (err Error) Error() string {
 //
 // If err is not nil and not of type Error, calls panic().
 func AsError(err error) Error {
-	// when nil, or an error, return as is!
-	if ee, ok := err.(Error); err == nil || ok {
-		return ee
+	ourError, ok := asError(err)
+	if !ok && err != nil {
+		panic("AsError: err must be nil or wrap type Error")
+	}
+	return ourError
+}
+
+// asError tries to turn error into an Error maintaining exit code.
+// If error is nil, return as is
+//
+// - if an Error, return that Error and true.
+// - if wrapping an Error, lift the exit code and wrapping.
+// - in all other cases: return Error{}, false.
+func asError(err error) (Error, bool) {
+	if err == nil {
+		return Error{}, false
 	}
 
-	// check if we're wrapping an error!
-	var ee Error
-	if errors.As(err, &ee) {
+	// when nil, or an error, return as is!
+	if ourError, ok := err.(Error); ok { //nolint:errorlint
+		return ourError, true
+	}
+
+	var wrapped Error
+	if errors.As(err, &wrapped) {
 		return Error{
-			ExitCode: ee.ExitCode,
+			ExitCode: wrapped.ExitCode,
 			Message:  err.Error(),
 			err:      err,
-		}
+		}, true
 	}
 
-	panic("AsError: err must be nil or wrap type Error")
+	return Error{}, false
 }
 
 // WithMessage returns a copy of this error with the same Code but different Message.
