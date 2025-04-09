@@ -1,5 +1,5 @@
 //spellchecker:words goprogram
-package goprogram
+package goprogram //nolint:testpackage
 
 //spellchecker:words reflect testing github pkglib stream
 import (
@@ -8,6 +8,8 @@ import (
 
 	"github.com/tkw1536/pkglib/stream"
 )
+
+//spellchecker:words nolint testpackage
 
 // Register a command for a program.
 // See the test suite for instantiated types.
@@ -24,6 +26,8 @@ func ExampleCommand() {
 }
 
 func TestProgram_Commands(t *testing.T) {
+	t.Parallel()
+
 	p := makeProgram()
 	p.Register(makeEchoCommand("a"))
 	p.Register(makeEchoCommand("c"))
@@ -38,6 +42,8 @@ func TestProgram_Commands(t *testing.T) {
 }
 
 func TestProgram_FmtCommands(t *testing.T) {
+	t.Parallel()
+
 	p := makeProgram()
 	p.Register(makeEchoCommand("a"))
 	p.Register(makeEchoCommand("c"))

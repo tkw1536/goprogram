@@ -104,8 +104,7 @@ func (err Error) WrapError(inner error) error {
 	return err
 }
 
-// DeferWrap ensures that the error pointed to by e is either nil or an Error.
-// If e is neither err.Wrap(*e) is called.
+// Deprecated: Manually ensure wrapping.
 func (err Error) DeferWrap(e *error) {
 	if e == nil || *e == nil {
 		return

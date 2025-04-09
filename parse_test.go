@@ -1,5 +1,5 @@
 //spellchecker:words goprogram
-package goprogram
+package goprogram //nolint:testpackage
 
 //spellchecker:words reflect testing
 import (
@@ -7,7 +7,11 @@ import (
 	"testing"
 )
 
+//spellchecker:words nolint testpackage
+
 func TestArguments_parseProgramFlags(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		argv []string
 	}
@@ -55,6 +59,8 @@ func TestArguments_parseProgramFlags(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			var args iArguments
 			err := args.parseProgramFlags(tt.args.argv)
 

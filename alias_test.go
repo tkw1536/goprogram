@@ -1,5 +1,5 @@
 //spellchecker:words goprogram
-package goprogram
+package goprogram //nolint:testpackage
 
 //spellchecker:words reflect testing github pkglib stream
 import (
@@ -8,6 +8,8 @@ import (
 
 	"github.com/tkw1536/pkglib/stream"
 )
+
+//spellchecker:words nolint testpackage
 
 // Register an alias for a program.
 // See the test suite for instantiated types.
@@ -28,6 +30,8 @@ func ExampleAlias() {
 }
 
 func TestProgram_Alias(t *testing.T) {
+	t.Parallel()
+
 	var p iProgram
 
 	p.Register(tCommand[struct{}]{MDesc: iDescription{

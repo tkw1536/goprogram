@@ -1,5 +1,5 @@
 //spellchecker:words parser
-package parser
+package parser_test
 
 //spellchecker:words reflect testing github jessevdk flags goprogram meta
 import (
@@ -8,9 +8,12 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/tkw1536/goprogram/meta"
+	"github.com/tkw1536/goprogram/parser"
 )
 
 func TestNewFlag(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
 		opt  *flags.Option
@@ -94,7 +97,9 @@ func TestNewFlag(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewFlag(tt.opt)
+			t.Parallel()
+
+			got := parser.NewFlag(tt.opt)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewFlag() = %#v, want %#v", got, tt.want)
 			}

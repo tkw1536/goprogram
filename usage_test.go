@@ -1,5 +1,5 @@
 //spellchecker:words goprogram
-package goprogram
+package goprogram //nolint:testpackage
 
 //spellchecker:words reflect testing github goprogram meta parser
 import (
@@ -10,9 +10,11 @@ import (
 	"github.com/tkw1536/goprogram/parser"
 )
 
-//spellchecker:words positionals tpcu
+//spellchecker:words positionals tpcu nolint testpackage
 
 func TestProgram_MainUsage(t *testing.T) {
+	t.Parallel()
+
 	program := makeProgram()
 
 	program.Register(makeEchoCommand("a"))
@@ -36,6 +38,8 @@ func makeTPCU_Positionals[Pos any]() parser.Parser {
 }
 
 func TestProgram_CommandUsage(t *testing.T) {
+	t.Parallel()
+
 	program := makeProgram()
 
 	// define requirements to allow only the Global1 (or any) arguments
@@ -105,6 +109,8 @@ func TestProgram_CommandUsage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			parser := tt.args.Positionals
 
 			context := iContext{
@@ -129,6 +135,8 @@ func TestProgram_CommandUsage(t *testing.T) {
 }
 
 func TestProgram_AliasUsage(t *testing.T) {
+	t.Parallel()
+
 	program := makeProgram()
 	program.Register(makeEchoCommand("a"))
 

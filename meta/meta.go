@@ -171,7 +171,7 @@ func (page Meta) writeCommandMessageTo(w io.Writer) error {
 		}
 	}
 
-	if len(page.GlobalFlags) >= 0 {
+	if len(page.GlobalFlags) > 0 {
 		if _, err := io.WriteString(w, " [--]"); err != nil {
 			return fmt.Errorf("unable to write ' [--]': %w", err)
 		}

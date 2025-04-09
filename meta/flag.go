@@ -95,9 +95,11 @@ func (opt Flag) spec(w io.Writer, sep string, longFirst bool, optionalBraces boo
 	// write the joined versions of the arguments into the specification
 	var args []string
 	if longFirst {
-		args = append(la, sa...)
+		args = la
+		args = append(args, sa...)
 	} else {
-		args = append(sa, la...)
+		args = sa
+		args = append(args, la...)
 	}
 	if _, err := text.Join(w, args, sep); err != nil {
 		return fmt.Errorf("unable to join args: %w", err)

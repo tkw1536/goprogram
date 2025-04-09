@@ -9,10 +9,12 @@ import (
 	"github.com/tkw1536/pkglib/stream"
 )
 
-//spellchecker:words jessevdk
+//spellchecker:words jessevdk nolint containedctx
 
 // Context represents an execution environment for a command.
 // it takes the same type parameters as a command and program.
+//
+//nolint:containedctx
 type Context[E any, P any, F any, R Requirement[F]] struct {
 	stream.IOStream // IOStream describes the input and output the command reads from and writes to.
 	Context         context.Context

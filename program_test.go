@@ -1,7 +1,7 @@
 //spellchecker:words goprogram
-package goprogram
+package goprogram //nolint:testpackage
 
-//spellchecker:words positionals
+//spellchecker:words positionals nolint testpackage
 
 //spellchecker:words bytes path filepath reflect runtime testing time github goprogram exit meta parser pkglib stream testlib
 import (
@@ -46,8 +46,8 @@ func makeEchoCommand(name string) iCommand {
 	cmd.MRun = func(command tCommand[echoStruct], context iContext) error {
 		defer func() { command.Positionals.Arguments = nil }() // for the next time
 
-		context.Printf("%v\n", command.Positionals.Arguments)
-		return nil
+		_, err := context.Printf("%v\n", command.Positionals.Arguments)
+		return err
 	}
 	return cmd
 }
@@ -127,15 +127,12 @@ func makeTPM_Positionals[Pos any]() iCommand {
 }
 
 func TestProgram_Main(t *testing.T) {
+	t.Parallel()
+
 	root := testlib.TempDirAbs(t)
 	if err := os.Mkdir(filepath.Join(root, "real"), os.ModeDir&os.ModePerm); err != nil {
 		panic(err)
 	}
-
-	// create buffers for input and output
-	var stdoutBuffer bytes.Buffer
-	var stderrBuffer bytes.Buffer
-	stream := stream.NewIOStream(&stdoutBuffer, &stderrBuffer, nil)
 
 	// define requirements to allow only the Global1 (or any) arguments
 	reqOne := tRequirements(func(flag meta.Flag) bool {
@@ -163,7 +160,6 @@ func TestProgram_Main(t *testing.T) {
 		wantStderr string
 		wantCode   uint8
 	}{
-
 		{
 			name:        "no arguments",
 			args:        []string{},
@@ -523,9 +519,12 @@ func TestProgram_Main(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// reset the buffers
-			stdoutBuffer.Reset()
-			stderrBuffer.Reset()
+			t.Parallel()
+
+			// create buffers for input and output
+			var stdoutBuffer bytes.Buffer
+			var stderrBuffer bytes.Buffer
+			stream := stream.NewIOStream(&stdoutBuffer, &stderrBuffer, nil)
 
 			// var fakeCommand *tCommand[T]
 			fakeCommand := reflect.ValueOf(tt.positionals).Elem()
@@ -542,11 +541,11 @@ func TestProgram_Main(t *testing.T) {
 				err := (func(command reflect.Value, context iContext) error {
 					pos := command.FieldByName("Positionals")
 
-					context.Printf("Got Flags: %s\n", context.Args.Flags)
-					context.Printf("Got Pos: %v\n", pos.Interface())
+					_, _ = context.Printf("Got Flags: %s\n", context.Args.Flags)
+					_, _ = context.Printf("Got Pos: %v\n", pos.Interface())
 
-					context.Println(command.FieldByName("StdoutMsg").Interface())
-					context.EPrintln(command.FieldByName("StderrMsg").Interface())
+					_, _ = context.Println(command.FieldByName("StdoutMsg").Interface())
+					_, _ = context.EPrintln(command.FieldByName("StderrMsg").Interface())
 
 					command.FieldByName("Positionals").FieldByName("Args")
 

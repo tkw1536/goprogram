@@ -85,11 +85,9 @@ func (pos Positional) WriteSpecTo(w io.Writer) error {
 	return nil
 }
 
-const (
-	errParseTakesNoArguments      = "no arguments permitted"
-	errParseTakesExactlyArguments = "exactly %d argument(s) required"
-	errParseTakesMinArguments     = "at least %d argument(s) required"
-	errParseTakesBetweenArguments = "between %d and %d argument(s) required"
+var (
+	errWrongArgumentCount    = errors.New("wrong argument count")
+	errParseTakesNoArguments = fmt.Errorf("%w: no arguments permitted", errWrongArgumentCount)
 )
 
 // Validate checks if the correct number of positional arguments have been passed.
@@ -101,14 +99,14 @@ func (pos Positional) Validate(count int) error {
 	// - we need to be below the max if the maximum is not unlimited
 	if count < pos.Min || ((pos.Max != -1) && (count > pos.Max)) {
 		switch {
-		case pos.Min == pos.Max && pos.Min == 0: // 0 arguments, but some given
-			return errors.New(errParseTakesNoArguments)
+		case pos.Min == 0 && pos.Max == 0: // 0 arguments, but some given
+			return (errParseTakesNoArguments)
 		case pos.Min == pos.Max: // exact number of arguments is wrong
-			return fmt.Errorf(errParseTakesExactlyArguments, pos.Min)
+			return fmt.Errorf("%w: exactly %d argument(s) required", errWrongArgumentCount, pos.Min)
 		case pos.Max == -1: // less than min arguments
-			return fmt.Errorf(errParseTakesMinArguments, pos.Min)
+			return fmt.Errorf("%w: at least %d argument(s) required", errWrongArgumentCount, pos.Min)
 		default: // between set number of arguments
-			return fmt.Errorf(errParseTakesBetweenArguments, pos.Min, pos.Max)
+			return fmt.Errorf("%w: between %d and %d argument(s) required", errWrongArgumentCount, pos.Min, pos.Max)
 		}
 	}
 

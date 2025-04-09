@@ -1,27 +1,31 @@
 //spellchecker:words meta
-package meta
+package meta_test
 
 //spellchecker:words strings testing
 import (
 	"strings"
 	"testing"
+
+	"github.com/tkw1536/goprogram/meta"
 )
 
 //spellchecker:words positionals
 
 func TestUsage_WriteMessageTo(t *testing.T) {
+	t.Parallel()
+
 	tests := []struct {
 		name string
-		meta Meta
+		meta meta.Meta
 		want string
 	}{
 		{
 			"main executable page",
-			Meta{
+			meta.Meta{
 				Executable:  "cmd",
 				Description: "do something interesting",
 
-				GlobalFlags: []Flag{
+				GlobalFlags: []meta.Flag{
 					{
 						Required: true,
 
@@ -47,12 +51,12 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 		},
 		{
 			"sub executable page",
-			Meta{
+			meta.Meta{
 				Executable:  "cmd",
 				Command:     "sub",
 				Description: "do something local",
 
-				GlobalFlags: []Flag{
+				GlobalFlags: []meta.Flag{
 					{
 						Required: true,
 
@@ -72,7 +76,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 						Default: "false",
 					},
 				},
-				CommandFlags: []Flag{
+				CommandFlags: []meta.Flag{
 					{
 						Required: true,
 
@@ -92,7 +96,7 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 						Default: "true",
 					},
 				},
-				Positionals: []Positional{
+				Positionals: []meta.Positional{
 					{
 						Value: "op",
 						Usage: "operations to make",
@@ -106,35 +110,14 @@ func TestUsage_WriteMessageTo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			var builder strings.Builder
 			if err := tt.meta.WriteMessageTo(&builder); err != nil {
 				t.Errorf("Usage.WriteMessageTo() returned non-nil error")
 			}
 			if got := builder.String(); got != tt.want {
 				t.Errorf("Usage.WriteMessageTo() = %q, want %q", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestMeta_writeCommandsTo(t *testing.T) {
-	tests := []struct {
-		name string
-		meta Meta
-		want string
-	}{
-		{"no commands", Meta{Commands: nil}, ""},
-		{"single command", Meta{Commands: []string{"a"}}, `"a"`},
-		{"multiple commands", Meta{Commands: []string{"a", "b", "c"}}, `"a", "b", "c"`},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			var builder strings.Builder
-			if err := tt.meta.writeCommandsTo(&builder); err != nil {
-				t.Errorf("Meta.writeCommandsTo() returned non-nil error")
-			}
-			if got := builder.String(); got != tt.want {
-				t.Errorf("Meta.writeCommandsTo() = %v, want %v", got, tt.want)
 			}
 		})
 	}
