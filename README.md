@@ -6,7 +6,11 @@ A go >= 1.23.3 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
-# 0.8.0 (Released [Apr 9 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.7.1))
+# 0.8.1 (Released [Apr 11 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.8.1))
+
+- run modernize analyzer
+
+# 0.8.0 (Released [Apr 9 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.8.0))
 
 - update to go1.24.1
 - make exit package work well with wrapped functions

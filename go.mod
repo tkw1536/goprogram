@@ -5,8 +5,8 @@ go 1.24.2
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/tkw1536/pkglib v0.0.0-20250403195407-1b2a3c5294f8
-	golang.org/x/tools v0.31.0
+	github.com/tkw1536/pkglib v0.0.0-20250411183545-eed6238479d8
+	golang.org/x/tools v0.32.0
 )
 
 require (
@@ -194,10 +194,10 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250210185358-939b2ce775ac // indirect
 	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/telemetry v0.0.0-20241220003058-cc96b6e0d3d9 // indirect
-	golang.org/x/term v0.30.0 // indirect
+	golang.org/x/term v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/tools/gopls v0.18.1 // indirect
 	golang.org/x/vuln v1.1.4 // indirect
