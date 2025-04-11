@@ -5,8 +5,8 @@ go 1.24.2
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/tkw1536/pkglib v0.0.0-20250411183545-eed6238479d8
-	golang.org/x/tools v0.32.0
+	github.com/tkw1536/pkglib v0.0.0-20250411185325-b51c33b2704b
+	golang.org/x/tools v0.31.0
 )
 
 require (
@@ -198,7 +198,7 @@ require (
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/telemetry v0.0.0-20241220003058-cc96b6e0d3d9 // indirect
 	golang.org/x/term v0.31.0 // indirect
-	golang.org/x/text v0.23.0 // indirect
+	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/tools/gopls v0.18.1 // indirect
 	golang.org/x/vuln v1.1.4 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect

@@ -6,6 +6,10 @@ A go >= 1.23.3 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.8.2 (Released [Apr 11 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.8.1))
+
+- fix broken linter dependencies
+
 # 0.8.1 (Released [Apr 11 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.8.1))
 
 - run modernize analyzer
