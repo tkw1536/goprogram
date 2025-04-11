@@ -52,7 +52,7 @@ func init() {
 var DocFmtAnalyzer = &analysis.Analyzer{
 	Name: "docfmt",
 	Doc:  "reports exit.Error instances with statically unsafe messages",
-	Run: func(pass *analysis.Pass) (interface{}, error) {
+	Run: func(pass *analysis.Pass) (any, error) {
 		for _, file := range pass.Files {
 			lintLiteralStructField(pass, file, exitPackage, errorType, messageFieldName, func(str string) (results []lintResult) {
 				for _, err := range docfmt.Validate(str, exceptions...) {

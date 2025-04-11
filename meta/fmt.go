@@ -11,7 +11,7 @@ import (
 
 // builderPool used by various formatters in this package.
 var builderPool = &sync.Pool{
-	New: func() interface{} { return new(strings.Builder) },
+	New: func() any { return new(strings.Builder) },
 }
 
 // String generates a usage page for this Meta.

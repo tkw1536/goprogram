@@ -17,7 +17,7 @@ func TestAsErrorPanic(t *testing.T) {
 	t.Parallel()
 
 	_, gotPanic := testlib.DoesPanic(func() { _ = exit.AsError(errNotAnError) })
-	wantPanic := interface{}("AsError: err must be nil or wrap type Error")
+	wantPanic := any("AsError: err must be nil or wrap type Error")
 	if wantPanic != gotPanic {
 		t.Errorf("AsError: got panic = %v, want = %v", gotPanic, wantPanic)
 	}
@@ -74,7 +74,7 @@ func TestError_WithMessageF(t *testing.T) {
 		Message  string
 	}
 	type args struct {
-		args []interface{}
+		args []any
 	}
 	tests := []struct {
 		name   string
@@ -83,13 +83,13 @@ func TestError_WithMessageF(t *testing.T) {
 		want   exit.Error
 	}{
 		{"keeps message without format", fields{Message: "hello world"}, args{}, exit.Error{Message: "hello world"}},
-		{"replaces message", fields{Message: "hello %s"}, args{[]interface{}{"world"}}, exit.Error{Message: "hello world"}},
+		{"replaces message", fields{Message: "hello %s"}, args{[]any{"world"}}, exit.Error{Message: "hello world"}},
 
-		{"keeps exit code 1", fields{ExitCode: 1, Message: "%s"}, args{[]interface{}{"hello world"}}, exit.Error{ExitCode: 1, Message: "hello world"}},
-		{"keeps exit code 2", fields{ExitCode: 2, Message: "%s"}, args{[]interface{}{"hello world"}}, exit.Error{ExitCode: 2, Message: "hello world"}},
-		{"keeps exit code 3", fields{ExitCode: 3, Message: "%s"}, args{[]interface{}{"hello world"}}, exit.Error{ExitCode: 3, Message: "hello world"}},
-		{"keeps exit code 4", fields{ExitCode: 4, Message: "%s"}, args{[]interface{}{"hello world"}}, exit.Error{ExitCode: 4, Message: "hello world"}},
-		{"keeps exit code 5", fields{ExitCode: 5, Message: "%s"}, args{[]interface{}{"hello world"}}, exit.Error{ExitCode: 5, Message: "hello world"}},
+		{"keeps exit code 1", fields{ExitCode: 1, Message: "%s"}, args{[]any{"hello world"}}, exit.Error{ExitCode: 1, Message: "hello world"}},
+		{"keeps exit code 2", fields{ExitCode: 2, Message: "%s"}, args{[]any{"hello world"}}, exit.Error{ExitCode: 2, Message: "hello world"}},
+		{"keeps exit code 3", fields{ExitCode: 3, Message: "%s"}, args{[]any{"hello world"}}, exit.Error{ExitCode: 3, Message: "hello world"}},
+		{"keeps exit code 4", fields{ExitCode: 4, Message: "%s"}, args{[]any{"hello world"}}, exit.Error{ExitCode: 4, Message: "hello world"}},
+		{"keeps exit code 5", fields{ExitCode: 5, Message: "%s"}, args{[]any{"hello world"}}, exit.Error{ExitCode: 5, Message: "hello world"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
