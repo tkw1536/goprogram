@@ -5,7 +5,7 @@ go 1.24.2
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/tkw1536/pkglib v0.0.0-20250411185325-b51c33b2704b
+	github.com/tkw1536/pkglib v0.0.0-20250415153013-42f5cb7cb7da
 	golang.org/x/tools v0.31.0
 )
 
