@@ -6,6 +6,10 @@ A go >= 1.23.3 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.8.4 (Released [Apr 23 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.8.4))
+
+- add 'exit.Code' function
+
 # 0.8.3 (Released [Apr 18 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.8.3))
 
 - update dependencies

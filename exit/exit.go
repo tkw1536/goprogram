@@ -4,6 +4,7 @@
 package exit
 
 import (
+	"math"
 	"os"
 )
 
@@ -11,6 +12,15 @@ import (
 // These are returned as an exit code to the operating system.
 // See ExitCode.Return().
 type ExitCode uint8
+
+// Code turns an integer into an ExitCode safely.
+// If it is outside of the range from the exit code, returns an unspecified non-zero value.
+func Code(code int) ExitCode {
+	if code < 0 || code > math.MaxUint8 {
+		return math.MaxUint8
+	}
+	return ExitCode(code)
+}
 
 // Return returns this ExitCode to the operating system by invoking os.Exit().
 func (code ExitCode) Return() {
