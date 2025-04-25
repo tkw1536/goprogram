@@ -3,6 +3,7 @@ package goprogram
 
 //spellchecker:words slices github goprogram exit parser
 import (
+	"fmt"
 	"slices"
 
 	"github.com/tkw1536/goprogram/exit"
@@ -11,22 +12,17 @@ import (
 
 //spellchecker:words positionals nolint wrapcheck
 
-var errParseArgsNeedOneArgument = exit.Error{
-	ExitCode: exit.ExitGeneralArguments,
-	Message:  "unable to parse arguments: need at least one argument",
-}
-
-var errParseArgsUnknownError = exit.Error{
-	ExitCode: exit.ExitGeneralArguments,
-	Message:  "unable to parse arguments: %s",
-}
+var (
+	errParseArgsNeedOneArgument = exit.NewErrorWithCode("unable to parse arguments: need at least one argument", exit.ExitGeneralArguments)
+	errParseArgsUnknownError    = exit.NewErrorWithCode("unable to parse arguments", exit.ExitGeneralArguments)
+)
 
 // parseProgramFlags parses program-wide arguments.
 //
 // In particular, it *does not* parse command specific arguments.
 // Any flags are just returned as unparsed positionals.
 //
-// When parsing fails, returns an error of type Error.
+// When parsing fails, returns an error with an exit code.
 //
 //nolint:wrapcheck
 func (args *Arguments[F]) parseProgramFlags(argv []string) error {
@@ -37,7 +33,7 @@ func (args *Arguments[F]) parseProgramFlags(argv []string) error {
 
 	// intercept unknown flags
 	if parser.IsUnknownFlag(err) {
-		err = errParseArgsUnknownError.WithMessageF(err.Error())
+		err = fmt.Errorf("%w: %w", errParseArgsUnknownError, err)
 	}
 
 	// store the arguments we got and complain if there are none.
@@ -63,6 +59,8 @@ func (args *Arguments[F]) parseProgramFlags(argv []string) error {
 
 	return err
 }
+
+var errParseArgCount = exit.NewErrorWithCode("wrong number of positional arguments", exit.ExitCommandArguments)
 
 // use prepares this context for using the provided command.
 // It expects the context.Arguments object to exist, see the parseP method of Arguments.
@@ -96,22 +94,19 @@ func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 
 	// check that no positional arguments are left over
 	if len(context.Args.pos) > 0 {
-		return errParseArgCount.WithMessageF(context.Args.Command, len(context.Args.pos))
+		return fmt.Errorf("%w for %s: %d additional arguments were provided", errParseArgCount, context.Args.Command, len(context.Args.pos))
 	}
 
 	return nil
 }
 
-var errWrongArguments = exit.Error{
-	ExitCode: exit.ExitCommandArguments,
-	Message:  "wrong arguments for %s: %s",
-}
+var errWrongArguments = exit.NewErrorWithCode("wrong arguments", exit.ExitCommandArguments)
 
 // parseCommandFlags uses the parser to parse flags passed directly to the command.
 //
 // When an error occurs, returns an error of type Error.
 //
-//nolint:wrapcheck
+
 func (context *Context[E, P, F, R]) parseCommandFlags() (err error) {
 	context.Args.pos, err = context.parser.ParseArgs(context.Args.pos)
 
@@ -123,13 +118,8 @@ func (context *Context[E, P, F, R]) parseCommandFlags() (err error) {
 
 	// if an error occurred, return it!
 	if err != nil {
-		err = errWrongArguments.WithMessageF(context.Args.Command, err.Error())
+		err = fmt.Errorf("%w for %s: %w", errWrongArguments, context.Args.Command, err)
 	}
 
 	return err
-}
-
-var errParseArgCount = exit.Error{
-	ExitCode: exit.ExitCommandArguments,
-	Message:  "wrong number of positional arguments for %s: %d additional arguments were provided",
 }

@@ -556,7 +556,7 @@ func TestProgram_Main(t *testing.T) {
 					if argField := pos.FieldByName("Args"); argField.IsValid() {
 						pos, ok := argField.Interface().([]string)
 						if ok && len(pos) > 0 && pos[0] == "fail" {
-							return exit.Error{ExitCode: exit.ExitGeneric, Message: "test failure"}
+							return exit.NewErrorWithCode("test failure", exit.ExitGeneric)
 						}
 					}
 
@@ -579,10 +579,13 @@ func TestProgram_Main(t *testing.T) {
 			}
 
 			// run the program
-			ret := exit.AsError(program.Main(stream, tt.parameters, tt.args))
+			code, ok := exit.CodeFromError(program.Main(stream, tt.parameters, tt.args))
+			if !ok {
+				t.Error("Program.Main() no valid code returned")
+			}
 
 			// check all the error values
-			gotCode := uint8(ret.ExitCode)
+			gotCode := uint8(code)
 			gotStdout := stdoutBuffer.String()
 			gotStderr := stderrBuffer.String()
 

@@ -3,11 +3,18 @@ package goprogram //nolint:testpackage
 
 //spellchecker:words reflect testing
 import (
+	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 )
 
 //spellchecker:words nolint testpackage
+
+var (
+	errNotAGlobalFlag   = errors.New("unknown flag `not-a-global-flag'")
+	errParseUnknownWrap = fmt.Errorf("%w: %w", errParseArgsUnknownError, errNotAGlobalFlag)
+)
 
 func TestArguments_parseProgramFlags(t *testing.T) {
 	t.Parallel()
@@ -55,7 +62,7 @@ func TestArguments_parseProgramFlags(t *testing.T) {
 		{"global flag with command and arguments (1)", args{[]string{"--global-two", "stuff", "cmd", "a1", "a2"}}, iArguments{Command: "cmd", Flags: tFlags{GlobalTwo: "stuff"}, pos: []string{"a1", "a2"}}, nil},
 		{"global flag with command and arguments (2)", args{[]string{"-b", "stuff", "cmd", "a1", "a2"}}, iArguments{Command: "cmd", Flags: tFlags{GlobalTwo: "stuff"}, pos: []string{"a1", "a2"}}, nil},
 
-		{"global looking flag", args{[]string{"--not-a-global-flag", "stuff", "command"}}, iArguments{}, errParseArgsUnknownError.WithMessageF("unknown flag `not-a-global-flag'")},
+		{"global looking flag", args{[]string{"--not-a-global-flag", "stuff", "command"}}, iArguments{}, errParseUnknownWrap},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

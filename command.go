@@ -3,6 +3,7 @@ package goprogram
 
 //spellchecker:words reflect slices github goprogram exit meta parser pkglib reflectx
 import (
+	"fmt"
 	"reflect"
 	"slices"
 
@@ -32,7 +33,7 @@ import (
 type Command[E any, P any, F any, R Requirement[F]] interface {
 	// Run runs this command in the given context.
 	//
-	// It is called only once and must return nil or wrap an error of type Error.
+	// It is called only once and must return nil or wrap an error with a code.
 	Run(context Context[E, P, F, R]) error
 
 	// Description returns a description of this command.
@@ -47,7 +48,7 @@ type AfterParseCommand[E any, P any, F any, R Requirement[F]] interface {
 	// AfterParse is called after arguments have been parsed, but before the command is being run.
 	// It may perform additional argument checking and should return an error if needed.
 	//
-	// It is called only once and must return either nil or wrap an error of type Error.
+	// It is called only once and must return either nil or an error with an exit code.
 	AfterParse() error
 }
 
@@ -128,10 +129,7 @@ func (p Program[E, P, F, R]) FmtCommands() string {
 	return meta.JoinCommands(p.Commands())
 }
 
-var errTakesNoArgument = exit.Error{
-	ExitCode: exit.ExitCommandArguments,
-	Message:  "wrong number of arguments: %q takes no %q argument",
-}
+var errTakesNoArgument = exit.NewErrorWithCode("wrong number of arguments", exit.ExitCommandArguments)
 
 // Validate validates that every flag f in args.flags either passes the AllowsOption method of the given requirement, or has the zero value.
 // If this is not the case returns an error of type ValidateAllowedFlags.
@@ -151,7 +149,7 @@ func ValidateAllowedFlags[F any](r Requirement[F], args Arguments[F]) error {
 			if len(name) == 0 {
 				name = []string{""}
 			}
-			return errTakesNoArgument.WithMessageF(args.Command, "--"+name[0])
+			return fmt.Errorf("%w: %q takes no %q argument", errTakesNoArgument, args.Command, "--"+name[0])
 		}
 	}
 

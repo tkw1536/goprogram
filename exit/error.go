@@ -4,110 +4,36 @@ package exit
 //spellchecker:words github pkglib docfmt
 import (
 	"errors"
-	"fmt"
-
-	"github.com/tkw1536/pkglib/docfmt"
 )
 
 //spellchecker:words nolint errorlint
 
-// Error represents any error state by a program.
-// It implements the builtin error interface.
-//
-// The zero value represents that no error occurred and is ready to use.
-type Error struct {
-	// Exit code of the program (if applicable)
-	ExitCode
-	// Message for this error
-	// Messages should pass docfmt.Validate
-	Message string
-
-	// underlying wrapped error, if any
-	err error
+// NewErrorWithCode creates a new error that additionally holds the given exit code.
+func NewErrorWithCode(message string, code ExitCode) error {
+	return &codeError{message: message, code: code}
 }
 
-// Unwrap unwraps this error, if any.
-func (err Error) Unwrap() error {
-	return err.err
+type codeError struct {
+	code    ExitCode
+	message string
 }
 
-// Error returns the error message belonging to this error.
-func (err Error) Error() string {
-	return err.Message
+func (err *codeError) Error() string {
+	return err.message
 }
 
-// AsError asserts that err is either nil, wraps an error of type Error, or is of type Error itself.
-// When failing the precondition, panic()s.
+// CodeFromError returns the ExitCode contained in error, if any.
+// The exit code is found by [errors.As] unwrapping into an error created by this package.
 //
-// If nil or of type Error, returns err unchanged.
-// When wrapping an Error, returns a new Error object with the appropriate exit code that wraps the original.
-//
-// If err is not nil and not of type Error, calls panic().
-func AsError(err error) Error {
-	ourError, ok := asError(err)
-	if !ok && err != nil {
-		panic("AsError: err must be nil or wrap type Error")
-	}
-	return ourError
-}
-
-// asError tries to turn error into an Error maintaining exit code.
-// If error is nil, return as is
-//
-// - if an Error, return that Error and true.
-// - if wrapping an Error, lift the exit code and wrapping.
-// - in all other cases: return Error{}, false.
-func asError(err error) (Error, bool) {
+// When err is nil, returns [ExitZero] and zero.
+// When err does not hold any [Error]s, returns [ExitGeneric] and false.
+func CodeFromError(err error) (code ExitCode, ok bool) {
 	if err == nil {
-		return Error{}, false
+		return ExitZero, true
 	}
-
-	// when nil, or an error, return as is!
-	if ourError, ok := err.(Error); ok { //nolint:errorlint
-		return ourError, true
+	var codeErr *codeError
+	if !errors.As(err, &codeErr) {
+		return ExitGeneric, false
 	}
-
-	var wrapped Error
-	if errors.As(err, &wrapped) {
-		return Error{
-			ExitCode: wrapped.ExitCode,
-			Message:  err.Error(),
-			err:      err,
-		}, true
-	}
-
-	return Error{}, false
-}
-
-// WithMessage returns a copy of this error with the same Code but different Message.
-//
-// The new message is the message passed as an argument.
-func (err Error) WithMessage(message string) Error {
-	docfmt.AssertValid(err.Message)
-	return Error{
-		ExitCode: err.ExitCode,
-		Message:  message,
-	}
-}
-
-// WithMessageF returns a copy of this error with the same Code but different Message.
-// The new message is the current message, formatted using a call to SPrintf and the arguments.
-func (err Error) WithMessageF(args ...any) Error {
-	docfmt.AssertValid(err.Message)
-	docfmt.AssertValidArgs(args...)
-	return err.WithMessage(fmt.Sprintf(err.Message, args...))
-}
-
-// WrapError creates a new Error with same exit code, wrapping the inner error.
-// When inner is nil, returns nil.
-// This function will return either nil, or an error of type Error.
-//
-// The message of the new error will contain the Error() result of the inner error.
-func (err Error) WrapError(inner error) error {
-	if inner == nil {
-		return nil
-	}
-	err.Message = fmt.Sprintf("%s: %s", err.Message, inner)
-	err.err = inner
-	return err
+	return codeErr.code, true
 }

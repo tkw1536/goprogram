@@ -6,6 +6,7 @@ package goprogram
 //spellchecker:words context github goprogram exit meta pkglib stream
 import (
 	"context"
+	"fmt"
 
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/meta"
@@ -177,20 +178,11 @@ func (p Program[E, P, F, R]) Exec(context Context[E, P, F, R], command string, p
 	return p.run(execContext, func(Context[E, P, F, R]) (E, error) { return context.Environment, nil })
 }
 
-var errProgramUnknownCommand = exit.Error{
-	ExitCode: exit.ExitUnknownCommand,
-	Message:  "unknown command: must be one of %s",
-}
-
-var errProgramContext = exit.Error{
-	ExitCode: exit.ExitContext,
-	Message:  "context was closed before main could run: %s",
-}
-
-var errProgramIO = exit.Error{
-	ExitCode: exit.ExitContext,
-	Message:  "failed to write to context",
-}
+var (
+	errProgramUnknownCommand = exit.NewErrorWithCode("unknown command", exit.ExitUnknownCommand) //  must be one of %s
+	errProgramContext        = exit.NewErrorWithCode("context was closed before main could run", exit.ExitContext)
+	errProgramIO             = exit.NewErrorWithCode("failed to write to context", exit.ExitContext)
+)
 
 // run implements Main and Exec.
 //
@@ -215,10 +207,16 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 	switch {
 	case context.Args.Universals.Help:
 		_, err = context.Println(p.MainUsage().String())
-		return errProgramIO.WrapError(err)
+		if err != nil {
+			return fmt.Errorf("%w: %w", errProgramIO, err)
+		}
+		return nil
 	case context.Args.Universals.Version:
 		_, err = context.Println(p.Info.FmtVersion())
-		return errProgramIO.WrapError(err)
+		if err != nil {
+			return fmt.Errorf("%w: %w", errProgramIO, err)
+		}
+		return nil
 	}
 
 	// expand the alias (if any)
@@ -237,7 +235,7 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 	// load the command if we have it
 	command, hasCommand := p.Command(context.Args.Command)
 	if !hasCommand {
-		return errProgramUnknownCommand.WithMessageF(p.FmtCommands())
+		return fmt.Errorf("%w: must be one of %s", errProgramUnknownCommand, p.FmtCommands())
 	}
 
 	// make the context use the given command
@@ -249,10 +247,16 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 	if context.Args.Universals.Help {
 		if hasAlias {
 			_, err = context.Println(p.AliasUsage(context, alias).String())
-			return errProgramIO.WrapError(err)
+			if err != nil {
+				return fmt.Errorf("%w: %w", errProgramIO, err)
+			}
+			return nil
 		}
 		_, err = context.Println(p.CommandUsage(context).String())
-		return errProgramIO.WrapError(err)
+		if err != nil {
+			return fmt.Errorf("%w: %w", errProgramIO, err)
+		}
+		return nil
 	}
 
 	// call the AfterParse hook
@@ -277,7 +281,7 @@ func (p Program[E, P, F, R]) run(context Context[E, P, F, R], setupEnvironment f
 
 	// check that the context isn't closed!
 	if err := context.Context.Err(); err != nil {
-		return errProgramContext.WrapError(err)
+		return fmt.Errorf("%w: %w", errProgramContext, err)
 	}
 
 	// do the command!
