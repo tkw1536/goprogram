@@ -6,6 +6,10 @@ A go >= 1.24.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.9.1 (Released [Apr 26 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.9.1))
+
+- remove 'errlint' command
+
 # 0.9.0 (Released [Apr 25 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.9.0))
 
 - rework 'exit.Error' functionality
