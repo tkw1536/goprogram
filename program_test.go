@@ -168,7 +168,7 @@ func TestProgram_Main(t *testing.T) {
 			args:        []string{},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStderr: "Unable to parse arguments: Need at least one argument\n",
+			wantStderr: "unable to parse arguments: need at least one argument\n",
 			wantCode:   3,
 		},
 
@@ -177,7 +177,7 @@ func TestProgram_Main(t *testing.T) {
 			args:        []string{"--this-flag-does-not-exist", "--", "fake"},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStderr: "Unable to parse arguments: Unknown flag `this-flag-does-not-exist'\n",
+			wantStderr: "unable to parse arguments: unknown flag `this-flag-does-not-exist'\n",
 			wantCode:   3,
 		},
 
@@ -186,7 +186,7 @@ func TestProgram_Main(t *testing.T) {
 			args:        []string{"--help"},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] COMMAND [ARGS...]\n\nSomething something dark side\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] COMMAND [ARGS...]\n\nsomething something dark side\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
 			wantCode:   0,
 		},
 
@@ -195,7 +195,7 @@ func TestProgram_Main(t *testing.T) {
 			args:        []string{"--help", "fake", "whatever"},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] COMMAND [ARGS...]\n\nSomething something dark side\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] COMMAND [ARGS...]\n\nsomething something dark side\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\n   COMMAND [ARGS...]\n      Command to call. One of \"fake\". See individual commands for more help.\n",
 			wantCode:   0,
 		},
 
@@ -214,7 +214,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] fake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] fake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
 			wantCode:   0,
 		},
 
@@ -224,7 +224,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] fake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] fake [--stdout|-o message] [--stderr|-e message]\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   -o, --stdout message\n       (default write to stdout)\n\n   -e, --stderr message\n       (default write to stderr)\n",
 			wantCode:   0,
 		},
 
@@ -240,7 +240,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nAlias for `exe fake`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nalias for `exe fake`. see `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake`\n",
 			wantCode:   0,
 		},
 
@@ -256,7 +256,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nAlias for `exe fake`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nalias for `exe fake`. see `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake`\n",
 			wantCode:   0,
 		},
 
@@ -274,7 +274,7 @@ func TestProgram_Main(t *testing.T) {
 			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nSome useful alias\n\nalias for `exe fake something else`. See `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      Print a help message and exit\n\n   -v, --version\n      Print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      Arguments to pass after `exe fake something else`\n",
+			wantStdout: "Usage: exe [--help|-h] [--version|-v] [--global-one|-a] [--global-two|-b] [--] alias [--] [ARG ...]\n\nsome useful alias\n\nalias for `exe fake something else`. see `exe fake --help` for detailed help page about fake\n\nGlobal Arguments:\n\n   -h, --help\n      print a help message and exit\n\n   -v, --version\n      print a version message and exit\n\n   -a, --global-one\n      \n\n   -b, --global-two\n      \n\nCommand Arguments:\n\n   [ARG ...]\n      arguments to pass after `exe fake something else`\n",
 			wantCode:   0,
 		},
 
@@ -286,7 +286,7 @@ func TestProgram_Main(t *testing.T) {
 				Args []string `required:"1-2"`
 			}](),
 
-			wantStderr: "Wrong arguments for fake: The required argument `Args (at least 1 argument)` was not provided\n",
+			wantStderr: "wrong arguments for fake: the required argument `Args (at least 1 argument)` was not provided\n",
 			wantCode:   4,
 		},
 
@@ -299,7 +299,7 @@ func TestProgram_Main(t *testing.T) {
 			}](),
 
 			wantStdout: "",
-			wantStderr: "Wrong arguments for fake: Unknown flag `argument-not-declared'\n",
+			wantStderr: "wrong arguments for fake: unknown flag `argument-not-declared'\n",
 			wantCode:   4,
 		},
 
@@ -360,7 +360,7 @@ func TestProgram_Main(t *testing.T) {
 				Args []string `required:"1-2"`
 			}](),
 
-			wantStderr: "Wrong number of arguments: \"fake\" takes no \"--global-one\" argument\n",
+			wantStderr: "wrong number of arguments: \"fake\" takes no \"--global-one\" argument\n",
 			wantCode:   4,
 		},
 
@@ -372,7 +372,7 @@ func TestProgram_Main(t *testing.T) {
 				Args []string `required:"1-2"`
 			}](),
 
-			wantStderr: "Wrong number of arguments: \"fake\" takes no \"--global-one\" argument\n",
+			wantStderr: "wrong number of arguments: \"fake\" takes no \"--global-one\" argument\n",
 			wantCode:   4,
 		},
 
@@ -440,7 +440,7 @@ func TestProgram_Main(t *testing.T) {
 			}](),
 
 			wantStdout: "Got Flags: { }\nGot Pos: {[fail]}\nwrite to stdout\n",
-			wantStderr: "write to stderr\nTest failure\n",
+			wantStderr: "write to stderr\ntest failure\n",
 			wantCode:   1,
 		},
 
@@ -449,7 +449,7 @@ func TestProgram_Main(t *testing.T) {
 			args:        []string{"notExistent"},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStderr: "Unknown command: Must be one of \"fake\"\n",
+			wantStderr: "unknown command: must be one of \"fake\"\n",
 			wantCode:   2,
 		},
 
@@ -464,7 +464,7 @@ func TestProgram_Main(t *testing.T) {
 			args:        []string{"notExistent"},
 			positionals: makeTPM_Positionals[struct{}](),
 
-			wantStderr: "Unknown command: Must be one of \"fake\"\n",
+			wantStderr: "unknown command: must be one of \"fake\"\n",
 			wantCode:   2,
 		},
 

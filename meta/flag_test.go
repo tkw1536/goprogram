@@ -114,27 +114,27 @@ func TestFlag_WriteMessageTo(t *testing.T) {
 		{
 			"long only option",
 			meta.Flag{Usage: "a long option", Long: []string{"long"}},
-			"\n\n   --long\n      A long option",
+			"\n\n   --long\n      a long option",
 		},
 		{
 			"short and long option",
 			meta.Flag{Usage: "a long or short option", Short: []string{"s"}, Long: []string{"long"}},
-			"\n\n   -s, --long\n      A long or short option",
+			"\n\n   -s, --long\n      a long or short option",
 		},
 		{
 			"short and long named option",
 			meta.Flag{Usage: "this one is named", Value: "name", Short: []string{"s"}, Long: []string{"long"}},
-			"\n\n   -s, --long name\n      This one is named",
+			"\n\n   -s, --long name\n      this one is named",
 		},
 		{
 			"short and long named option with default",
 			meta.Flag{Usage: "this one is named", Value: "name", Short: []string{"s"}, Long: []string{"long"}, Default: "default"},
-			"\n\n   -s, --long name\n      This one is named (default default)",
+			"\n\n   -s, --long name\n      this one is named (default default)",
 		},
 		{
 			"short and long named option with default and choices",
 			meta.Flag{Usage: "this one is named", Value: "name", Short: []string{"s"}, Long: []string{"long"}, Default: "default", Choices: []string{"choice1", "choice2"}},
-			"\n\n   -s, --long name\n      This one is named (choices: choice1, choice2; default default)",
+			"\n\n   -s, --long name\n      this one is named (choices: choice1, choice2; default default)",
 		},
 	}
 	for _, tt := range tests {

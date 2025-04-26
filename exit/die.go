@@ -5,7 +5,6 @@ package exit
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/docfmt"
 	"github.com/tkw1536/pkglib/stream"
 )
 
@@ -26,7 +25,7 @@ func Die(str stream.IOStream, err error) error {
 
 	// print the error message to standard error in a wrapped way
 	if message := fmt.Sprint(err); message != "" {
-		_, _ = str.EPrintln(docfmt.Format(message)) // no way to report the failure
+		_, _ = str.EPrintln(message) // no way to report the failure
 	}
 
 	return err

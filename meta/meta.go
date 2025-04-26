@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-
-	"github.com/tkw1536/pkglib/docfmt"
 )
 
 //spellchecker:words positionals
@@ -85,7 +83,7 @@ func (meta Meta) writeProgramMessageTo(w io.Writer) error {
 		if _, err := io.WriteString(w, "\n\n"); err != nil {
 			return fmt.Errorf("unable to write newlines: %w", err)
 		}
-		if _, err := io.WriteString(w, docfmt.Format(meta.Description)); err != nil {
+		if _, err := io.WriteString(w, meta.Description); err != nil {
 			return fmt.Errorf("unable to write description: %w", err)
 		}
 	}
@@ -214,7 +212,7 @@ func (page Meta) writeCommandMessageTo(w io.Writer) error {
 		if _, err := io.WriteString(w, "\n\n"); err != nil {
 			return fmt.Errorf("unable to write newlines: %w", err)
 		}
-		if _, err := io.WriteString(w, docfmt.Format(page.Description)); err != nil {
+		if _, err := io.WriteString(w, page.Description); err != nil {
 			return fmt.Errorf("unable to write description: %w", err)
 		}
 	}
@@ -257,7 +255,7 @@ func (page Meta) writeCommandMessageTo(w io.Writer) error {
 		if _, err := io.WriteString(w, usageMsg2); err != nil {
 			return fmt.Errorf("unable to write positional usage message: %w", err)
 		}
-		if _, err := io.WriteString(w, docfmt.Format(p.Usage)); err != nil {
+		if _, err := io.WriteString(w, p.Usage); err != nil {
 			return fmt.Errorf("unable to write positional usage message: %w", err)
 		}
 		if _, err := io.WriteString(w, usageMsg3); err != nil {

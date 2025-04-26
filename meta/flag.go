@@ -7,7 +7,6 @@ import (
 	"io"
 	"slices"
 
-	"github.com/tkw1536/pkglib/docfmt"
 	"github.com/tkw1536/pkglib/text"
 )
 
@@ -151,7 +150,7 @@ func (opt Flag) WriteMessageTo(w io.Writer) error {
 		return fmt.Errorf("unable to write usage text: %w", err)
 	}
 
-	if _, err := io.WriteString(w, docfmt.Format(opt.Usage)); err != nil {
+	if _, err := io.WriteString(w, opt.Usage); err != nil {
 		return fmt.Errorf("unable to format usage message: %w", err)
 	}
 
