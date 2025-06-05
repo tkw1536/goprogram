@@ -580,8 +580,8 @@ github.com/timakin/bodyclose v0.0.0-20241222091800-1db5c5ca4d67 h1:9LPGD+jzxMlnk
 github.com/timakin/bodyclose v0.0.0-20241222091800-1db5c5ca4d67/go.mod h1:mkjARE7Yr8qU23YcGMSALbIxTQ9r9QBVahQOBRfU460=
 github.com/timonwong/loggercheck v0.10.1 h1:uVZYClxQFpw55eh+PIoqM7uAOHMrhVcDoWDery9R8Lg=
 github.com/timonwong/loggercheck v0.10.1/go.mod h1:HEAWU8djynujaAVX7QI65Myb8qgfcZ1uKbdpg3ZzKl8=
-github.com/tkw1536/pkglib v0.0.0-20250605200801-2a4541fba646 h1:0HlcBzOgAnKeaaSpNBACW+RHfrgsQBOX7T6Kdyrsfmc=
-github.com/tkw1536/pkglib v0.0.0-20250605200801-2a4541fba646/go.mod h1:rWYewArMkp4Krzyrm/Q4a5Qhy6d9rIaXxMLN/BiBfmE=
+github.com/tkw1536/pkglib v0.0.0-20250605201517-cb02913ff076 h1:6IAW9koMXzxEhYmKd1iQfzL3NLZw9/KsCCazsqsXSKU=
+github.com/tkw1536/pkglib v0.0.0-20250605201517-cb02913ff076/go.mod h1:1WE4OiYO6kB5xBzApduztfeOAaHRav1xb+wGdiFl4bs=
 github.com/tomarrell/wrapcheck/v2 v2.10.0 h1:SzRCryzy4IrAH7bVGG4cK40tNUhmVmMDuJujy4XwYDg=
 github.com/tomarrell/wrapcheck/v2 v2.10.0/go.mod h1:g9vNIyhb5/9TQgumxQyOEqDHsmGYcGsVMOx/xGkqdMo=
 github.com/tommy-muehle/go-mnd/v2 v2.5.1 h1:NowYhSdyE/1zwK9QCLeRb6USWdoif80Ie+v+yU8u1Zw=

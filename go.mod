@@ -5,7 +5,7 @@ go 1.24.4
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/tkw1536/pkglib v0.0.0-20250605200801-2a4541fba646
+	github.com/tkw1536/pkglib v0.0.0-20250605201517-cb02913ff076
 )
 
 require (
