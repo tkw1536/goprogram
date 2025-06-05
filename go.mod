@@ -1,11 +1,11 @@
 module github.com/tkw1536/goprogram
 
-go 1.24.2
+go 1.24.4
 
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
 	github.com/jessevdk/go-flags v1.6.1
-	github.com/tkw1536/pkglib v0.0.0-20250426054217-2ee805d8e0b1
+	github.com/tkw1536/pkglib v0.0.0-20250605200801-2a4541fba646
 )
 
 require (
@@ -192,13 +192,13 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250210185358-939b2ce775ac // indirect
-	golang.org/x/mod v0.24.0 // indirect
-	golang.org/x/sync v0.13.0 // indirect
-	golang.org/x/sys v0.32.0 // indirect
+	golang.org/x/mod v0.25.0 // indirect
+	golang.org/x/sync v0.15.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/telemetry v0.0.0-20241220003058-cc96b6e0d3d9 // indirect
-	golang.org/x/term v0.31.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
-	golang.org/x/tools v0.31.0 // indirect
+	golang.org/x/term v0.32.0 // indirect
+	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/tools v0.33.0 // indirect
 	golang.org/x/tools/gopls v0.18.1 // indirect
 	golang.org/x/vuln v1.1.4 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
