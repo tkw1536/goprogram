@@ -199,7 +199,6 @@ require (
 	golang.org/x/term v0.32.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	golang.org/x/tools v0.33.0 // indirect
-	golang.org/x/tools/gopls v0.18.1 // indirect
 	golang.org/x/vuln v1.1.4 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
@@ -212,6 +211,5 @@ require (
 
 tool (
 	github.com/golangci/golangci-lint/v2/cmd/golangci-lint
-	golang.org/x/tools/gopls/internal/analysis/modernize/cmd/modernize
 	golang.org/x/vuln/cmd/govulncheck
 )
