@@ -6,6 +6,10 @@ A go >= 1.24.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.9.4 (Released [Jun 5 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.9.4))
+
+- fix linting utility bug 
+
 # 0.9.3 (Released [Jun 5 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.9.3))
 
 - update go version and dependencies
