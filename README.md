@@ -6,6 +6,10 @@ A go >= 1.24.2 package to create programs, originally designed for [ggman](https
 
 ## Changelog
 
+# 0.9.6 (Released [Jul 5 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.9.6))
+
+- update go import path
+
 # 0.9.5 (Released [Jun 5 2025](https://github.com/tkw1536/goprogram/releases/tag/v0.9.5))
 
 - update more utilities
