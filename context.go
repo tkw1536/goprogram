@@ -6,7 +6,7 @@ import (
 	"context"
 
 	"github.com/tkw1536/goprogram/parser"
-	"github.com/tkw1536/pkglib/stream"
+	"go.tkw01536.de/pkglib/stream"
 )
 
 //spellchecker:words jessevdk nolint containedctx

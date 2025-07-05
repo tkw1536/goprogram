@@ -17,8 +17,8 @@ import (
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/parser"
-	"github.com/tkw1536/pkglib/stream"
-	"github.com/tkw1536/pkglib/testlib"
+	"go.tkw01536.de/pkglib/stream"
+	"go.tkw01536.de/pkglib/testlib"
 )
 
 // This file contains dummy implementations of everything required to assemble a program.

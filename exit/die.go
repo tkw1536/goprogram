@@ -5,7 +5,7 @@ package exit
 import (
 	"fmt"
 
-	"github.com/tkw1536/pkglib/stream"
+	"go.tkw01536.de/pkglib/stream"
 )
 
 var errUnknown = NewErrorWithCode("unknown error", ExitGeneric)

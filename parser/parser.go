@@ -10,7 +10,7 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/tkw1536/goprogram/meta"
-	"github.com/tkw1536/pkglib/reflectx"
+	"go.tkw01536.de/pkglib/reflectx"
 )
 
 //spellchecker:words positionals nolint wrapcheck

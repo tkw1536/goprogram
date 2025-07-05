@@ -10,7 +10,7 @@ import (
 	"github.com/tkw1536/goprogram/exit"
 	"github.com/tkw1536/goprogram/meta"
 	"github.com/tkw1536/goprogram/parser"
-	"github.com/tkw1536/pkglib/reflectx"
+	"go.tkw01536.de/pkglib/reflectx"
 )
 
 //spellchecker:words jessevdk

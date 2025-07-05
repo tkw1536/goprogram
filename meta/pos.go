@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/tkw1536/pkglib/text"
+	"go.tkw01536.de/pkglib/text"
 )
 
 // Positional holds meta-information about a positional argument.

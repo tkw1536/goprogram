@@ -7,7 +7,7 @@ import (
 	"io"
 	"slices"
 
-	"github.com/tkw1536/pkglib/text"
+	"go.tkw01536.de/pkglib/text"
 )
 
 // Flag holds meta-information about a single flag of a command.
