@@ -1,4 +1,4 @@
-module github.com/tkw1536/goprogram
+module go.tkw01536.de/goprogram
 
 go 1.24.4
 

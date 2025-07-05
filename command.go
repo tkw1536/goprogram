@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"slices"
 
-	"github.com/tkw1536/goprogram/exit"
-	"github.com/tkw1536/goprogram/meta"
-	"github.com/tkw1536/goprogram/parser"
+	"go.tkw01536.de/goprogram/exit"
+	"go.tkw01536.de/goprogram/meta"
+	"go.tkw01536.de/goprogram/parser"
 	"go.tkw01536.de/pkglib/reflectx"
 )
 

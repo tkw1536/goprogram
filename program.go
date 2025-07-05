@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/tkw1536/goprogram/exit"
-	"github.com/tkw1536/goprogram/meta"
+	"go.tkw01536.de/goprogram/exit"
+	"go.tkw01536.de/goprogram/meta"
 	"go.tkw01536.de/pkglib/stream"
 )
 

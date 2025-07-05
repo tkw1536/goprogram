@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/tkw1536/goprogram/meta"
-	"github.com/tkw1536/goprogram/parser"
+	"go.tkw01536.de/goprogram/meta"
+	"go.tkw01536.de/goprogram/parser"
 )
 
 func TestNewFlag(t *testing.T) {

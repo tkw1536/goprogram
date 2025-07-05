@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/tkw1536/goprogram/meta"
-	"github.com/tkw1536/goprogram/parser"
+	"go.tkw01536.de/goprogram/meta"
+	"go.tkw01536.de/goprogram/parser"
 )
 
 //spellchecker:words positionals tpcu nolint testpackage

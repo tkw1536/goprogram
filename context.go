@@ -5,7 +5,7 @@ package goprogram
 import (
 	"context"
 
-	"github.com/tkw1536/goprogram/parser"
+	"go.tkw01536.de/goprogram/parser"
 	"go.tkw01536.de/pkglib/stream"
 )
 

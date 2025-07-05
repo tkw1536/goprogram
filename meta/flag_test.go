@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tkw1536/goprogram/meta"
+	"go.tkw01536.de/goprogram/meta"
 )
 
 func TestFlag_WriteSpecTo(t *testing.T) {
