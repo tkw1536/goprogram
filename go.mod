@@ -1,6 +1,6 @@
 module go.tkw01536.de/goprogram
 
-go 1.24.4
+go 1.24.5
 
 require (
 	al.essio.dev/pkg/shellescape v1.6.0
