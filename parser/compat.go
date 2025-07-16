@@ -47,7 +47,11 @@ func NewFlag(option *flags.Option) (flag meta.Flag) {
 
 // AllFlags is a convenience method to get all flags for the provided argument type.
 func AllFlags[T any]() []meta.Flag {
-	data := new(T)
+	return AllFlagsOf(new(T))
+}
+
+// AllFlagsOf is a convenience method to get all flags of the provided argument.
+func AllFlagsOf(data any) []meta.Flag {
 	return Parser{
 		parser: flags.NewParser(data, flags.None),
 		tp:     reflect.TypeOf(data).Elem(),
