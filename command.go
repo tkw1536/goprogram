@@ -59,8 +59,6 @@ type Description[F any, R Requirement[F]] struct {
 	Command     string
 	Description string
 
-	ParserConfig parser.Config // information about how to configure a parser for this command
-
 	// Requirements on the environment to be able to run the command
 	Requirements R
 }

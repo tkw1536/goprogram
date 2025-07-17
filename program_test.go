@@ -16,7 +16,6 @@ import (
 
 	"go.tkw01536.de/goprogram/exit"
 	"go.tkw01536.de/goprogram/meta"
-	"go.tkw01536.de/goprogram/parser"
 	"go.tkw01536.de/pkglib/stream"
 	"go.tkw01536.de/pkglib/testlib"
 )
@@ -293,7 +292,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name: "'fake' with unknown argument (not allowed)",
 			args: []string{"fake", "--argument-not-declared"},
-			desc: iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: false}},
+			desc: iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct {
 				Args []string
 			}](),
@@ -305,8 +304,8 @@ func TestProgram_Main(t *testing.T) {
 
 		{
 			name: "'fake' with unknown argument (allowed)",
-			args: []string{"fake", "--argument-not-declared"},
-			desc: iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			args: []string{"fake", "--", "--argument-not-declared"},
+			desc: iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct {
 				Args []string
 			}](),
@@ -378,8 +377,8 @@ func TestProgram_Main(t *testing.T) {
 
 		{
 			name:        "'fake' with non-global argument with identical name",
-			args:        []string{"--", "fake", "--global-one"},
-			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			args:        []string{"--", "fake", "--", "--global-one"},
+			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{ Args []string }](),
 
 			wantStdout: "Got Flags: { }\nGot Pos: {[--global-one]}\nwrite to stdout\n",
@@ -390,7 +389,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:        "'fake' with parsed short argument",
 			args:        []string{"fake", "-o", "message"},
-			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{ Args []string }](),
 
 			wantStdout: "Got Flags: { }\nGot Pos: {[]}\nmessage\n",
@@ -401,7 +400,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:        "'fake' with non-parsed short argument",
 			args:        []string{"fake", "--", "--s", "message"},
-			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{ Args []string }](),
 
 			wantStdout: "Got Flags: { }\nGot Pos: {[--s message]}\nwrite to stdout\n",
@@ -412,7 +411,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:        "'fake' with parsed long argument",
 			args:        []string{"fake", "--stdout", "message"},
-			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{ Args []string }](),
 
 			wantStdout: "Got Flags: { }\nGot Pos: {[]}\nmessage\n",
@@ -423,7 +422,7 @@ func TestProgram_Main(t *testing.T) {
 		{
 			name:        "'fake' with non-parsed long argument",
 			args:        []string{"fake", "--", "--stdout", "message"},
-			desc:        iDescription{Requirements: reqAny, ParserConfig: parser.Config{IncludeUnknown: true}},
+			desc:        iDescription{Requirements: reqAny},
 			positionals: makeTPM_Positionals[struct{ Args []string }](),
 
 			wantStdout: "Got Flags: { }\nGot Pos: {[--stdout message]}\nwrite to stdout\n",

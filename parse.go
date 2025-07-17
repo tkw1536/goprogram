@@ -73,7 +73,7 @@ var errParseArgCount = exit.NewErrorWithCode("wrong number of positional argumen
 func (context *Context[E, P, F, R]) use(command Command[E, P, F, R]) error {
 	context.Description = command.Description()
 
-	context.parser = context.Description.ParserConfig.NewCommandParser(command)
+	context.parser = parser.NewCommandParser(command)
 
 	// specifically intercept the "--help" and "-h" arguments.
 	// this prevents any kind of side effect from occurring.
